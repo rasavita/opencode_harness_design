@@ -235,6 +235,7 @@ The other commands below are still available, but the harness should usually rou
 | `/pr-respond <pr#>` | A harness PR has red CI or review comments | Polls checks + comments, classifies via the self-healing table, fixes, pushes, replies with evidence; bounded and budget-metered; never merges |
 | `/status` | See progress | Reads current pipeline state; also available as `npm run status` |
 | `/agent-readiness` | Is this codebase ready for heavy AI-agent use? | 8-pillar synthesis dashboard over signals the harness already collects; also available as `npm run agent-readiness` |
+| `/eject` | App is done; you want an app-only repo | Removes (or copies away with `--out <dir>`) the fixed harness footprint from a scaffolded project — `.opencode/`, `specs/`, `sprint-contracts/`, root control files, harness docs. Dry-run by default; `node .opencode/scripts/eject.js` works without a session |
 
 ## Approval Modes
 

@@ -431,12 +431,14 @@
     "scaffold": {
       "why": "Project initialization + harness distribution. Separate lifecycle from the SDLC lanes.",
       "skill": [
+        "eject",
         "fix-from-diagnostics",
         "scaffold-upgrade"
       ],
       "agent": [],
       "script": [
         "diagnostics-shard",
+        "eject",
         "scaffold-apply",
         "scaffold-copy",
         "scaffold-encoding",
