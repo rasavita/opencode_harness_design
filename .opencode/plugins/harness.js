@@ -93,7 +93,10 @@ function hooksFor(manifest, eventName, toolName) {
 
 function runHookScript(script, payload, projectDir, timeoutMs) {
   return new Promise((resolve) => {
-    const child = spawn(process.execPath, [script], {
+    // Not process.execPath: under opencode that is the bundled bun/opencode
+    // binary, not node, and the spawn would fail open. The manifest commands
+    // are `node "$OPENCODE_PROJECT_DIR/..."`, so run them with node.
+    const child = spawn("node", [script], {
       cwd: projectDir,
       env: {
         ...process.env,
