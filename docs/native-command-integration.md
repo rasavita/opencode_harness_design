@@ -1,5 +1,11 @@
 # Native Claude Code Command Integration — Proposal
 
+> **Port note (opencode):** this proposal predates the opencode port and analyzes Claude
+> Code's native commands (`/review`, `/simplify`, `/loop`, …), which opencode does not
+> ship. It is kept for the rationale behind the `/review` → `/gate` rename and the
+> command-boundary rule; under opencode the `/refactor` mechanical-cleanup step runs as
+> a direct simplify sweep instead of delegating to native `/simplify`.
+
 **Status:** Draft proposal (analysis artifact — not product code, no SDLC pipeline)
 **Date:** 2026-06-14
 **Question:** Where does the harness duplicate Claude Code's out-of-the-box commands, and how do we leverage native commands to make the harness a solid software engineer?

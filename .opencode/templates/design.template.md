@@ -10,7 +10,7 @@
 └─────────────────────┬───────────────────────────────────────┘
                       │ slash commands
 ┌─────────────────────▼───────────────────────────────────────┐
-│                   Orchestrator (Claude)                      │
+│                  Orchestrator (opencode)                     │
 │  /brd → /spec → /design → /build → /test → /evaluate        │
 └──┬──────────┬──────────┬──────────┬──────────┬──────────────┘
    │          │          │          │          │
@@ -79,7 +79,7 @@ One consolidated hook per event (each dispatches its checks in-process from `.op
 | `UserPromptSubmit · Stop · SubagentStop` | `record-run.js` | no | Telemetry journal — off the per-edit hot path |
 | `Stop` | `review-on-stop.js` | yes | Force clean-code + security reviewer before turn ends (consumes `pending-reviews.jsonl`); emits session-learnings advisories when clean |
 
-Commit-time gates are real **git hooks** (installed in Step 8), not Claude Code hooks — they block the commit before it exists and fire once however the commit was invoked:
+Commit-time gates are real **git hooks** (installed in Step 8), not harness session hooks — they block the commit before it exists and fire once however the commit was invoked:
 
 | Git hook | Purpose |
 |---|---|
@@ -100,7 +100,7 @@ Commit-time gates are real **git hooks** (installed in Step 8), not Claude Code 
    /tdd-guard:setup        # registers its own PreToolUse hook + configures reporters
    ```
 
-   Add the matching reporter — pytest: `uv add --dev tdd-guard-pytest`; vitest: `npm i -D tdd-guard-vitest` (add `new VitestReporter(path.resolve(__dirname))` to `vitest.config.ts`); jest: `npm i -D tdd-guard-jest`. It stores state in `.opencode/tdd-guard/data/` (git-ignored) and uses the Claude Code session model by default (`VALIDATION_CLIENT=sdk`; set `VALIDATION_CLIENT=api` + `TDD_GUARD_ANTHROPIC_API_KEY` for CI). Toggle mid-session with `tdd-guard on` / `tdd-guard off`.
+   Add the matching reporter — pytest: `uv add --dev tdd-guard-pytest`; vitest: `npm i -D tdd-guard-vitest` (add `new VitestReporter(path.resolve(__dirname))` to `vitest.config.ts`); jest: `npm i -D tdd-guard-jest`. It stores state in `.opencode/tdd-guard/data/` (git-ignored); use `VALIDATION_CLIENT=api` + `TDD_GUARD_ANTHROPIC_API_KEY` (its `sdk` default requires a Claude Code session, which opencode is not). Toggle mid-session with `tdd-guard on` / `tdd-guard off`.
 
    > Do **not** also add a `tdd-guard` command to `settings.json` — `/tdd-guard:setup` registers its own PreToolUse hook, and a hand-added duplicate would double-invoke it (an uninstalled binary would error on every edit). The harness's `pre-write-gate` and tdd-guard coexist as separate PreToolUse hooks.
 

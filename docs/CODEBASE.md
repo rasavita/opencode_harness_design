@@ -5,7 +5,7 @@
 
 ## What this system is
 
-A Claude Code plugin for building and changing software with a generator/evaluator loop, ratcheting quality gates, and explicit human review before merge.
+An [opencode](https://opencode.ai) harness for building and changing software with a generator/evaluator loop, ratcheting quality gates, and explicit human review before merge.
 
 _Source: `README.md`_
 
@@ -13,8 +13,8 @@ _Source: `README.md`_
 
 | Metric | Value |
 |---|---|
-| Indexed files | 482 |
-| Graph edges | 2222 |
+| Indexed files | 0 |
+| Graph edges | 0 |
 | Concept pages | 20 |
 | Wiki cluster pages | 20 |
 
@@ -31,27 +31,11 @@ npm run ask -- "..."     # ask the codebase
 
 ## Architecture (hub modules)
 
-| Module | fan-in | fan-out |
-|---|---|---|
-| `test/helpers/hook-fixture.js` | 25 | 0 |
-| `test/helpers/skill-corpus.js` | 24 | 0 |
-| `test/e2e/helpers/opencode-runner.js` | 17 | 0 |
-| `test/e2e/helpers/project-suite.js` | 9 | 0 |
-| `test/helpers/pre-commit-fixtures.js` | 9 | 0 |
-| `symphony_clone/src/orchestrator/scheduler.js` | 7 | 6 |
-| `test/helpers/pack-membership.js` | 6 | 0 |
-| `symphony_clone/src/config.js` | 5 | 0 |
-| `symphony_clone/src/orchestrator/workspace-manager.js` | 5 | 0 |
-| `test/e2e/helpers/fresh-project.js` | 5 | 0 |
-| `test/helpers/record-run-fixture.js` | 5 | 0 |
-| `test/e2e/full-auto-output/src/server.js` | 4 | 1 |
+_No hubs yet — run `/code-map` or wait for graph-refresh._
 
 ## Entry points
 
-- `test/e2e/brownfield-run-output/main.js`
-- `test/evals/fixtures/clean-app/app.js`
-- `test/fixtures/code-index/enterprise/main.go`
-- `test/fixtures/code-index/sample/api/users.py`
+_No route/main entrypoints detected in the graph._
 
 ## Concept pages (clusters)
 

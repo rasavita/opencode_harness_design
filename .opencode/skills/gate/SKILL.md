@@ -1,6 +1,6 @@
 ---
 name: gate
-description: "Run the adaptive pre-merge quality gate: deterministic checks, evaluator, diff review, and security review only when the diff crosses a security/data/API boundary. (Renamed from /review to avoid colliding with Claude Code's native /review PR-review command.)"
+description: "Run the adaptive pre-merge quality gate: deterministic checks, evaluator, diff review, and security review only when the diff crosses a security/data/API boundary. (Named /gate rather than /review so it can never collide with a PR-review command — the Claude Code ancestor had a native /review.)"
 argument-hint: "[story-id]"
 context: fork
 ---
@@ -18,8 +18,9 @@ On-demand, pre-merge entry point to the harness's **one** quality gate. It keeps
 /gate E3-S1      # reviews a specific story and its group
 ```
 
-> **Not** Claude Code's native `/review` (which reviews a GitHub PR). This is the harness's
-> local pre-merge quality gate. See the command-boundary notes in `README.md`.
+> **Not** a PR review — the Claude Code ancestor's native `/review` reviewed a GitHub PR,
+> which is why this kept the `/gate` name. This is the harness's local pre-merge quality
+> gate. See the command-boundary notes in `README.md`.
 
 ## Execution
 

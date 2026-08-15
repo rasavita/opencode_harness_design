@@ -60,7 +60,7 @@ node .opencode/scripts/unattended-preflight.js
 
 The certification must be current and match the exact unattended policy and
 enforcement sources. Both commands must pass before any delegation. Preflight
-verifies a fail-closed Claude sandbox,
+verifies a fail-closed sandbox,
 subprocess credential scrubbing, a deny-by-default egress policy, container/CI
 or externally attested isolation, absence of mounted host credential stores,
 and required security scanners. A warning is not sufficient in headless mode.

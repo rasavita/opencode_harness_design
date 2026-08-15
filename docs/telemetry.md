@@ -1,10 +1,10 @@
 # Telemetry — Setup and Reference
 
-Telemetry is **on by default in scaffolded projects**. `/scaffold` bakes the OTEL/Pushgateway env vars into the new project's `.opencode/settings.json` and `.opencode/settings.auto.json`, so Claude Code exports metrics and the `record-run.js` hook pushes harness metrics from the first run. Nothing in the build loop depends on it: the push has a 2s timeout and swallows connection errors, so until you start the stack it simply no-ops. To actually see dashboards you start the stack (below) and restart the session. (The harness's *own* repo stays telemetry-off; only the projects it scaffolds default on.) To turn it **off** for a project, remove the `HARNESS_ENABLE_TELEMETRY` / `OTEL_*` / `HARNESS_PUSHGATEWAY_URL` keys from its `settings.json`. (The quick version is in the README's "Telemetry" section.)
+Telemetry is **on by default in scaffolded projects**. `/scaffold` bakes the OTEL/Pushgateway env vars into the new project's `.opencode/settings.json` and `.opencode/settings.auto.json`; the harness plugin adapter applies that `env` block to every hook process, so the `record-run.js` hook pushes harness metrics from the first run. Nothing in the build loop depends on it: the push has a 2s timeout and swallows connection errors, so until you start the stack it simply no-ops. To actually see dashboards you start the stack (below) and restart the session. (The harness's *own* repo stays telemetry-off; only the projects it scaffolds default on.) To turn it **off** for a project, remove the `HARNESS_ENABLE_TELEMETRY` / `OTEL_*` / `HARNESS_PUSHGATEWAY_URL` keys from its `settings.json`. (The quick version is in the README's "Telemetry" section.)
 
 ## Start the telemetry stack (one per team)
 
-The telemetry stack runs as a shared service. Start it once — every team member points their Claude Code instance to it.
+The telemetry stack runs as a shared service. Start it once — every team member points their opencode instance to it.
 
 ```bash
 docker compose -f telemetry_docker_compose.yml up -d
@@ -14,7 +14,7 @@ This launches four services:
 
 | Service | Port | Purpose |
 |---|---|---|
-| OTEL Collector | 4317 (gRPC), 4318 (HTTP) | Receives native Claude Code OTLP metrics |
+| OTEL Collector | 4317 (gRPC), 4318 (HTTP) | Receives OTLP metrics from runtimes that export them (opencode does not export native metrics; the collector serves runtimes that do, e.g. Claude Code) |
 | Prometheus | 9090 | Stores and queries all metrics |
 | Pushgateway | 9091 | Receives harness-custom metrics from each developer |
 | **Grafana** | **3001** | **Dashboards — open `http://localhost:3001`** |
@@ -39,7 +39,7 @@ Anonymous read access is enabled — team members can view dashboards without lo
 
 ## The telemetry env vars in `settings.json`
 
-Claude Code reads env vars from `.opencode/settings.json`, not from `.env` files. A fresh scaffold **writes these for you** (into both `settings.json` and `settings.auto.json`) — this section is for confirming them, or re-adding them if you turned telemetry off and want it back.
+The harness plugin adapter (`.opencode/plugins/harness.js`) applies the `env` block of `.opencode/settings.json` to every hook process (the launching shell's environment wins on conflict). A fresh scaffold **writes these for you** (into both `settings.json` and `settings.auto.json`) — this section is for confirming them, or re-adding them if you turned telemetry off and want it back.
 
 Open `.opencode/settings.json` and confirm the `env` block contains:
 
@@ -56,17 +56,17 @@ Open `.opencode/settings.json` and confirm the `env` block contains:
 }
 ```
 
-**Why `settings.json` and not `.env`?** Claude Code only loads environment variables from `settings.json`. A `.env` file is also created for shell scripts and documentation, but **`settings.json` is what actually activates telemetry in Claude Code sessions.**
+**Why `settings.json` and not `.env`?** The hook processes are spawned by the plugin adapter, which reads `settings.json#env` — opencode itself does not load `.env` into hooks. A `.env` file is also created for shell scripts and documentation, but **`settings.json` is what actually activates hook telemetry in opencode sessions.**
 
 **Every team member must have their own `HARNESS_USER`** in their `settings.json`. If `HARNESS_USER` is not set, the hook falls back to `git config user.name`, then OS username.
 
-After changing `.opencode/settings.json`, restart the active Claude Code session before expecting new hook telemetry. Claude Code may keep the previous hook configuration for an already-running session, so newly added `UserPromptSubmit` / `PostToolUse` telemetry hooks may not fire until the session is restarted.
+After changing `.opencode/settings.json`, restart the active opencode session before expecting new hook telemetry — the plugin re-reads the manifest per dispatch, but a restart guarantees a clean slate for an already-running session.
 
 **What flows where:**
 
 | Metric source | Activated by | Pushed to |
 |---|---|---|
-| Native OTEL (tokens, cost, LOC, commits, PRs) | `HARNESS_ENABLE_TELEMETRY=1` in `settings.json` | OTEL Collector → Prometheus |
+| Native OTEL (tokens, cost, LOC, commits, PRs) | a runtime that exports OTLP (not opencode; inherited from the Claude Code ancestor) | OTEL Collector → Prometheus |
 | Harness-custom (lanes, agents, turns, reviews) | `record-run.js` hook (pushes only when `HARNESS_PUSHGATEWAY_URL` is set) | Pushgateway → Prometheus |
 | JSONL run receipts | `record-run.js` hook (always active) | `.opencode/runs/YYYY-MM-DD.jsonl` (local) |
 | Commit trailers | `prepare-commit-msg` git hook (always active) | Git commit messages |
@@ -84,7 +84,7 @@ For a remote shared telemetry server, change the URLs in `settings.json`:
 
 Two sources of metrics land in Prometheus. Both are queryable from `http://localhost:9090/query`.
 
-**Source 1 — Native Claude Code metrics** (via OTEL Collector):
+**Source 1 — Native runtime metrics** (via OTEL Collector — only exported by runtimes with built-in OTEL, e.g. Claude Code; opencode does not export these, so expect this table to be empty under opencode):
 
 | Prometheus metric name | What it covers |
 |---|---|
@@ -97,7 +97,7 @@ Two sources of metrics land in Prometheus. Both are queryable from `http://local
 | `claude_code_code_edit_tool_decision_total` | Tool accept/reject rates |
 | `claude_code_active_time_seconds_total` | User vs CLI active time (seconds) |
 
-These appear after you run a Claude Code session with the `.env` loaded.
+These appear only when a session runs under a runtime that exports native OTLP metrics.
 
 **Source 2 — Harness-custom metrics** (via Pushgateway):
 
@@ -126,7 +126,7 @@ Every commit gets: `Harness-Lane:`, `Harness-Mode:`, `Harness-Iteration:`, `Harn
 
 1. Open `http://localhost:9090/targets` in your browser
 2. You should see two targets, both showing **UP**:
-   - `otel-collector` (port 8889) — native Claude Code metrics
+   - `otel-collector` (port 8889) — native runtime OTLP metrics (empty under opencode)
    - `harness-pushgateway` (port 9091) — harness-custom metrics
 3. If either shows **DOWN**, check that `docker compose -f telemetry_docker_compose.yml up -d` is running
 
@@ -147,7 +147,7 @@ harness_agent_runs_total{
   user="Chaminda Wijayasundara",  ← who pushed this metric (from HARNESS_USER / git config)
   agent="generator",              ← which agent ran
   exit="ok",                      ← succeeded or failed ("ok" / "error")
-  instance="abc-123",             ← Claude Code session ID
+  instance="abc-123",             ← session ID
   job="claude_harness",           ← always "claude_harness"
   kind="subagent",                ← event type (subagent / subagent_stop)
   lane="change",                  ← which lane (/change, /vibe, /auto, etc.)
@@ -208,7 +208,7 @@ A single metric like this:
 harness_agent_runs_total{user="Alice", agent="generator", exit="ok", lane="improve", mode="full", group="group-01"} 1
 ```
 
-Tells you: **Alice's** Claude Code instance ran the **generator** agent once, it **succeeded** (`exit="ok"`), was working in the **/change** lane, using **full** execution mode, on dependency **group-01**.
+Tells you: **Alice's** opencode instance ran the **generator** agent once, it **succeeded** (`exit="ok"`), was working in the **/change** lane, using **full** execution mode, on dependency **group-01**.
 
 A metric like this:
 
@@ -347,7 +347,7 @@ These metrics are operational diagnostics, not evidence for a productivity
 multiplier. To evaluate a claim such as “8x”, use the matched study described in
 `docs/productivity-study.md`.
 
-### Cost tracking (native OTEL — available once Claude Code sessions run with .env)
+### Cost tracking (native OTEL — only for runtimes that export these metrics; opencode does not)
 
 ```promql
 sum(max_over_time(claude_code_cost_usage_USD_total[24h]))                  -- total USD / day
@@ -395,7 +395,7 @@ for r in json.load(sys.stdin)['data']['result']:
 | `docker compose -f telemetry_docker_compose.yml up` fails | Ensure Docker is running. Check image pulls with `docker pull prom/prometheus:v3.2.1` |
 | No metrics in Prometheus | Verify OTEL env vars are set. Check `http://localhost:9090/targets` — both jobs should show UP |
 | Pushgateway metrics missing | `record-run.js` pushes fire-and-forget. Verify Pushgateway is reachable: `curl http://localhost:9091/metrics` |
-| Stories/files are being written but dashboard metrics are not moving | Restart the active Claude Code session after updating `.opencode/settings.json`; hook configuration may not reload mid-session |
+| Stories/files are being written but dashboard metrics are not moving | Restart the active opencode session after updating `.opencode/settings.json`; hook configuration may not reload mid-session |
 | Grafana shows no data | Open `http://localhost:3001`, go to a dashboard panel, click Edit, verify the datasource is "Prometheus" and the query returns data |
 | Metrics have no `user` label | Set `HARNESS_USER` in `.env` or verify `git config user.name` returns your name |
 

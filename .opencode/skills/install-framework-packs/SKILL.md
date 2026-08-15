@@ -7,7 +7,7 @@ context: fork
 
 # Install Framework Skill Packs
 
-`/scaffold` records the user's chosen framework packs in `project-manifest.json` under `framework_skill_packs`, then prints normal-terminal install commands. The Claude Code auto-mode classifier blocks external GitHub installs as a safety gate (independent of `settings.json` allowlist), so this skill does not attempt to run `npx skills add` from inside Claude Code.
+`/scaffold` records the user's chosen framework packs in `project-manifest.json` under `framework_skill_packs`, then prints normal-terminal install commands. Agent auto-mode blocks external GitHub installs as a safety gate (independent of the `settings.json` allowlist), so this skill does not attempt to run `npx skills add` from inside the session.
 
 This skill is the one-command path to verify those installs. It is idempotent and safe to run repeatedly.
 
@@ -75,7 +75,7 @@ For each missing or partial pack, print this verbatim — substituting `<repo>`,
   [!] Pack pending manual install: <repo>
 ═══════════════════════════════════════════════════════════════════════════════
 
-  Open a normal terminal (NOT Claude Code) and run:
+  Open a normal terminal (NOT the agent session) and run:
 
     cd <project-root>
     npx --yes skills add <repo> -a opencode -s '*' -y
@@ -84,7 +84,7 @@ For each missing or partial pack, print this verbatim — substituting `<repo>`,
 
     ls .opencode/skills/ | grep '^<prefix>'
 
-  Then come back to Claude Code and run `/install-framework-packs` again
+  Then come back to the session and run `/install-framework-packs` again
   to confirm the install.
 
 ═══════════════════════════════════════════════════════════════════════════════
@@ -112,11 +112,11 @@ This is informational only — the skill does not depend on it for correctness; 
 
 ## When NOT to use this skill
 
-- The framework pack is published as a Claude Code marketplace plugin (use `enabledPlugins` in `settings.json` instead).
+- The framework pack is published as a Claude Code marketplace plugin only (register it via `enabledPlugins` in `settings.json` instead).
 - You want to install a one-off, unregistered pack from a different repository (run `npx skills add <repo> -a opencode -s '*' -y` directly instead).
 - You're auditing what's installed — `--list` is fine; otherwise use `ls .opencode/skills/` directly.
 
 ## Safety notes
 
 - The `skills` CLI runs Snyk/Socket/Gen security risk assessments and prints them before installing. Two LangChain pack skills (`deepagents-code`, `deploy`) carry a "Med Risk" Snyk flag — surface this when reporting the install result.
-- The classifier denial is doing real work: it stops the in-Claude-Code session from quietly running external code. Always route the manual install through the user's own terminal so they see the Snyk warnings and stay in the loop.
+- The install denial is doing real work: it stops the agent session from quietly running external code. Always route the manual install through the user's own terminal so they see the Snyk warnings and stay in the loop.

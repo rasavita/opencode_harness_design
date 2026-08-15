@@ -6,7 +6,7 @@ user-invocable: false
 
 # Author Prompt Surface
 
-Claude-only discipline for the harness monorepo (and any plugin that ships
+Prompt-surface discipline for the harness monorepo (and any loadout that ships
 agents/skills). Load **before** writing or rewriting a prompt surface.
 
 ## Required reading

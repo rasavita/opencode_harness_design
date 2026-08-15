@@ -49,9 +49,11 @@ everything else a model-generation change touches. A new generation is
 usually announced by the upstream-watch workflow flagging a new
 `*-migration` plugin in `anthropics/claude-code/plugins`.
 
-1. **Run Anthropic's migration plugin first, if one shipped** (e.g.
-   `claude-opus-4-5-migration`). Apply the model-string changes only; defer
-   its prompt adjustments until step 3 shows they're needed.
+1. **Check Anthropic's migration plugin first, if one shipped** (e.g.
+   `claude-opus-4-5-migration`). It targets Claude Code, so under opencode
+   read it as a checklist rather than running it: apply the model-string
+   changes it describes; defer its prompt adjustments until step 3 shows
+   they're needed.
 2. **Re-pin model tiers.** Update `.opencode/scripts/model-tier.js` presets to
    the new exact model IDs and re-run `test/model-tier.test.js` — the
    security-reviewer invariant and "exact IDs, never aliases" rules must hold.

@@ -36,7 +36,7 @@ node .opencode/scripts/cost-report.js --json     # machine
 - **Cost:** ~$ · source=estimate|receipts|mixed · worker% · model mix
 - **Navigation / token-advisor:** context savings (not API $)
 
-Enable Claude Code OTEL for authoritative cache hit rate (see `telemetry/CACHE_MONITORING.md`).
+Enable runtime OTEL export for authoritative cache hit rate (see `telemetry/CACHE_MONITORING.md`).
 
 ## Structural routing
 
@@ -65,7 +65,7 @@ node -e "console.log(require('./.opencode/scripts/team-policy').decideTeamMode({
 }
 ```
 
-Fail-open without symbol ranges. Escape: set `HARNESS_TOKEN_GOVERNOR=off` **in the session environment** (before launching `claude`) or `mode: off` in the manifest. An inline `HARNESS_TOKEN_GOVERNOR=off <cmd>` prefix does **not** bypass — the PreToolUse hook reads the session env, not the child command's. For verbose commands under `enforced`, run them through `run-compact.js` (below) rather than disabling the governor.
+Fail-open without symbol ranges. Escape: set `HARNESS_TOKEN_GOVERNOR=off` **in the session environment** (before launching `opencode`) or `mode: off` in the manifest. An inline `HARNESS_TOKEN_GOVERNOR=off <cmd>` prefix does **not** bypass — the PreToolUse hook reads the session env, not the child command's. For verbose commands under `enforced`, run them through `run-compact.js` (below) rather than disabling the governor.
 
 Prefer:
 

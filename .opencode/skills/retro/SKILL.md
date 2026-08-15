@@ -115,7 +115,7 @@ Each recommendation is one JSON object:
 ```json
 {
   "id": "REC-<YYYYMMDD>-<3-digit-seq>",
-  "target": "skill:auto | gate:cycle-gate | sensor:loop-health | rule:learned-rules | manifest | claude-md | <specific file path>",
+  "target": "skill:auto | gate:cycle-gate | sensor:loop-health | rule:learned-rules | manifest | agents-md | <specific file path>",
   "change": "One paragraph: the concrete change, not the problem restated.",
   "class": "docs | sensor-tune | gate-tighten | rule-add | prompt-edit | gate-loosen | security",
   "risk": "low | med | high",

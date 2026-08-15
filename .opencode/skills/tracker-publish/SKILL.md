@@ -11,7 +11,7 @@ Publish approved story groups to an external tracker. This skill prepares the ha
 
 ## Operating Model (overview)
 
-This optional add-on mirrors approved OpenCode Harness story groups into an external tracker (Linear/Jira), then lets a standalone orchestrator schedule unblocked groups and launch Claude Code in isolated workspaces. The default scaffold remains local-only — use tracker orchestration only when a project wants Linear/Jira to act as the visible work queue and human review surface.
+This optional add-on mirrors approved OpenCode Harness story groups into an external tracker (Linear/Jira), then lets a standalone orchestrator schedule unblocked groups and launch opencode in isolated workspaces. The default scaffold remains local-only — use tracker orchestration only when a project wants Linear/Jira to act as the visible work queue and human review surface.
 
 OpenCode Harness stays the source of truth for planning and verification (`/brd` → `/spec` → `/design` → `/auto --group <id>`). The tracker is only a control plane: issue status gates whether a group may run, blocker links mirror the local dependency graph, and comments hold proof/PR links. Human review and final merge stay outside the autonomous loop. The orchestrator is external — it polls the tracker, claims eligible unblocked group issues, creates one workspace per group, launches `opencode run --auto`, reads `.opencode/state/tracker-runs/<group>/result.json`, updates the tracker, and leaves completed work in `Human Review`.
 
@@ -33,7 +33,7 @@ The `--granularity` flag chooses what becomes a tracker issue:
 | Mode | Issue maps to | When to use |
 |------|---------------|-------------|
 | `group` (default) | One tracker issue per dependency group from `dependency-graph.md`. The group issue body lists every ready story in that group, and the harness command is `/auto --group <id>` (or whatever `HARNESS_COMMAND_TEMPLATE` resolves to). | Default for `/build` projects and any work where a group is reviewed as a single PR. The agent team inside `/auto` handles per-story decomposition. |
-| `story` | One tracker issue per ready story. Each story issue carries `Story: E1-S1` plus its group ID. Group-level blockers are mirrored as `blocked_by` links between story issues. The orchestrator runs each story individually via the per-issue mode override (default `mode-vibe` for trivial stories; the publisher writes `mode-lite` or `mode-vibe` based on story metadata). | When the human reviewer wants one PR per story (smaller diffs, faster review cycle), when stories are independently shippable, or when you want different Claude commands per story (for example, `mode-vibe` for a docs story, `/auto` for an API story). |
+| `story` | One tracker issue per ready story. Each story issue carries `Story: E1-S1` plus its group ID. Group-level blockers are mirrored as `blocked_by` links between story issues. The orchestrator runs each story individually via the per-issue mode override (default `mode-vibe` for trivial stories; the publisher writes `mode-lite` or `mode-vibe` based on story metadata). | When the human reviewer wants one PR per story (smaller diffs, faster review cycle), when stories are independently shippable, or when you want different harness commands per story (for example, `mode-vibe` for a docs story, `/auto` for an API story). |
 | `single` | One tracker issue for a single brownfield story (no epic/dependency-graph prerequisites). Built by `scripts/single-story-map.js` into the same map shape `publish-to-linear.js` consumes, then published with the unchanged publisher. | Used by `/feature`'s single-story lane, where the change is one bounded story and the full `/build` artifact set (epics, dependency-graph, component-map, features.json) does not exist. |
 
 Picking the right granularity matters more than people think:
@@ -232,7 +232,7 @@ Under story granularity, the `groups` section is informational — every actual 
 
 ## Remote Publish — How Tracker Issues Actually Get Created
 
-`/tracker-publish` writes the local handoff contract (`.opencode/state/tracker-map.json` + `.opencode/state/tracker-runs/group-*.md`). It does **not** call Linear directly from Claude's tool surface. The actual remote create happens via one of three transports, picked in this order:
+`/tracker-publish` writes the local handoff contract (`.opencode/state/tracker-map.json` + `.opencode/state/tracker-runs/group-*.md`). It does **not** call Linear directly from the agent's tool surface. The actual remote create happens via one of three transports, picked in this order:
 
 1. **Linear MCP server** — if a Linear MCP is configured in the session, prefer the MCP tool (`linear:issue:create` or equivalent). MCP gives you OAuth and avoids storing the API key.
 2. **Bundled publisher script** — `node .opencode/skills/tracker-publish/scripts/publish-to-linear.js`. Self-contained Node script that:

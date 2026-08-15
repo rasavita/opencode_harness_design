@@ -103,7 +103,7 @@ All artifacts go under `specs/brownfield/`. Create the directory if missing.
 ### Step 1 — Detect Producer
 
 ```bash
-# Pseudocode — Claude evaluates these in order.
+# Pseudocode — the agent evaluates these in order.
 if python3 -c "import ast" 2>/dev/null; then
   PRODUCER=vendored-ast        # tree-sitter wheels needed for non-Python files
 elif test -f .understand-anything/knowledge-graph.json; then

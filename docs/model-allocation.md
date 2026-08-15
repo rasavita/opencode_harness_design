@@ -48,7 +48,7 @@ The harness runs a **GAN**: the generator produces, the evaluator judges. Cost f
 
 On every preset except `fusion`, `implementer` equals `generator`, so the worker role is behaviour-neutral until you opt into `fusion`.
 
-Pins are exact model IDs: `claude-opus-5`, `claude-sonnet-5`, `claude-haiku-4-5`.
+Pins are exact provider-qualified model IDs (opencode format): `anthropic/claude-opus-5`, `anthropic/claude-sonnet-5`, `anthropic/claude-haiku-4-5`, overridable via `HARNESS_MODEL_JUDGMENT` / `HARNESS_MODEL_GENERATION` / `HARNESS_MODEL_EXPLORATION`.
 
 > **Fable 5:** Removed as a live pin. `MODEL_PRICE` reserves `claude-fable-5` for a future advisor-only pin if product re-enables it — do not stamp agents with it today.
 

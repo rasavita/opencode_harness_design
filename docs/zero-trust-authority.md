@@ -23,7 +23,7 @@ an explicit receipt role:
 ```
 
 Never place the corresponding private key in the repository, agent container,
-environment, secret mount, shell history, or Claude context. In production, an
+environment, secret mount, shell history, or model context. In production, an
 approval service should read the task envelope, authenticate the human, apply
 policy, sign the receipt, and inject it into `.opencode/authority/`.
 

@@ -17,7 +17,7 @@ Design: `docs/archive/internal/PIPELINE_PROGRESS_PROPOSAL_2026-06-21.md`.
 
 ## Usage
 
-Run the script directly — it works inside or outside a Claude session, so you can
+Run the script directly — it works inside or outside an opencode session, so you can
 watch a running `/auto` from a second terminal:
 
 ```bash

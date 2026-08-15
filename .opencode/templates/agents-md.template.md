@@ -74,7 +74,7 @@ Verify: `{lsp_verify_command}`
 
 ## Large Codebase Navigation
 
-- Claude Code respects `.gitignore` for file navigation — keep it comprehensive
+- The agent's search tools respect `.gitignore` for file navigation — keep it comprehensive
 - Before broad source reads, check `specs/brownfield/wiki/WIKI.md` and `specs/brownfield/symbol-map.md`; if the wiki is a placeholder, use `specs/design/component-map.md` until source exists
 - Prefer exact line ranges from `symbol-map.md` over whole-file reads; run `node .opencode/scripts/pipeline-status.js status` if navigation freshness is unclear
 - For monorepos, add subdirectory AGENTS.md files with scoped test/lint commands

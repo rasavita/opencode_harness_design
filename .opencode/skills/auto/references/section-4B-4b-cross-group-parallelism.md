@@ -89,7 +89,7 @@ You may parallelize teammates within this group up to 5 (Rule 2 mandate). You ma
 
 ### Wait + Merge Protocol
 
-The parent dispatches all group-orchestrators in the wave in a single message (multiple `Agent` tool calls in one block — Claude Code runs them concurrently). The parent then:
+The parent dispatches all group-orchestrators in the wave in a single message (multiple `Agent` tool calls in one block — the runtime runs them concurrently). The parent then:
 
 1. Waits for all group-orchestrator subagents to return.
 2. For each returned summary, runs the roll-up steps above (in dependency-graph order, deterministic).
@@ -121,7 +121,7 @@ If `--parallel-groups N > 3`, accept it but emit a warning to the iteration log.
 ceiling: the `PreToolUse(Task)` hook `.opencode/hooks/concurrency-gate.js` counts
 in-flight subagents and **denies** a spawn that would exceed
 `max_concurrent_agents` (`project-manifest.json#execution.max_concurrent_agents`
-→ env `CLAUDE_MAX_CONCURRENT_AGENTS` → default 18), decrementing on
+→ env `HARNESS_MAX_CONCURRENT_AGENTS` → default 18), decrementing on
 `SubagentStop`. The gate counts **ALL** Task subagents, including the
 group-orchestrators themselves (which are also Task spawns). At the documented
 3-group × 5-teammate peak that is 3 orchestrators + 15 teammates = 18 concurrent

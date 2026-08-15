@@ -268,7 +268,7 @@ Approval flags and tool permissions are **two different planes**, and headless a
 | `.opencode/settings.json` | Curated interactive allowlist — prompts for risky ops | Always (default) |
 | `.opencode/settings.auto.json` | Unattended full-auto profile — no permission prompts (`Bash(*)`, `Write(*)`, … + `HARNESS_AUTO_CONTINUE=1`, agent teams) | Only when passed explicitly |
 
-Claude Code does not auto-load the auto profile; you opt in per run — `claude -p "/build docs/prd.md --auto" --settings .opencode/settings.auto.json`. It **merges over** `settings.json`, so the deterministic gate hooks (`pre-write-gate`, `pre-bash-gate`), git hooks, the `/auto` ratchet, security review, and pre-PR verify all still fire, and no PR opens over a red build.
+The harness does not auto-load the auto profile; you opt in per run — `HARNESS_SETTINGS=.opencode/settings.auto.json opencode run "/build docs/prd.md --auto"`. It **merges over** `settings.json`, so the deterministic gate hooks (`pre-write-gate`, `pre-bash-gate`), git hooks, the `/auto` ratchet, security review, and pre-PR verify all still fire, and no PR opens over a red build.
 
 **Isolation boundary required:** `Bash(*)` still permits *reading* host secrets (`~/.ssh`, cloud creds) and network egress — the gate hooks only constrain writes. This is the productized form of Bun's cgroup-isolation caveat above: run the auto profile only inside a container / CI runner / VM with no host secrets mounted and limited egress. Never promote it to the default `settings.json`.
 

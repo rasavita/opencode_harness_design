@@ -701,7 +701,7 @@ Read `.opencode/templates/agents-md.template.md`, fill in `{project-name}`, `{de
 
 ### Step 5.B: Generate Subdirectory AGENTS.md Files (monorepo/multi-module projects)
 
-If the project has separate `backend/` and `frontend/` directories (presets A, B, C), generate scoped AGENTS.md files for each subdirectory. These load additively as Claude navigates the tree.
+If the project has separate `backend/` and `frontend/` directories (presets A, B, C), generate scoped AGENTS.md files for each subdirectory. These load additively as the agent navigates the tree.
 
 - **backend/AGENTS.md** (Python projects): copy `.opencode/templates/backend-agents-md.template.md`, then tailor the test/lint commands and conventions to the actual stack.
 - **frontend/AGENTS.md** (TypeScript projects): copy `.opencode/templates/frontend-agents-md.template.md`, then tailor the same way.
@@ -795,7 +795,7 @@ docker compose -f telemetry_docker_compose.yml up -d
 # OTEL collector :4317 · Prometheus :9090 · Pushgateway :9091 · Grafana :3001 (admin/harness)
 ```
 
-The stack (`telemetry_docker_compose.yml`, `telemetry/` configs, dashboards) is copied only in telemetry mode. After starting it, restart the Claude session so the env block is picked up. Each teammate can set `HARNESS_USER` to label their metrics; left unset, the `record-run` hook derives it from git `user.name` / the OS user. Full setup, the metric catalog, and PromQL queries: **`docs/telemetry.md`** (copied into the project). To turn telemetry off again, remove the `HARNESS_ENABLE_TELEMETRY` / `OTEL_*` / `HARNESS_PUSHGATEWAY_URL` keys from settings.
+The stack (`telemetry_docker_compose.yml`, `telemetry/` configs, dashboards) is copied only in telemetry mode. After starting it, restart the opencode session so the env block is picked up. Each teammate can set `HARNESS_USER` to label their metrics; left unset, the `record-run` hook derives it from git `user.name` / the OS user. Full setup, the metric catalog, and PromQL queries: **`docs/telemetry.md`** (copied into the project). To turn telemetry off again, remove the `HARNESS_ENABLE_TELEMETRY` / `OTEL_*` / `HARNESS_PUSHGATEWAY_URL` keys from settings.
 
 Write `.gitignore` by copying the template:
 

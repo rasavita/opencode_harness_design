@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Token Usage Optimizer reduces Claude Code Enterprise spend by making the harness
+Token Usage Optimizer reduces enterprise model spend by making the harness
 intentional about what context reaches the model. It builds on Token Governor v1
 (`docs/token-governor.md`), which already keeps a living DeepWiki/code-map fresh
 from `/scaffold` onward.
@@ -33,7 +33,7 @@ verbose commands. Hard blocking remains future work.
 
 ## Non-Goals
 
-- No Claude traffic proxy in the default implementation.
+- No model-traffic proxy in the default implementation.
 - No lossy compression of source files or final PR diffs.
 - No embeddings in v1 of the context-access layer. Deterministic graph/wiki
   retrieval comes first; embeddings can be added later if recall is insufficient.
@@ -230,7 +230,7 @@ Output:
 ### 4. Local CCR Optimizer
 
 Local CCR is the scaffold-native version of Headroom's reversible compression
-pattern. It does not proxy Claude traffic. Instead, it targets the highest-token
+pattern. It does not proxy model traffic. Instead, it targets the highest-token
 local inputs before they become agent context: command output, logs, search
 results, and broad local artifacts.
 
@@ -365,7 +365,7 @@ Future telemetry:
 - `harness_verbose_command_warnings_total`
 - `harness_navigation_stale_warnings_total`
 
-All savings are estimates unless native Claude Code token metrics are available
+All savings are estimates unless native runtime token metrics are available
 through OTEL. Estimated values must be labelled as estimates in UI and docs.
 
 ## Safety

@@ -15,9 +15,9 @@ This doc is the single place that names:
 | **harness-lite** | Disposable artifacts only (mockups, ARB docs, research) | Artifact lanes; no SDLC, no GAN, no quality hooks |
 | **harness-core** | Default product teams | Build / feature / gate spine + brownfield discipline; lean plugin allowlist |
 | **harness-full** | Teams that want the full optional surface | Core + optional skills (framework packs, verticals), full plugin set, telemetry templates |
-| **symphony** *(future product boundary)* | Headless tracker → PR factory | Orchestrator outside Claude Code; not part of core install |
+| **symphony** *(future product boundary)* | Headless tracker → PR factory | Orchestrator outside the agent session; not part of core install |
 
-The monorepo is the source of truth. **Packaging emit is live** (`npm run package:skus` → `dist/skus/<sku>`). Load a built tree with `claude --plugin-dir dist/skus/harness-core`. Marketplace/registry publish remains a follow-on; the vocabulary above is stable.
+The monorepo is the source of truth. **Packaging emit is live** (`npm run package:skus` → `dist/skus/<sku>`). Load a built tree with `cd dist/skus/harness-core && opencode`. Registry/tarball publish remains a follow-on; the vocabulary above is stable.
 
 **Symphony** (`symphony_clone/`) is a separate product boundary (tracker orchestrator). It is not part of harness-core / lite / full SKUs — see [`docs/symphony-product.md`](symphony-product.md).
 

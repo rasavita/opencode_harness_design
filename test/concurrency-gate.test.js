@@ -46,9 +46,9 @@ test('normalizeState defaults malformed input to empty', () => {
 
 test('resolveCap precedence: manifest > env > default 18', () => {
   assert.strictEqual(resolveCap({ execution: { max_concurrent_agents: 8 } }, {}), 8);
-  assert.strictEqual(resolveCap(null, { CLAUDE_MAX_CONCURRENT_AGENTS: '6' }), 6);
+  assert.strictEqual(resolveCap(null, { HARNESS_MAX_CONCURRENT_AGENTS: '6' }), 6);
   assert.strictEqual(resolveCap(null, {}), 18);
-  assert.strictEqual(resolveCap({ execution: {} }, { CLAUDE_MAX_CONCURRENT_AGENTS: '0' }), 18);
+  assert.strictEqual(resolveCap({ execution: {} }, { HARNESS_MAX_CONCURRENT_AGENTS: '0' }), 18);
 });
 
 // ---- wrapper integration (spawn the hook with a stdin payload) ----
@@ -67,7 +67,7 @@ test('hook denies (exit 2) a Task spawn when state is at cap', () => {
   fs.writeFileSync(path.join(dir, '.opencode', 'state', 'inflight-agents.json'),
     JSON.stringify({ active: [now, now, now] }));
   const r = runGate({ hook_event_name: 'PreToolUse', tool_name: 'Task' },
-    { OPENCODE_PROJECT_DIR: dir, CLAUDE_MAX_CONCURRENT_AGENTS: '3' });
+    { OPENCODE_PROJECT_DIR: dir, HARNESS_MAX_CONCURRENT_AGENTS: '3' });
   assert.strictEqual(r.status, 2);
   assert.match(r.stderr, /cap reached/i);
 });
@@ -75,7 +75,7 @@ test('hook denies (exit 2) a Task spawn when state is at cap', () => {
 test('hook allows (exit 0) a Task spawn under cap and records it', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-gate-'));
   const r = runGate({ hook_event_name: 'PreToolUse', tool_name: 'Task' },
-    { OPENCODE_PROJECT_DIR: dir, CLAUDE_MAX_CONCURRENT_AGENTS: '3' });
+    { OPENCODE_PROJECT_DIR: dir, HARNESS_MAX_CONCURRENT_AGENTS: '3' });
   assert.strictEqual(r.status, 0);
   const state = JSON.parse(fs.readFileSync(path.join(dir, '.opencode', 'state', 'inflight-agents.json'), 'utf8'));
   assert.strictEqual(state.active.length, 1);
@@ -99,7 +99,7 @@ test('hook denies (exit 2) an Agent spawn when state is at cap', () => {
   fs.writeFileSync(path.join(dir, '.opencode', 'state', 'inflight-agents.json'),
     JSON.stringify({ active: [now, now, now] }));
   const r = runGate({ hook_event_name: 'PreToolUse', tool_name: 'Agent' },
-    { OPENCODE_PROJECT_DIR: dir, CLAUDE_MAX_CONCURRENT_AGENTS: '3' });
+    { OPENCODE_PROJECT_DIR: dir, HARNESS_MAX_CONCURRENT_AGENTS: '3' });
   assert.strictEqual(r.status, 2);
   assert.match(r.stderr, /cap reached/i);
 });
@@ -107,7 +107,7 @@ test('hook denies (exit 2) an Agent spawn when state is at cap', () => {
 test('hook allows (exit 0) an Agent spawn under cap and records it', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-gate-'));
   const r = runGate({ hook_event_name: 'PreToolUse', tool_name: 'Agent' },
-    { OPENCODE_PROJECT_DIR: dir, CLAUDE_MAX_CONCURRENT_AGENTS: '3' });
+    { OPENCODE_PROJECT_DIR: dir, HARNESS_MAX_CONCURRENT_AGENTS: '3' });
   assert.strictEqual(r.status, 0);
   const state = JSON.parse(fs.readFileSync(path.join(dir, '.opencode', 'state', 'inflight-agents.json'), 'utf8'));
   assert.strictEqual(state.active.length, 1);

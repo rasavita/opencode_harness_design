@@ -64,13 +64,24 @@ function readSettings(file) {
 // Base manifest is .opencode/settings.json. An unattended run opts into an
 // override profile via HARNESS_SETTINGS (e.g. .opencode/settings.auto.json),
 // which merges over the base at the top level.
-function loadHookManifest(projectDir) {
+function loadSettings(projectDir) {
   const base = readSettings(path.join(projectDir, ".opencode", "settings.json"))
   const overridePath = process.env.HARNESS_SETTINGS
   const override = overridePath
     ? readSettings(path.resolve(projectDir, overridePath))
     : {}
-  return { ...base, ...override }.hooks || {}
+  return { ...base, ...override }
+}
+
+function loadHookManifest(projectDir) {
+  return loadSettings(projectDir).hooks || {}
+}
+
+// settings.json#env (harness flags like HARNESS_AUTO_CONTINUE, and the
+// telemetry OTEL/Pushgateway vars a scaffold bakes in) is applied to each
+// hook process. The launching shell's environment always wins.
+function loadHookEnv(projectDir) {
+  return loadSettings(projectDir).env || {}
 }
 
 // Extract the hook script path from a manifest command like
@@ -108,6 +119,7 @@ function runHookScript(script, payload, projectDir, timeoutMs) {
     const child = spawn("node", [script], {
       cwd: projectDir,
       env: {
+        ...loadHookEnv(projectDir),
         ...process.env,
         OPENCODE_PROJECT_DIR: projectDir,
         HARNESS_PLUGIN_ROOT: path.join(projectDir, ".opencode"),

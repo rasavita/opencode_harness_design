@@ -1,6 +1,6 @@
 # OpenCode Harness Engine v6
 
-A Claude Code plugin for building and changing software with a generator/evaluator loop, ratcheting quality gates, and explicit human review before merge.
+An [opencode](https://opencode.ai) harness for building and changing software with a generator/evaluator loop, ratcheting quality gates, and explicit human review before merge.
 
 Current version: `3.0.0`
 
@@ -19,76 +19,44 @@ Current version: `3.0.0`
 
 ## Start Here
 
-### Recommended: install as a local plugin
+### Recommended: open the repo in opencode
 
-This repo ships a **local marketplace** (`.opencode-plugin/marketplace.json`), so you can install the harness as a persistent Claude Code plugin — it stays loaded across sessions with no `--plugin-dir` flag to retype:
+opencode loads project-local plugins, agents, commands, and skills from the repo's own `.opencode/` directory ([config docs](https://opencode.ai/docs/config/)) — no install or registration step:
 
 ```bash
-git clone https://github.com/cwijayasundara/claude_harness_eng_v6.git ~/claude_harness_eng_v6
-
-# Register the local marketplace (points at your clone), then install the plugin
-claude plugin marketplace add ~/claude_harness_eng_v6
-claude plugin install claude_harness_eng_v6@opencode-harness-local
+git clone https://github.com/rasavita/opencode_harness_design.git ~/opencode_harness_design
+cd ~/opencode_harness_design && opencode
 ```
 
-`claude plugin install` defaults to `--scope user` (available in every project). Use `--scope project` to write it into a specific project's `.opencode/settings.json` (shared with everyone who clones that project), or `--scope local` for a gitignored per-project install. After pulling new commits, refresh with `claude plugin marketplace update opencode-harness-local`.
-
-Then inside Claude Code:
+Then inside opencode:
 
 ```text
 /scaffold
 ```
 
-If your Claude Code UI shows a namespaced command, use `/claude_harness_eng_v6:scaffold`.
+Opening the repo gives you every harness *command*; `/scaffold` still installs the lean `core` surface into your project by default (`/scaffold --full` for the full set). The deterministic gate hooks wire up when `/scaffold` copies `.opencode/` into a target project — the plugin adapter (`.opencode/plugins/harness.js`) is discovered automatically when opencode opens that project.
 
-Installing gives you every harness *command*; `/scaffold` still installs the lean `core` surface into your project by default (`/scaffold --full` for the full set). The deterministic gate hooks wire up when `/scaffold` copies `.opencode/` into a target project.
+#### Permissions
 
-#### Quick one-session load (no install)
-
-To try it without installing, point `--plugin-dir` at the checked-in `.opencode/` directory — the plugin root that holds `.opencode-plugin/plugin.json`. Per the [plugins reference](https://code.opencode.com/docs/en/plugins-reference#plugin-caching-and-file-resolution), this loads the plugin for the current session only:
-
-```bash
-claude --plugin-dir ~/claude_harness_eng_v6/.opencode
-```
-
-#### Optional: start in auto mode
-
-Add `--permission-mode auto` to launch a mostly-hands-off session (auto-runs actions except ones a background classifier flags — force pushes, credential leaks, prod deploys, destructive commands):
-
-```bash
-claude --permission-mode auto
-```
-
-To make it the default so you don't pass the flag each time, set it in your **user-level** `~/.opencode/settings.json`:
-
-```json
-{ "permissions": { "defaultMode": "auto" } }
-```
-
-> **Not the project's `.opencode/settings.json`.** Claude Code (v2.1.142+) *silently ignores* `defaultMode: "auto"` from a repo's `.opencode/settings.json` or `.opencode/settings.local.json` — a checked-in config is not allowed to escalate itself to auto mode (it just starts in `default`, with no error). So `auto` **cannot be scoped to a single repo** via committed settings: user-level `~/.opencode/settings.json` turns it on for *every* project, so to keep auto scoped to one repo pass the `--permission-mode auto` flag (or a shell alias) at launch instead.
-
-Modes, least → most permissive: `plan`, `default`, `acceptEdits`, `auto`, `bypassPermissions`. Prefer `auto`; reserve `bypassPermissions` (skips *all* checks) for isolated, offline containers only. Auto mode skips per-action prompts but does **not** bypass the harness's own pipeline gates (`/build` phases 1–3, `/gate` before merge).
+Tool permissions live in `opencode.json#permission` ([permissions docs](https://opencode.ai/docs/permissions/)): the curated Bash allowlist ported from the Claude Code `permissions.allow` list, with risky patterns left on `ask`. To loosen or tighten a scaffolded project, edit its `opencode.json`. Permission changes never bypass the harness's own pipeline gates (`/build` phases 1–3, `/gate` before merge) — those are enforced by the hook layer, not by opencode prompts.
 
 ### Optional: build a pruned SKU (core / full / lite)
 
-`--plugin-dir <clone>/.opencode` loads the **full** harness surface. To load a lean/pruned loadout instead — or to produce a distributable tree/tarball — build a SKU first. **`dist/` is a generated build artifact: it is gitignored and absent from a fresh clone** until you run `npm run package:skus`:
+Opening the monorepo loads the **full** harness surface. To load a lean/pruned loadout instead — or to produce a distributable tree/tarball — build a SKU first. **`dist/` is a generated build artifact: it is gitignored and absent from a fresh clone** until you run `npm run package:skus`:
 
 ```bash
 npm run package:skus
 # → dist/skus/harness-core , dist/skus/harness-lite , dist/skus/harness-full
 
-cd ~/my-project
-# Point at the packaged SKU root itself — NOT a .opencode/ subfolder.
-# package:skus flattens .opencode/* up to the package root (plugin.json lives at
-# harness-core/.opencode-plugin/), so do NOT append /.opencode here.
-claude --plugin-dir /path/to/claude_harness_eng_v6/dist/skus/harness-core
+# Each SKU is a ready-to-open opencode project (nested .opencode/ tree):
+cd /path/to/opencode_harness_design/dist/skus/harness-core && opencode
 ```
 
-| SKU | Load (`--plugin-dir`) | Use when |
+| SKU | Load | Use when |
 |---|---|---|
-| **harness-core** (default product) | `dist/skus/harness-core` | Building/changing software |
-| **harness-full** | `dist/skus/harness-full` | Need optional skills / full surface |
-| **harness-lite** | `dist/skus/harness-lite` | Mockups / ARB docs / research only |
+| **harness-core** (default product) | `cd dist/skus/harness-core && opencode` | Building/changing software |
+| **harness-full** | `cd dist/skus/harness-full && opencode` | Need optional skills / full surface |
+| **harness-lite** | `cd dist/skus/harness-lite && opencode` | Mockups / ARB docs / research only |
 
 SKU vocabulary: [docs/product-skus-and-tiers.md](docs/product-skus-and-tiers.md).  
 Publish process (marketplace / tarball / interim): [docs/marketplace-publish.md](docs/marketplace-publish.md).
@@ -165,7 +133,7 @@ lying.
 
 ### Upgrading an already-scaffolded project
 
-Inside Claude Code (scaffolded projects with the skill installed):
+Inside opencode (scaffolded projects with the skill installed):
 
 ```text
 /scaffold-upgrade
@@ -282,10 +250,10 @@ The `--auto` / `--autonomous` flags above control **approval gates** (BRD/story/
 | `.opencode/settings.json` | Curated interactive allowlist — prompts for risky ops | Always (default) |
 | `.opencode/settings.auto.json` | **Unattended full-auto profile** — no permission prompts (`Bash(*)`, `Write(*)`, `Edit(*)`, … + `HARNESS_AUTO_CONTINUE=1`, agent teams) | Only when passed explicitly |
 
-Both files are copied into every scaffolded project (`scaffold-apply.js`). Claude Code does **not** auto-load `settings.auto.json` — you opt in per run:
+Both files are copied into every scaffolded project (`scaffold-apply.js`). The plugin adapter does **not** auto-load `settings.auto.json` — you opt in per run via the `HARNESS_SETTINGS` env var (read by `.opencode/plugins/harness.js` and merged over `settings.json`):
 
 ```bash
-claude -p "/build docs/prd.md --auto" --settings .opencode/settings.auto.json
+HARNESS_SETTINGS=.opencode/settings.auto.json opencode run "/build docs/prd.md --auto"
 ```
 
 It **merges over** `settings.json`, so the deterministic gate hooks (`pre-write-gate`, `pre-bash-gate`), git hooks, the `/auto` ratchet, security review, and pre-PR verify all still fire, and no PR opens over a red build.
@@ -301,7 +269,7 @@ For long unattended PRD-to-PR runs, prefer the resilient chain launcher — see 
 - **Just re-invoke `/auto`.** It resumes from `harness-progress.txt` (the append-only progress log every iteration writes), re-reads `features.json` and git state, and runs a startup smoke check before building on prior work. Nothing needs exporting from the dead session. (Wall-clock is metered from `.opencode/state/budget-start`, which survives the dead session — a long gap counts as spend.)
 - **See where it stopped** with `/status` (or `node .opencode/scripts/pipeline-status.js status`), which reads the same state files.
 - **Budget stops are clean stops.** Every run is metered (wall-clock, agent spawns, estimated cost via `node .opencode/scripts/budget-state.js`) and stops at an iteration boundary when a cap is hit, setting `next_action: "BUDGET — …"` in `harness-progress.txt`. Raise the cap via `project-manifest.json#execution.budget` (or relaunch through `/build … --budget <spec>` / `--budget off`), then re-invoke `/auto` to resume.
-- **For long unattended PRD-to-PR runs**, prefer `node .opencode/scripts/build-chain.js docs/prd.md` — it starts a fresh `claude -p` process per build wave through the same progress file, so a killed process resumes at the next wave.
+- **For long unattended PRD-to-PR runs**, prefer `node .opencode/scripts/build-chain.js docs/prd.md` — it starts a fresh `opencode run` process per build wave through the same progress file, so a killed process resumes at the next wave.
 
 Default budget caps by model tier (`.opencode/scripts/budget-state.js`):
 
@@ -336,17 +304,18 @@ When the next unit of work is a full PRD rather than a single request, use `/spr
 
 Use `/brownfield` directly only when you want discovery without implementation. Use `/brownfield --seams "<goal>"` when you need safe cut-points before a risky change. Use `/brownfield --full` only for heavier CI/flag/perf inventory and evaluator scoring.
 
-## Harness vs native Claude Code commands
+## Harness vs native commands
 
-| Need | Native Claude Code | Harness |
-|---|---|---|
-| Review a GitHub PR | `/review` | Use native `/review` |
-| Run blocking pre-merge quality checks | - | `/gate` |
-| Eyeball/run the app | `/run`, `/verify` | `/evaluate` when you need scored verification |
-| Mechanical cleanup | `/simplify` | `/refactor` wraps `/simplify` with behavior-preservation gates |
-| Generate only AGENTS.md | `/init` | `/scaffold` for full harness bootstrap |
+The harness inherited a command-boundary rule from its Claude Code ancestry: native commands own atomic actions; the harness owns orchestration, ratcheting, and writer/grader separation. Under opencode the native surface is smaller (`/init` generates AGENTS.md; there is no native `/review` or `/simplify`), so the harness commands carry the whole table:
 
-Rule: native commands own atomic actions; the harness owns orchestration, ratcheting, and writer/grader separation.
+| Need | Harness |
+|---|---|
+| Run blocking pre-merge quality checks | `/gate` |
+| Scored app verification | `/evaluate` |
+| Mechanical cleanup with behavior-preservation gates | `/refactor` |
+| Full harness bootstrap (superset of native `/init`) | `/scaffold` |
+
+The `/gate` name (rather than `/review`) is kept so it can never collide with a PR-review command — see [docs/native-command-integration.md](docs/native-command-integration.md).
 
 ## What The Harness Protects
 
@@ -473,11 +442,11 @@ Dial back to advisory with `token_governor.mode: "advisory"` in
 ## Testing This Harness
 
 ```bash
-npm test                 # fast unit/contract suite, no live Claude
-node --test test/token-compression-e2e.test.js  # local token optimizer e2e, no live Claude
+npm test                 # fast unit/contract suite, no live model calls
+node --test test/token-compression-e2e.test.js  # local token optimizer e2e, no live model calls
 npm run test:e2e:fast    # e2e contracts + safe helper tests
-npm run test:routes      # scaffold + lite-auto + full-auto + gated + feature routes (live Claude)
-npm run test:e2e:live    # all live route/smoke checks (live Claude, costs tokens)
+npm run test:routes      # scaffold + lite-auto + full-auto + gated + feature routes (live opencode)
+npm run test:e2e:live    # all live route/smoke checks (live opencode, costs tokens)
 npm run test:e2e:cert    # certification stack
 npm run test:e2e:all     # fast -> live -> cert
 ```

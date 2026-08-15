@@ -7,7 +7,7 @@ The harness includes a full E2E test suite that builds a real project through th
 ### Quick run
 
 ```bash
-npm run test:e2e:fast       # no live Claude and no local server; contracts + safe helper tests
+npm run test:e2e:fast       # no live opencode and no local server; contracts + safe helper tests
 npm run test:e2e:live       # plan -> semi -> auto -> smoke
 npm run test:e2e:cert       # certification stack
 npm run test:e2e:all        # fast -> live -> cert
@@ -73,7 +73,7 @@ npm test
 > Use `npm test` (or `node --test "test/*.test.js"`), **not** `node --test test/`.
 > Passing a bare directory makes Node try to load `test/` as a module and fails
 > with `MODULE_NOT_FOUND` (`cjs/loader:1408`). `npm test` also scopes to the unit
-> suite so the costly e2e tests (which spawn `claude`) are not swept in — run
+> suite so the costly e2e tests (which spawn `opencode`) are not swept in — run
 > those with `npm run test:e2e`.
 
 Run a single file while iterating:
@@ -100,7 +100,7 @@ test/
     run.sh                         # Compatibility wrapper for run-pack.js cert
     harness-pipeline.test.js       # Certification layer
     helpers/
-      opencode-runner.js             # Spawn claude -p with model/budget
+      opencode-runner.js             # Spawn opencode run with model tier
       llm-validator.js             # LLM artifact quality checks (Haiku)
       prometheus-checker.js        # Prometheus HTTP API queries
       grafana-checker.js           # Grafana REST API dashboard checks

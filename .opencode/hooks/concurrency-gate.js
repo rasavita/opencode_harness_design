@@ -18,7 +18,7 @@ const TTL_MS = 30 * 60 * 1000;
 // DEFAULT_CAP = 18: the documented /auto peak is 3 group-orchestrators + 3×5 teammates = 18
 // concurrent Task subagents. The gate counts orchestrators too (they are Task spawns), so 18
 // accommodates the full peak without throttling. Configure down via
-// project-manifest.json#execution.max_concurrent_agents or CLAUDE_MAX_CONCURRENT_AGENTS.
+// project-manifest.json#execution.max_concurrent_agents or HARNESS_MAX_CONCURRENT_AGENTS.
 const DEFAULT_CAP = 18;
 
 function normalizeState(raw) {
@@ -31,7 +31,7 @@ function normalizeState(raw) {
 function resolveCap(manifest, env) {
   const m = manifest && manifest.execution && Number(manifest.execution.max_concurrent_agents);
   if (Number.isFinite(m) && m > 0) return m;
-  const e = Number((env || {}).CLAUDE_MAX_CONCURRENT_AGENTS);
+  const e = Number((env || {}).HARNESS_MAX_CONCURRENT_AGENTS);
   if (Number.isFinite(e) && e > 0) return e;
   return DEFAULT_CAP;
 }

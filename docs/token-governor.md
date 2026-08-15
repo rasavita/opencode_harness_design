@@ -106,7 +106,7 @@ node .opencode/scripts/context-pack.js --diff --budget 1600 "where is session va
 node .opencode/scripts/nav-query.js pack --budget 1600 "where is session validation handled?"
 ```
 
-or in Claude Code:
+or in opencode:
 
 ```text
 /context "where is session validation handled?"

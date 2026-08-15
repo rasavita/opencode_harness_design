@@ -1,6 +1,6 @@
 # Codebase Map
 
-Top-level directory structure with one-line descriptions. Helps Claude navigate without scanning.
+Top-level directory structure with one-line descriptions. Helps the agent navigate without scanning.
 
 ## Directories
 

@@ -163,22 +163,22 @@ After each principle: run tests, run lint, run type checks. If anything breaks, 
 
 When committing, follow **`keeping-refactors-pure`**: commit with `HARNESS_COMMIT_KIND=refactor git commit …` — the pre-commit hook then blocks any staged test/snapshot edits (a pure refactor leaves them byte-identical). Any behavioral fix discovered en route goes in a separate behavior commit.
 
-### Step 6 — Mechanical Cleanup Pass (native `/simplify`)
+### Step 6 — Mechanical Cleanup Pass (simplify sweep)
 
-After the principle-driven refactor is complete and the suite is green (Step 5), run Claude Code's native **`/simplify`** over the refactor's changed files to catch mechanical cleanups the manual pass missed — duplicate logic that should reuse a helper, redundant branches, needless intermediate variables, altitude/efficiency tweaks. Native `/simplify` *applies* the kind of fix the harness reviewers only *report*, so it is genuinely additive — not a duplicate of `code-reviewer`, which owns the structural / SOLID / module-depth judgment `/simplify` does not do.
+After the principle-driven refactor is complete and the suite is green (Step 5), run a dedicated **simplify sweep** over the refactor's changed files to catch mechanical cleanups the manual pass missed — duplicate logic that should reuse a helper, redundant branches, needless intermediate variables, altitude/efficiency tweaks. (In the Claude Code ancestor this step delegated to the native `/simplify` command; opencode has no equivalent, so the sweep is performed directly.) The sweep *applies* the kind of fix the harness reviewers only *report*, so it is genuinely additive — not a duplicate of `code-reviewer`, which owns the structural / SOLID / module-depth judgment the sweep does not do.
 
 Fence it with the same behavior-preservation discipline as the rest of this skill:
 
-1. **Green precondition.** Only run with a passing suite — `/simplify` is quality-only (it does not hunt bugs) and assumes already-correct code.
-2. **Scope to the diff.** `/simplify` operates on the changed code; do not let it wander outside the refactor's target path. Reject any edit to a file the refactor did not already touch.
-3. **Re-verify.** Re-run tests, lint, and type checks after. If `/simplify` turns a test red, that edit was not behavior-preserving — revert that specific change, never the test.
+1. **Green precondition.** Only run with a passing suite — the sweep is quality-only (it does not hunt bugs) and assumes already-correct code.
+2. **Scope to the diff.** The sweep operates on the changed code; do not let it wander outside the refactor's target path. Reject any edit to a file the refactor did not already touch.
+3. **Re-verify.** Re-run tests, lint, and type checks after. If the sweep turns a test red, that edit was not behavior-preserving — revert that specific change, never the test.
 4. **Pure-refactor commit.** Commit under **`keeping-refactors-pure`** (`HARNESS_COMMIT_KIND=refactor`). The pre-commit hook blocks staged test edits, so a cleanup that quietly rewrites a test is caught automatically.
 
-Skip this step when the refactor's entire purpose *was* a single mechanical change `/simplify` would itself propose — there is nothing left to clean.
+Skip this step when the refactor's entire purpose *was* a single mechanical change the sweep would itself propose — there is nothing left to clean.
 
 ### Step 7 — Spawn code-reviewer (and security-reviewer at a boundary)
 
-After all changes are complete, spawn the `code-reviewer` agent (harness-provided: `.opencode/agents/code-reviewer.md`) on the full diff. Native `/simplify` (Step 6) already absorbed the mechanical cleanups; the reviewer now judges **structure** — SOLID, module depth, abstraction quality, public-interface testing — which `/simplify` does not touch.
+After all changes are complete, spawn the `code-reviewer` agent (harness-provided: `.opencode/agents/code-reviewer.md`) on the full diff. The simplify sweep (Step 6) already absorbed the mechanical cleanups; the reviewer now judges **structure** — SOLID, module depth, abstraction quality, public-interface testing — which the sweep does not touch.
 
 **Also spawn `security-reviewer` when the diff touches** authentication, authorization, secrets, user input handling, uploads/downloads, network fetch/redirect/proxy code, payments/billing, persistence/schema/migrations, API routes/controllers/middleware, or configured security patterns — the same trigger `/gate` and `/change` use. Run both reviewers in parallel in a single message. If no file crosses that boundary, run neither the security reviewer nor the scan, and record `security_review: skipped_no_boundary`.
 
