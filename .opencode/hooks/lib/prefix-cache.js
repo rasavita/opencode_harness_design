@@ -12,7 +12,7 @@
 const path = require('path');
 
 const PREFIX_RES = [
-  /^CLAUDE\.md$/i,
+  /^AGENTS\.md$/i,
   /^\.mcp\.json$/,
   /^\.opencode\/settings(\.auto|\.local)?\.json$/,
 ];

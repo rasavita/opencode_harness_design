@@ -11,7 +11,7 @@ const BASH_HOOK = 'pre-bash-gate.js';
 const ENV = { HARNESS_TDD_GATE: 'off' };
 
 // Paths that are prefix-only (machinery trust-boundary does not cover them).
-const PREFIX_ONLY_RELS = ['AGENTS.md', 'Claude.md', '.mcp.json'];
+const PREFIX_ONLY_RELS = ['AGENTS.md', 'Agents.md', '.mcp.json'];
 // Settings are dual-guarded: machinery blocks first in target projects; prefix
 // still applies in the harness monorepo where machinery is skipped.
 const SETTINGS_PREFIX_RELS = [

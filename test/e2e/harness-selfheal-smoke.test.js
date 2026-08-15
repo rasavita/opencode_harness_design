@@ -56,7 +56,7 @@ function logResult(label, data) {
 }
 
 // Base run options shared by every claude invocation here (scaffold/build/change).
-function claudeOpts() {
+function opencodeOpts() {
   return { cwd: PROJECT_DIR, model: 'sonnet', budgetUsd: '3.00', timeoutMs: 420000, continueSession: true, pluginDir: HARNESS_PLUGIN_DIR, sessionId: SESSION_ID };
 }
 
