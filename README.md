@@ -36,6 +36,15 @@ Then inside opencode:
 
 Opening the repo gives you every harness *command*; `/scaffold` still installs the lean `core` surface into your project by default (`/scaffold --full` for the full set). The deterministic gate hooks wire up when `/scaffold` copies `.opencode/` into a target project — the plugin adapter (`.opencode/plugins/harness.js`) is discovered automatically when opencode opens that project.
 
+#### Troubleshooting: `/scaffold` (or other harness commands) not in the slash menu
+
+Verified against opencode **1.18.18**: after the clone above, typing `/scaf` in the TUI input lists `/scaffold`, and `Ctrl+P` shows the full command palette. If harness commands don't appear:
+
+1. **Check your opencode version** — `opencode --version`, then `opencode upgrade`. Project commands are read from `.opencode/commands/*.md`; old releases may not scan that directory.
+2. **Confirm you opened opencode at the repo root** — the directory containing `opencode.json` and `.opencode/`. Running `opencode` from a parent or subdirectory loads a different project.
+3. **Inspect what opencode actually resolved** — from the repo root run `opencode debug config` and check the `command` section; `scaffold`, `build`, `auto`, etc. should be listed. If they are, the commands are registered and the TUI will complete them after `/`.
+4. **Look for a config error** — a malformed global config (`~/.config/opencode/opencode.json`) can break project loading; `opencode debug config` will surface the error.
+
 #### Permissions
 
 Tool permissions live in `opencode.json#permission` ([permissions docs](https://opencode.ai/docs/permissions/)): the curated Bash allowlist ported from the Claude Code `permissions.allow` list, with risky patterns left on `ask`. To loosen or tighten a scaffolded project, edit its `opencode.json`. Permission changes never bypass the harness's own pipeline gates (`/build` phases 1–3, `/gate` before merge) — those are enforced by the hook layer, not by opencode prompts.
