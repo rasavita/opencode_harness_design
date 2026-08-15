@@ -1,0 +1,9 @@
+{
+  "cluster_id": "test/adherence-critic-contract.test.js",
+  "member_paths": [
+    "test/adherence-critic-contract.test.js"
+  ],
+  "content_hashes": {},
+  "content_hash": "e3b0c44298fc1c14",
+  "stale": false
+}

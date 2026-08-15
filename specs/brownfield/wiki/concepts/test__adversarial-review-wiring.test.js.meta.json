@@ -1,0 +1,9 @@
+{
+  "cluster_id": "test/adversarial-review-wiring.test.js",
+  "member_paths": [
+    "test/adversarial-review-wiring.test.js"
+  ],
+  "content_hashes": {},
+  "content_hash": "e3b0c44298fc1c14",
+  "stale": false
+}

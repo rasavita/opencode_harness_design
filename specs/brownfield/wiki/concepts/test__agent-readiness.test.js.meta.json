@@ -1,0 +1,11 @@
+{
+  "cluster_id": "test/agent-readiness.test.js",
+  "member_paths": [
+    "test/agent-readiness.test.js"
+  ],
+  "content_hashes": {
+    "test/agent-readiness.test.js": "27aba14a5b06e1b8"
+  },
+  "content_hash": "7f9f2a20bc444720",
+  "stale": false
+}

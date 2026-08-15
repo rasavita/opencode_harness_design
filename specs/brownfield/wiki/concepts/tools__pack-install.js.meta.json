@@ -1,0 +1,11 @@
+{
+  "cluster_id": "tools/pack-install.js",
+  "member_paths": [
+    "tools/pack-install.js"
+  ],
+  "content_hashes": {
+    "tools/pack-install.js": "ef6825c065523dc2"
+  },
+  "content_hash": "3a436db6c365302d",
+  "stale": false
+}

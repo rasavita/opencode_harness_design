@@ -1,0 +1,108 @@
+# Sensor Arbitration
+
+The harness now has many guides and sensors. This policy keeps them coherent when signals disagree, and gives agents a narrow way to record justified exceptions without hiding drift.
+
+## Sensor tier membership
+
+Which commit-time sensors run is also governed by **`project-manifest.json#quality.sensor_tier`** (`minimal` | `standard` | `strict`). Tiers are the primary complexity dial; blocking levels (below) still apply to every sensor that *does* run.
+
+| Tier | Intent |
+|---|---|
+| `minimal` | Low-ceremony (CLI/library): secrets + structural basics when configured |
+| `standard` | Default product posture — preserves today's full pre-commit set |
+| `strict` | Standard plus architecture ratchets at commit (cycle / coupling) |
+
+Normative gate membership table, SKU boundaries, and escape-hatch rules: [`docs/product-skus-and-tiers.md`](product-skus-and-tiers.md). Per-gate `HARNESS_*_GATE=off` remains a local skip, not a substitute for lowering tier or a reviewed waiver.
+
+## Agent-facing message shape
+
+Pre-commit prints `pre-commit: sensor_tier=<tier>` at start. New or refactored **BLOCKED** messages should use `.claude/hooks/lib/gate-result.js` `formatBlock()`:
+
+```text
+BLOCKED [gate-id]: one-line summary
+  ...detail lines...
+Fix: what the agent should do next
+Waive: sensor-waivers.json sensor_id=… or HARNESS_*_GATE=off (local only)
+Tier: active sensor_tier="standard"; this gate runs at standard+
+```
+
+`fail()` automatically appends a `Tier:` footer when the gate registry has set the active tier and the message lacks one. Skip announcements use the same Tier line via `formatSkip()`.
+
+## Blocking Levels
+
+Every sensor should declare one of these levels in its docs or manifest entry:
+
+| Level | Meaning | Examples |
+|---|---|---|
+| `hard-block` | The change cannot proceed until fixed or explicitly waived by a human. | grounding failures, secret leaks, new API breaking changes, a cross-feature regression (`regression-suite-full`) |
+| `self-correct` | The agent must try to fix it in the current loop before asking for review. | lint, type, layer, mutation survivor on touched code |
+| `review-focus` | The change may proceed, but the finding must be surfaced in review. | threshold bump, modularity concern, known flake |
+| `advisory` | Informational trend or slow-cadence signal. | harness coverage holes, dead-code drift, modularity-review staleness (G19) |
+
+## Conflict Order
+
+When signals point in different directions, resolve them in this order:
+
+1. **Traceability and safety win first.** Grounding, secrets, authz, privacy, and contract-breaking findings override style, speed, and convenience.
+2. **Behaviour preservation beats cleanup.** A refactor cannot update tests or snapshots to make the refactor pass; split behaviour work into a separate change.
+3. **Architecture fitness beats local convenience.** Do not bypass layer/context/cycle rules to make a small edit easier.
+4. **Test adequacy beats coverage vanity.** A 100% covered line with a mutation survivor is still under-tested.
+5. **Readability beats micro-optimization unless an SLO is failing.** If latency and clarity conflict, document the trade-off and let the perf ratchet decide.
+6. **Small modules beat arbitrary thresholds.** Length and complexity caps guide refactoring, but avoid splitting code into pass-through fragments or prop chains just to satisfy a number.
+
+## Waiver Schema
+
+Waivers live at `specs/reviews/sensor-waivers.json` and must match `.claude/templates/sensor-waivers.schema.json`. A waiver is not a suppression forever; it is a reviewed note with an expiry condition.
+
+Required fields:
+
+- `sensor_id` — the manifest id, for example `mutation-smoke` or `length-caps`.
+- `scope` — file, glob, endpoint, or artifact covered by the waiver.
+- `reason` — the trade-off, stated concretely.
+- `expires` — date, release, ticket, or measurable condition that ends the waiver.
+- `approved_by` — human reviewer or explicit approval marker.
+
+## Expiry
+
+Expired waivers should be treated as `review-focus` findings at minimum and `hard-block` when they cover safety, traceability, API compatibility, or test adequacy. A threshold bump without an expiry is invalid.
+
+## Worked Classification: `regression-suite-full` (G15)
+
+`regression-suite-full` (`.claude/scripts/regression-gate.js`) is `hard-block`: a previously-passing accumulated `e2e/` Playwright spec or a prior story-group's sprint-contract API check failing against the running app is exactly the "something that used to work is now broken" case this policy exists to catch — it must not be waved through by the change that broke it. It is waivable only the same way any hard-block is: a human-reviewed `sensor-waivers.json` entry with `sensor_id: "regression-suite-full"`, a `scope` naming the specific spec or contract check regressed, a concrete `reason` (e.g. an intentional breaking change to a feature being retired this sprint, with the replacement behavior already covered by a new/updated spec), and an `expires` condition tied to when the old spec/check is deleted or rewritten — never an open-ended suppression. A regression against a test already recorded in `specs/drift/flake-history.jsonl` is excluded automatically (it is a known flake, not a regression) and needs no waiver.
+
+## Worked Classification: `impact-scoped-regression` (G16)
+
+`impact-scoped-regression` (`.claude/scripts/local-regression-gate.js`) is `hard-block`, for the same reason `regression-suite-full` (G15) is: a regressed e2e spec or contract check is "something that used to work is now broken," whether caught by the full merge-time sweep or the fast local one. It is waivable the same way — a `sensor-waivers.json` entry with `sensor_id: "impact-scoped-regression"`, a `scope` naming the specific spec or contract check, a concrete `reason`, and an `expires` condition — never open-ended. Two differences from G15's waiver worth noting: (1) a waiver here only covers the LOCAL check — the same regression will still be caught by G15's full sweep at `/gate`/`/auto` unless separately waived there too, so a local-only waiver cannot smuggle a real regression to merge; (2) an unreadable `code-graph.json` or `verification-matrix.json` degrades the scope to "changed files only" (a loud note, not silence) rather than blocking — the absence of impact data is not itself a regression, but it does mean this check's coverage is weaker than usual for that run, which is why G15's full sweep remains mandatory at merge regardless of how clean G16 came back.
+
+## Worked Classification: `legacy-discipline-proof` (G17)
+
+`legacy-discipline-proof` (`.claude/scripts/legacy-discipline-gate.js`) is `hard-block`, for the same category of reason `regression-suite-full` (G15) and `impact-scoped-regression` (G16) are: "checking-coverage-before-change never ran before this legacy edit" and "this UNCOVERED edit has no pin-down/sprout evidence" are exactly the silent-regression-invitation cases this policy exists to stop before they reach review. It is waivable only the same way any hard-block is: a human-reviewed `sensor-waivers.json` entry with `sensor_id: "legacy-discipline-proof"`, a `scope` naming the specific file (and, where relevant, symbol) the waiver covers, a concrete `reason` (e.g. a vendored file with no realistic local test harness, or a one-line typo fix where writing a pin-down is genuinely disproportionate to the risk), and an `expires` condition tied to when real coverage lands for that file — never an open-ended suppression. `HARNESS_LEGACY_DISCIPLINE_GATE=off` is a local, unreviewed escape hatch (the same shape as `HARNESS_OWNERSHIP_GATE=off`): it acknowledges a skip for one machine's commit, it does not substitute for a waiver, and a maintainer reviewing history should treat a commit that used it the same as an unreviewed exception. Two things distinguish this sensor from G15/G16's runtime regressions: (1) it never touches a running app — its evidence is entirely a receipts ledger (`specs/reviews/coverage-verdicts.jsonl`, itself gitignored local-session state, same as `ownership-check.json`) plus `git diff --cached`, so its cadence and scope are `commit`/`artifacts`, not `integration`/`runtime`; (2) it composes with, rather than duplicates, `mutation-smoke` (G7) — this gate proves *evidence of process* (a verdict was recorded; a test was staged alongside an UNCOVERED edit), while `mutation-smoke` independently proves that test *actually bites*. Neither one substitutes for the other.
+
+As of gap G29, "a verdict was recorded" and "a test was staged alongside an UNCOVERED edit" are both stricter, range/relatedness-aware claims than they used to be — a receipt only counts when its `[start,end]` overlaps the actually-changed lines (`hooks/lib/diff-hunks.js`), and evidence only counts when the staged test is related to the uncovered file via `component-map.md` story ownership or a naming heuristic, not merely present somewhere in the commit (`hooks/lib/legacy-discipline-relatedness.js`) — so the same waiver and escape-hatch reasoning above now applies to a mechanically narrower, more accurate signal, not a looser one. G29 also adds a second, independent escape hatch, `HARNESS_LEGACY_BITE_CHECK=off`, for the new narrow manual-commit bite-check backstop (`hooks/lib/legacy-bite-check.js`) this gate now runs after accepting an UNCOVERED file's evidence on relatedness alone — it is a local, unreviewed acknowledgment in the same shape as `HARNESS_LEGACY_DISCIPLINE_GATE=off`, distinct from it (one disables the whole gate; the other disables only the smaller bite-check layered on top of a PASS), and likewise no substitute for a `sensor-waivers.json` entry if a real, reviewed exception is needed.
+
+## Worked Classification: `coupling-ratchet` (G18)
+
+`coupling-ratchet` (`.claude/scripts/coupling-gate.js`) is `hard-block`, the same level and the same rationale conflict-order item 3 already states for its sibling ratchet, `cycle-detection` (G8): "architecture fitness beats local convenience — do not bypass layer/context/cycle rules to make a small edit easier." A monotonic ratchet exists precisely so a change cannot make architecture fitness worse to get itself over the line, and an unstable hub (fan_in >= 5, instability >= 0.8) is architecture fitness decaying in exactly the same sense a new import cycle is — coupling concentrating on a file that everything depends on and that itself depends on little, making that file expensive to change safely. It is waivable only the same way any hard-block is: a human-reviewed `sensor-waivers.json` entry with `sensor_id: "coupling-ratchet"`, a `scope` naming the specific hub file, a concrete `reason` (e.g. a deliberate, reviewed facade/aggregator whose high fan-in is the intended design, not accidental coupling), and an `expires` condition tied to when the hub is split or the design is revisited — never an open-ended suppression. Two things distinguish this sensor from `cycle-detection`'s waiver: (1) the baseline it ratchets against stores the actual unstable-hub id set, not just a count, so a BLOCK can always name the specific new hub(s) rather than restating the whole current set; (2) it is deliberately count-based like `cycle-detection`, not a full set-diff gate — a run where one hub is fixed and a different hub newly crosses the threshold in the same commit can net to an unchanged or lower count and pass without blocking, the identical known limitation `cycle-detection`'s ratchet already accepts for cycles. A reviewer relying on this gate alone should still treat `coupling-report.md`'s full hub table as the periodic drift-cadence backstop for that edge case, the same way `regression-suite-full` (G15) backstops `impact-scoped-regression` (G16).
+
+## Worked Classification: `at-first-proof` (G23)
+
+`at-first-proof` (`.claude/scripts/at-first-gate.js`) is `hard-block`, for the same category of reason `legacy-discipline-proof` (G17) is: "writing-acceptance-tests-first's AT was never confirmed red before this story's new production code was committed" is the same silent-regression-invitation case this policy exists to stop before it reaches review — a story could otherwise skip straight from acceptance criteria to implementation with nothing verifying the requirement was understood. It is waivable only the same way any hard-block is: a human-reviewed `sensor-waivers.json` entry with `sensor_id: "at-first-proof"`, a `scope` naming the specific story (and its `atPath`), a concrete `reason` (e.g. a trivial one-line story where writing a Ports-and-Adapters AT is genuinely disproportionate to the risk, or a story whose "production" file is itself pure scaffolding/config with no business logic to assert against), and an `expires` condition tied to when the AT lands — never an open-ended suppression. `HARNESS_AT_FIRST_GATE=off` is a local, unreviewed escape hatch (the same shape as `HARNESS_LEGACY_DISCIPLINE_GATE=off`): it acknowledges a skip for one machine's commit, it does not substitute for a waiver, and a maintainer reviewing history should treat a commit that used it the same as an unreviewed exception. One thing distinguishes this sensor's evidence from a strict reading of the Iron Law it backs: a `record-at-red.js` receipt's timestamp mechanically proves the AT was confirmed red BY THE TIME OF THIS COMMIT — it does not, and cannot without fragile git-history archaeology, prove the red run strictly preceded every line of the specific implementation commit that follows. This is the same class of disclosed-not-hidden limitation `legacy-discipline-proof` (G17) states for its own file-level (not symbol-level) receipt matching: the mechanical value is real ("the AT existed and was proven red before this commit landed"), but it is narrower than the skill's own wording ("no implementation until an acceptance test exists, fails for the right reason... only NOW proceed") — a reviewer relying on this gate alone should still spot-check genuinely suspicious timing (e.g. a receipt and its story's first production file staged in the same commit) the way any hard-block gate's evidence should be sanity-checked, not treated as unconditionally conclusive.
+
+## Worked Classification: `sprout-diff-one-symbol` (G30)
+
+`sprout-diff-one-symbol` (`.claude/scripts/sprout-diff-gate.js`) is `hard-block`, the same category and rationale as `legacy-discipline-proof` (G17) it composes with: an in-place edit to more than the legitimate number of symbols in a legacy file, on a commit already flagged UNCOVERED-with-evidence, is exactly the silent-regression-invitation case this policy exists to stop before it reaches review — sprouting-instead-of-editing's whole point is that unpinned legacy code only gets touched at one call line (or a two-symbol wrap-rename pair), and a wider touch is an unobserved behavior change hiding behind a nominal "sprout." It is waivable only the same way any hard-block is: a human-reviewed `sensor-waivers.json` entry with `sensor_id: "sprout-diff-one-symbol"`, a `scope` naming the specific file (and the extra symbol(s) it covers), a concrete `reason` (e.g. the extra symbol is itself a trivial, low-risk one-line change genuinely disproportionate to a further sprout split), and an `expires` condition tied to when the legacy file gets properly pinned or the extra edit is un-sprouted into its own change — never an open-ended suppression. `HARNESS_SPROUT_DIFF_GATE=off` is a local, unreviewed escape hatch (the same shape as `HARNESS_LEGACY_DISCIPLINE_GATE=off`): it acknowledges a skip for one machine's commit, it does not substitute for a waiver, and a maintainer reviewing history should treat a commit that used it the same as an unreviewed exception. Two things distinguish this sensor from `legacy-discipline-proof`'s own scope: (1) it fires only on the narrower subset of UNCOVERED-with-evidence commits that are also sprout-shaped (a genuinely new production file staged, not a pin-down's test-only evidence) — a pin-down commit is entirely out of this gate's scope, by design, since pinning-down-behavior has no one-symbol constraint; (2) its 2-symbol allowance (not 1) is a disclosed cap, not a verified pattern match — sprouting-instead-of-editing's own Process step 2 names a legitimate wrap-rename-pair shape that touches two symbols, and this gate cannot mechanically tell that shape apart from two unrelated small edits, so a 2-symbol touch passes with an "assumed wrap-rename pair, not independently verified" note rather than a falsely confident PASS. A reviewer relying on this gate alone should still spot-check a passing 2-symbol touch the way any hard-block gate's evidence should be sanity-checked, not treated as unconditionally conclusive — the same discipline `at-first-proof` (G23) already asks of its own timestamp-only receipt evidence.
+
+## Worked Classification: `test-deletion-guard` (G31)
+
+`test-deletion-guard` (`.claude/scripts/test-deletion-gate.js`) is `hard-block`, per conflict-order item 2: "behaviour preservation beats cleanup — a refactor cannot update tests or snapshots to make the refactor pass." Deleting or newly skipping the test that would catch a regression is the same failure this rule already names, just reached from a different direction — instead of editing the test to make it pass, the change removes it (or the assertion it would have made) entirely. It is waivable only the same way any hard-block is: a human-reviewed `sensor-waivers.json` entry with `sensor_id: "test-deletion-guard"`, a `scope` naming the specific test file (and, for a count-decrease, which case(s)), a concrete `reason` (e.g. the test covered functionality that was intentionally removed this change, with the removal itself covered elsewhere; or the test is a known flake already recorded in `specs/drift/flake-history.jsonl` and is being quarantined, not silently dropped), and an `expires` condition tied to when the replacement coverage lands or the quarantine is reviewed — never an open-ended suppression. `HARNESS_TEST_DELETION_GATE=off` is a local, unreviewed escape hatch (the same shape as `HARNESS_LEGACY_DISCIPLINE_GATE=off`): it acknowledges a skip for one machine's commit, it does not substitute for a waiver, and a maintainer reviewing history should treat a commit that used it the same as an unreviewed exception. Two things distinguish this sensor from `regression-suite-full` (G15) and `impact-scoped-regression` (G16), the harness's other test-integrity gates: (1) those two prove a still-*present* test's outcome didn't regress against a running app; this one proves the test itself wasn't quietly removed or skipped from the suite in the first place — composing, not duplicating; (2) its evidence is a heuristic regex count over old/new file content (`git show HEAD:<file>` vs the staged index), not an AST parse or a running suite — a reviewer relying on this gate alone should still spot-check a passing count for a test that was rewritten to cover materially different behavior at an unchanged count, the same "sanity-check, don't treat as unconditionally conclusive" discipline `sprout-diff-one-symbol` (G30) and `at-first-proof` (G23) already ask of their own narrower evidence.
+
+`live-externals` (`.claude/scripts/live-externals-gate.js`, gap G36) is `hard-block`, per conflict-order item 1: "correctness and determinism beat convenience." A `tests/integration` or `e2e` test that reaches a real DB, HTTP service, or LLM is non-deterministic and flaky by construction — the exact failure mode the boundary-test-doubles kit (G34) exists to remove. It is waivable only the same way any hard-block is: a human-reviewed `sensor-waivers.json` entry with `sensor_id: "live-externals"`, a `scope` naming the specific test file, a concrete `reason` (e.g. a deliberately-live smoke test that must hit a real staging endpoint, with its flakiness accepted and isolated from the deterministic suite), and an `expires` condition — never an open-ended suppression. `HARNESS_LIVE_EXTERNALS_GATE=off` is a local, unreviewed escape hatch (the same shape as `HARNESS_TEST_DELETION_GATE=off`): it acknowledges a skip for one machine's commit, not a substitute for a waiver. The gate's lint half is heuristic regex (non-localhost URL / real DB DSN / raw SDK client), not an AST parse, so a reviewer relying on it alone should still spot-check for a dynamically-constructed live call it cannot see; the wrapper-honors-the-flag guarantee is proven at runtime instead, where the regression gates (G15/G16) treat a missing fixture under forced replay as a live-external reach.
+
+## Adding Sensors
+
+When adding a guide or sensor:
+
+1. Register it in `harness-manifest.json`.
+2. Document its blocking level.
+3. State whether it is waivable.
+4. If waivable, name the evidence needed in `sensor-waivers.json`.

@@ -1,0 +1,11 @@
+{
+  "cluster_id": "test/accessibility-contract.test.js",
+  "member_paths": [
+    "test/accessibility-contract.test.js"
+  ],
+  "content_hashes": {
+    "test/accessibility-contract.test.js": "ccaa7bd991b8dac1"
+  },
+  "content_hash": "cb6e60c30014da9f",
+  "stale": false
+}

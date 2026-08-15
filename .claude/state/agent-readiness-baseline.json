@@ -1,0 +1,66 @@
+{
+  "generatedAt": "2026-07-10T15:53:58.914Z",
+  "summary": {
+    "active": 8,
+    "partial": 0,
+    "planned": 0
+  },
+  "pillars": [
+    {
+      "id": "style-validation",
+      "label": "Style & Validation",
+      "status": "active",
+      "detail": "js: configured + provisioned",
+      "remediation": null
+    },
+    {
+      "id": "architecture-fitness",
+      "label": "Architecture Fitness",
+      "status": "active",
+      "detail": "Cycle and coupling ratchets established (baseline: 0 cycle(s), 0 unstable hub(s)).",
+      "remediation": null
+    },
+    {
+      "id": "testing",
+      "label": "Testing",
+      "status": "active",
+      "detail": "Coverage ratchet: yes; mutation gate: yes; regression gates: yes. No acceptance-test artifacts yet under specs/test_artefacts/acceptance/ (G20 not yet adopted — informational, doesn't affect this pillar's status).",
+      "remediation": null
+    },
+    {
+      "id": "modularity-freshness",
+      "label": "Code Quality / Modularity Freshness",
+      "status": "active",
+      "detail": "No modularity staleness — the last real review covers all currently unstable hubs.",
+      "remediation": null
+    },
+    {
+      "id": "documentation-navigation",
+      "label": "Documentation / Navigation",
+      "status": "active",
+      "detail": "Living code-graph exists and derived navigation is present and not stamped stale.",
+      "remediation": null
+    },
+    {
+      "id": "observability",
+      "label": "Observability",
+      "status": "active",
+      "detail": "RED-metrics baseline enabled (metrics_path: /metrics).",
+      "remediation": null
+    },
+    {
+      "id": "security-governance",
+      "label": "Security & Governance",
+      "status": "active",
+      "detail": "Baseline secrets scan always active. Enhanced tools — semgrep: yes, gitleaks: yes, dep-audit: yes.",
+      "remediation": null
+    },
+    {
+      "id": "dev-environment",
+      "label": "Dev Environment",
+      "status": "active",
+      "detail": "verification.mode: local; init.sh: no.",
+      "remediation": null
+    }
+  ]
+}

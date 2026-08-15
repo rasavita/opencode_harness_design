@@ -1,0 +1,11 @@
+{
+  "cluster_id": "test/adversarial-live-e2e-contract.test.js",
+  "member_paths": [
+    "test/adversarial-live-e2e-contract.test.js"
+  ],
+  "content_hashes": {
+    "test/adversarial-live-e2e-contract.test.js": "b3cd7117a6920e73"
+  },
+  "content_hash": "638b06f7f3ae6ac0",
+  "stale": false
+}

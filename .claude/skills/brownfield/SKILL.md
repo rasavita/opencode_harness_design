@@ -1,0 +1,327 @@
+---
+name: brownfield
+description: Discover and map an existing codebase before planning or changing it. Add --seams "<goal>" to also rank the safest cut-points for that goal.
+argument-hint: "[optional-focus-path-or-goal] [--seams \"<goal>\"]"
+context: fork
+agent: planner
+---
+
+# Brownfield Discovery
+
+Use `/brownfield` in existing repositories before substantial planning, improvements, refactors, or bug work. The goal is to build a factual map of the current system so agents respect the codebase instead of inventing a parallel architecture.
+
+This skill does not change production code.
+
+> **Ultracode tip:** Mapping an unknown codebase is the canonical fan-out task, so run `/effort ultracode` *before* this phase — broad parallel coverage plus adversarial verification produces better maps. Drop back to `/effort high` before the execution phases (`/auto`, `/implement`).
+
+---
+
+## Usage
+
+```text
+/brownfield
+/brownfield backend/src
+/brownfield "map auth and billing before adding team invites"
+/brownfield --for "add team invites"          # lean maps scoped to a change goal
+/brownfield --seams "add team invites"        # map, then rank the safest cut-points for this goal
+/brownfield --full                            # LLM essays + CI/flag/perf + evaluator scoring
+```
+
+`--seams "<goal>"` is the single entry point for seam analysis: it runs the normal discovery, then runs the `/seam-finder` stage for `<goal>` and writes `specs/brownfield/seams-<goal>.md`. (`/seam-finder` remains directly invokable as a power-user stage, but you don't need to call it separately.)
+
+Default `/brownfield` is intentionally lean and DeepWiki-first: build the deterministic graph/wiki, write **deterministic** short maps (no LLM essays), refresh nav indexes, and stop. Use `--full` for LLM-enriched essays, migration audits, CI/flag/perf inventory, or formal discovery scoring. Use `--for "<goal>"` to goal-scope the lean maps + optional seam ranking.
+
+---
+
+## Outputs
+
+Write these files:
+
+| File | Purpose |
+|---|---|
+| `specs/brownfield/code-graph.json` | Deterministic dependency graph produced by `/code-map` |
+| `specs/brownfield/code-graph.meta.json` | Producer, language counts, scan warnings, timestamp |
+| `specs/brownfield/wiki/WIKI.md` + `wiki/pages/*.md` | Committed DeepWiki-style repo guide: module pages, Mermaid diagrams, source citations, and page index. Future code changes read this first. |
+| `specs/brownfield/symbol-map.md` | Agent navigation map with symbols and line ranges for precise `Read(offset, limit)` slicing |
+| `specs/brownfield/codebase-map.md` | **Lean (default):** deterministic inventory from `nav-brownfield-maps.js`. **`--full`:** optional LLM enrichment. Wiki is the main orientation artifact. |
+| `specs/brownfield/dependency-graph.md` | Mermaid render of file/module-level edges |
+| `specs/brownfield/coupling-report.md` | Fan-in, fan-out, cycles, hubs, unstable modules |
+| `specs/brownfield/architecture-map.md` | **Lean:** deterministic hubs/layers/edges stub. **`--full`:** LLM narrative citing graph evidence |
+| `specs/brownfield/test-map.md` | **Lean:** test paths from graph. **`--full`:** commands, coverage, flake notes |
+| `specs/brownfield/risk-map.md` | **Lean:** keyword + coupling risks. **`--full`:** domain/security narrative |
+| `specs/brownfield/change-strategy.md` | **Lean:** lane table + context-first steps. **`--full`:** richer strategy |
+| `specs/brownfield/ci-map.md`, `flag-inventory.md`, `perf-baseline.json` | `--full` only: CI alignment, feature flags, and latency baseline |
+| `specs/brownfield/seams-<goal>.md` | Optional ranked seam candidates produced by `/seam-finder "<goal>"` |
+| `specs/brownfield/naming-clusters.md` | Deterministic root-noun clusters from `code-graph.json` symbols — candidate domain terms for Step 6 |
+| `CONTEXT.md` | Domain glossary, seeded from naming-cluster evidence and confirmed against source — no longer purely optional; see Step 6 |
+
+---
+
+## Step 1 — Inventory the Repo
+
+Discover facts, not guesses:
+
+- Languages and frameworks
+- Package managers and lockfiles
+- App entry points
+- Test/build/lint/typecheck commands
+- Runtime services and Docker/compose files
+- Environment/config files
+- CI workflows
+- Database migrations or schema files
+- Public API route definitions
+- Frontend routes/screens
+
+Use `rg`, `find`, package manifests, config files, and existing docs. Prefer primary repo evidence over assumptions.
+
+---
+
+## Step 1.5 — Build the Dependency Graph (delegate to `/code-map`)
+
+Run the `/code-map` skill (`.claude/skills/code-map/SKILL.md`) — its Steps 1–3 are the **single source of truth** for producer detection (AST indexer → Understand-Anything import → regex fallback), the exact commands, and the rendering of `symbol-map.md`, `dependency-graph.md`, and `coupling-report.md`. Do not restate or improvise those commands here; if anything in this skill disagrees with code-map's SKILL.md, code-map wins.
+
+Expected artifacts under `specs/brownfield/` when it completes: `code-graph.json` (+ `.meta.json`), `symbol-map.md`, `skeletons/` (god files only), `dependency-graph.md`, `coupling-report.md`, and `wiki/WIKI.md` + pages.
+
+If the graph is empty or has only warnings, stop and report. Do not invent architecture from filenames. When the AST producer ran, treat `symbol-map.md` and `skeletons/` as the navigation layer: read a single symbol with `Read(offset=START, limit=END-START+1)` instead of reading god files whole.
+
+### Step 1.6 — Deterministic lean maps + nav refresh (default)
+
+Always run after a successful code-map (seconds, no LLM):
+
+```bash
+# Optional goal from --for "..." or the brownfield argument when it is a phrase
+node .claude/scripts/nav-brownfield-maps.js --root . --goal "<goal-or-empty>"
+node .claude/scripts/nav-query.js refresh
+```
+
+This writes/refreshes: lean `codebase-map.md`, `architecture-map.md`, `test-map.md`, `risk-map.md`, `change-strategy.md`, TF-IDF index, graph inverted index, co-change, concept pages.
+
+**Lean mode stops after Step 1.6 + Step 6 (glossary) + Gate** — skip LLM Steps 2–5 unless `--full` or the user explicitly asked for narrative maps.
+
+When a goal is present, also run:
+```bash
+node .claude/scripts/nav-query.js pack --diff --budget 1600 "<goal>"
+```
+and attach the pack summary to the human gate.
+
+---
+
+## Step 2 — Map Architecture (`--full` only for LLM narrative)
+
+In **lean** mode, keep the deterministic `architecture-map.md` from Step 1.6. Do not regenerate with an LLM.
+
+In **`--full`**, expand `architecture-map.md` as a short companion to the wiki:
+
+- Major modules and their responsibilities — cite specific edges from `code-graph.json`
+- Public interfaces for each major module — use the graph symbols list where available
+- Data flow through the system — follow `imports` / `calls` chains
+- External integrations — cite `ext:*` targets from the graph where available
+- Persistence boundaries
+- Auth/session boundaries
+- Existing layering conventions — confirm with directional fan-in/fan-out from `coupling-report.md`
+- Deep modules worth preserving — high fan-in and low instability
+- Shallow/pass-through modules that may be refactor candidates — high instability and little domain logic
+
+Every "module X depends on Y" claim must reference graph evidence, preferably an edge with file:line evidence. Do not redesign the system. Capture what exists.
+
+---
+
+## Step 3 — Map Tests (`--full` only for deep inventory)
+
+In **lean** mode, keep the deterministic `test-map.md` from Step 1.6.
+
+In **`--full`**, expand `test-map.md` with:
+
+- Test frameworks and commands
+- Unit/integration/e2e locations
+- Which public interfaces are covered
+- Which critical public interfaces lack tests
+- Known slow/flaky tests if discoverable
+- Whether tests isolate env/config correctly
+
+If commands are obvious and safe, run lightweight discovery commands such as `npm test -- --help`, `pytest --collect-only`, or package script listing. Do not run expensive test suites unless the user asked.
+
+---
+
+## Step 3.5 — Optional Full Inventory (`--full` only)
+
+Skip this section in default lean mode. In `--full`, run the deterministic CI and flag inventory scripts:
+
+```bash
+node .claude/scripts/ci-ingest.js --root .     # → specs/brownfield/ci-map.md
+node .claude/scripts/flag-scan.js --root .     # → specs/brownfield/flag-inventory.md
+```
+
+If the app is runnable (manifest has `evaluation.api_base_url` and `evaluation.health_check`, and the stack is up), also capture the performance baseline:
+
+```bash
+node .claude/scripts/perf-baseline.js          # → specs/brownfield/perf-baseline.json
+# after a change: node .claude/scripts/perf-baseline.js --compare   (exit 1 on p95 regression)
+```
+
+- `ci-map.md` extracts the test/lint/coverage commands the project's CI *actually* enforces, with an alignment section against the harness gates. Where CI and harness disagree (different linter, different coverage bar), surface the discrepancy in `change-strategy.md` — the stricter gate should win, and the choice belongs to the user.
+- `flag-inventory.md` lists feature-flag usage (SDKs, `FEATURE_*` env gates, config flags) with references. Flags gate dark code paths: a change inside a flagged path needs the flag's production state known before the lane is chosen.
+
+Both are heuristic extractions — spot-check anything load-bearing against the source files. If a script reports nothing (no CI config, no flags), note that in the relevant map; absence is itself a finding.
+
+## Step 3.6 — Modularity Review (`--full` only, gap G6)
+
+The deterministic `coupling-report.md` says *where* the coupling is; it cannot say whether a high-fan-in module is a god module or a legitimate factory, or whether two similar files are real duplication. Add the inferential layer, grounded in the coupling data so it does not flag intentional patterns:
+
+```bash
+node .claude/scripts/modularity-pack.js     # → specs/brownfield/modularity-pack.md (+ .json)
+```
+
+Then spawn the `modularity-reviewer` agent (artifact/maintainability sensor — inferential) against the pack. It judges semantic duplication, misplaced responsibility, argument clumps, and cycles against the source, confirms which `likely-legitimate` hubs are genuinely fine, and writes `specs/reviews/modularity-review.md` + `modularity-verdict.json`. This is a maintainability *sensor*, not a gate — it informs `change-strategy.md` and prioritizes refactoring; it never blocks. Skip in lean mode.
+
+Once the agent completes, record that a real review just ran (gap G19 — the drift-cadence staleness proxy that tells the next drift run which unstable hubs are new since this review):
+
+```bash
+node .claude/scripts/record-modularity-review.js
+```
+
+This writes/updates `.claude/state/modularity-review-marker.json` with `{timestamp, unstableHubIds}` — the current unstable-hub set at the moment this review ran. Skip only if it errors for lack of a code-graph (already handled loudly by the script itself).
+
+---
+
+## Step 4 — Map Risks (`--full` only for deep narrative)
+
+In **lean** mode, keep the deterministic `risk-map.md` from Step 1.6.
+
+In **`--full`**, expand `risk-map.md` with:
+
+### Domain risks
+
+- Auth, permissions, privacy, billing, payment, and security-sensitive paths
+- Database migrations and irreversible data operations
+- External APIs and side-effecting integrations
+- Generated code or vendored code that should not be edited manually
+- Areas where tests are weak or missing
+- Code paths gated by feature flags (`flag-inventory.md`) — the inactive branch may be the production one
+
+### Structural risks
+
+Read these from `coupling-report.md` and `code-graph.json`:
+
+- **Cycles** — files inside strongly connected components; refactors across cycle boundaries need explicit approval.
+- **Hub modules without tests** — high fan-in files without corresponding test coverage in `test-map.md`.
+- **Unstable hubs** — fan_in >= 5 and instability >= 0.8.
+- **Orphan files** — fan_in == 0 and not an entry point.
+
+For each risk, include the evidence path or graph node id.
+
+---
+
+## Step 5 — Recommend Change Strategy (`--full` only for deep narrative)
+
+In **lean** mode, keep the deterministic `change-strategy.md` from Step 1.6 (already includes context-first steps).
+
+In **`--full`**, expand `change-strategy.md` with:
+
+- What qualifies for `/vibe`
+- What should use `/change` (behavior change; `--issue N` for a tracked bug)
+- What should use `/refactor`
+- What requires `/spec` → `/design` → `/auto`
+- What should require explicit human approval before touching
+
+Include a short "first safe next steps" list.
+
+When recommending `/spec → /design → /auto` for any cluster of work, note in the strategy that `/auto` parallelizes on two axes:
+- **Within a group:** multi-story groups (≥ 2 stories) fan out into parallel teammates — see `.claude/agents/generator.md` Rule 2.
+- **Across groups:** independent dependency groups run concurrently as group-orchestrators (up to 3 by default) — see Section 4B of `.claude/skills/auto/SKILL.md`.
+
+This shapes how you cluster stories AND how you shape the dependency graph: clusters with truly independent stories get within-group parallelism, and independent dependency groups (backend vs frontend vs ingest, for example) get cross-group parallelism. Prefer designs that surface independence at both levels — group by integration boundary internally, and minimize cross-group `Consumes:` edges in the dependency graph.
+
+If the requested work has a concrete goal, run seam analysis via `/brownfield --seams "<goal>"` (which runs the `/seam-finder` stage for you). Use `seams-<goal>.md` to choose whether the next lane should extend an existing seam, wrap a boundary, introduce an adapter, split a read/write path, or avoid a poor seam.
+
+---
+
+## Step 6 — Domain Glossary
+
+Run the deterministic naming-cluster extraction before writing anything:
+
+```bash
+node .claude/scripts/naming-clusters.js
+```
+
+This writes `specs/brownfield/naming-clusters.md` — root nouns that recur across 2+ symbols in `code-graph.json` (e.g. `Account` appearing in `AccountController`, `AccountRepository`, `AccountService`), each with file evidence. Treat this as candidate terms to confirm, not a final glossary — judge each against the source before writing a definition. It only catches suffix-stripped symbol names, not terms embedded purely in prose or comments, so also add any other recurring domain terms you find in the source.
+
+Create or update `CONTEXT.md` from the confirmed candidates:
+
+```markdown
+# Context
+
+## Terms
+
+### Account
+Definition meaningful to users/domain experts.
+
+### User
+Definition and how it differs from Account.
+```
+
+Do not fill `CONTEXT.md` with implementation details. Every codebase produces at least the naming-clusters evidence file, so create `CONTEXT.md` even if only 1-2 terms are confirmed — it is no longer purely optional.
+
+---
+
+## Gate
+
+Before recommending implementation, present:
+
+- What the system appears to be
+- Highest-risk areas
+- Existing test confidence
+- Recommended lane for the requested work
+- Any uncertainty that needs human confirmation
+
+Do not proceed to code changes from `/brownfield` unless the user explicitly asks.
+
+---
+
+## Phase Evaluation Gate (`--full` only)
+
+In lean mode, do not spawn an evaluator just to score discovery prose. The deterministic graph/wiki and source citations are the gate. In `--full`, after all discovery artifacts are written, spawn the `evaluator` agent (artifact mode) to validate the brownfield analysis.
+
+**Agent invocation:**
+
+Spawn Agent with subagent_type="evaluator" and prompt:
+- Phase: brownfield
+- Artifacts: specs/brownfield/codebase-map.md, specs/brownfield/architecture-map.md, specs/brownfield/test-map.md, specs/brownfield/risk-map.md, specs/brownfield/coupling-report.md, specs/brownfield/code-graph.json (if exists)
+- Upstream: null (verify against actual codebase instead)
+- Rubric: Read .claude/templates/phase-eval-rubrics.json, key "brownfield"
+- Iteration: 1 (increment on retry)
+- Previous score: null (or previous iteration's weighted_average)
+- Verification: Spot-check 3-5 modules claimed in architecture-map.md actually exist as directories/files. Verify test commands in test-map.md reference real test files.
+- Write result to specs/reviews/phase-brownfield-eval.json
+
+**Ratchet loop (max 2 iterations):**
+
+1. If verdict is **PASS** — proceed to Human Gate with eval summary.
+2. If verdict is **FAIL** — re-scan the areas with findings. Update the maps. Re-run evaluator.
+3. **Ratchet rule:** weighted_average must be >= previous iteration. Revert on regression.
+4. After 2 iterations — present best version with findings to human.
+
+---
+
+## Human Gate
+
+**Human approval is required before proceeding to implementation.**
+
+Present the discovery maps with the quality summary:
+- Wiki path: `specs/brownfield/wiki/WIKI.md`
+- Any remaining warnings from the graph producer or, in `--full`, the evaluator
+- Recommended change strategy
+
+Ask: "Does this brownfield analysis look accurate? Approve to proceed, or flag areas that need re-scanning."
+
+Do not proceed to code changes from `/brownfield` unless the user explicitly approves the discovery AND requests changes.
+
+---
+
+## Gotchas
+
+- **Do not invent architecture.** If evidence is missing, say unknown.
+- **Do not create parallel implementations.** Brownfield work modifies existing paths unless a story/design explicitly approves a replacement.
+- **Do not trust names alone.** Confirm responsibilities from imports, tests, route wiring, and callers.
+- **Do not over-map the universe.** Focus enough to guide safe future changes.
+- **Do not run destructive commands.** Discovery is read-only except for writing brownfield docs and optional `CONTEXT.md`.

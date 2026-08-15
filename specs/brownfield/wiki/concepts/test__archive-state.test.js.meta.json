@@ -1,0 +1,12 @@
+{
+  "cluster_id": "test/archive-state.test.js",
+  "member_paths": [
+    "test/archive-state.test.js"
+  ],
+  "content_hashes": {
+    "test/archive-state.test.js": "dac55a4b3017a95c"
+  },
+  "content_hash": "fb70e18f49ca130d",
+  "generated_at": "2026-07-14T05:23:10.361Z",
+  "stale": false
+}
