@@ -96,7 +96,7 @@ function checkSprintContract(ctx) {
   const { projectDir } = ctx;
   let progress;
   try {
-    progress = fs.readFileSync(path.join(projectDir, 'claude-progress.txt'), 'utf8');
+    progress = fs.readFileSync(path.join(projectDir, 'harness-progress.txt'), 'utf8');
   } catch (_) {
     return;
   }

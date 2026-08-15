@@ -8,7 +8,7 @@ context: fork
 # Pipeline status
 
 A read-only view of where the SDLC pipeline is right now. It aggregates the files
-the harness already writes (`claude-progress.txt`, `.opencode/state/*`,
+the harness already writes (`harness-progress.txt`, `.opencode/state/*`,
 `features.json`, `specs/stories/dependency-graph.md`, `.opencode/runs/*.jsonl`) into
 one normalized snapshot and renders it. It writes no state and makes no network
 calls.

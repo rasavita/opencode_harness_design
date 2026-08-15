@@ -8,34 +8,34 @@ const path = require('path');
 const HARNESS_ROOT = path.join(__dirname, '..', '..');
 const E2E_SETTINGS = path.join(__dirname, '..', 'fixtures', 'e2e-settings.json');
 
-function buildClaudeArgs(model, budgetUsd, continueSession, pluginDir, sessionId, outputFormat) {
-  const args = [
-    '-p',
-    '--model', model,
-    '--max-budget-usd', budgetUsd,
-    '--settings', E2E_SETTINGS,
-    '--exclude-dynamic-system-prompt-sections',
-    // Isolate from the host's global MCP config. Without this, the nested
-    // `claude` inherits the developer's global MCP servers (playwright-mcp,
-    // aws-serverless-mcp, context7-mcp, …) and can hang for an hour on their
-    // startup — and because those grandchildren hold the stdio pipes open,
-    // spawnSync's timeout cannot reap the tree. No --mcp-config => zero MCP servers.
-    '--strict-mcp-config',
-  ];
-  // Explicit session ids beat --continue: --continue grabs the most recent
-  // session for the cwd, which can be a stale one from an earlier run.
-  if (sessionId && continueSession) args.push('--resume', sessionId);
-  else if (sessionId) args.push('--session-id', sessionId);
-  else if (continueSession) args.push('--continue');
-  if (pluginDir) args.push('--plugin-dir', pluginDir);
-  // stream-json exposes intermediate assistant turns (print mode requires --verbose with it)
-  if (outputFormat) args.push('--output-format', outputFormat, '--verbose');
+// Bare tier names used throughout the e2e suite map onto the harness model
+// tiers (opencode wants provider/model ids).
+const MODEL_TIERS = {
+  opus: process.env.HARNESS_MODEL_JUDGMENT || 'anthropic/claude-opus-5',
+  sonnet: process.env.HARNESS_MODEL_GENERATION || 'anthropic/claude-sonnet-5',
+  haiku: process.env.HARNESS_MODEL_EXPLORATION || 'anthropic/claude-haiku-4-5',
+};
+
+function resolveModel(model) {
+  return MODEL_TIERS[model] || model;
+}
+
+// opencode run has no --settings/--plugin-dir/--max-budget-usd/--session-id:
+// the settings profile travels via HARNESS_SETTINGS (read by the plugin
+// adapter), the plugin loads from the project's .opencode/, budget caps are
+// metered in-harness, and sessions cannot start with a caller-chosen id — a
+// later link resumes the most recent session for the cwd via --continue.
+function buildOpencodeArgs(model, continueSession, outputFormat) {
+  const args = ['run', '-m', resolveModel(model)];
+  if (continueSession) args.push('--continue');
+  if (outputFormat) args.push('--format', 'json');
   return args;
 }
 
-function buildClaudeEnv() {
+function buildOpencodeEnv() {
   return {
     ...process.env,
+    HARNESS_SETTINGS: E2E_SETTINGS,
     HARNESS_ENABLE_TELEMETRY: '1',
     OTEL_METRICS_EXPORTER: 'otlp',
     OTEL_EXPORTER_OTLP_PROTOCOL: 'grpc',
@@ -50,21 +50,18 @@ function buildClaudeEnv() {
   };
 }
 
-function runClaude(prompt, options = {}) {
+function runOpencode(prompt, options = {}) {
   const {
     cwd = process.cwd(),
     model = 'sonnet',
-    budgetUsd = '1.00',
     timeoutMs = 300000,
     continueSession = false,
-    pluginDir = null,
-    sessionId = null,
     outputFormat = null,
-  } = options;
+  } = options; // budgetUsd/pluginDir/sessionId accepted by callers but have no opencode equivalent
 
-  const args = buildClaudeArgs(model, budgetUsd, continueSession, pluginDir, sessionId, outputFormat);
-  const { result, stdout, stderr } = spawnCapturedGroup('claude', args, {
-    input: prompt, cwd, timeoutMs, env: buildClaudeEnv(),
+  const args = [...buildOpencodeArgs(model, continueSession, outputFormat), prompt];
+  const { result, stdout, stderr } = spawnCapturedGroup('opencode', args, {
+    input: '', cwd, timeoutMs, env: buildOpencodeEnv(),
   });
   const combined = `${stdout || ''}\n${stderr || ''}`;
   // Surface account/session caps immediately so live e2e fails with a clear
@@ -89,14 +86,14 @@ function readTextOr(p, fallback) {
 
 // spawnSync, but capture stdout/stderr to FILES instead of pipes and reap the
 // whole process group afterward. With pipes, a grandchild that outlives the
-// killed `claude` — a lingering dev server, or a node:test that never
+// killed `opencode` — a lingering dev server, or a node:test that never
 // force-exits — keeps the pipe open, so spawnSync blocks draining it far past
-// timeoutMs; because runClaude is synchronous that also wedges node:test's own
+// timeoutMs; because runOpencode is synchronous that also wedges node:test's own
 // timeout. Files never block, and the group-kill (-pid, only reachable because
 // the child is detached/a group leader) cleans up the orphans spawnSync's
 // single-pid SIGKILL leaves behind.
 function spawnCapturedGroup(command, args, { input, cwd, timeoutMs, env }) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'claude-run-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'opencode-run-'));
   const outFd = fs.openSync(path.join(dir, 'out'), 'w');
   const errFd = fs.openSync(path.join(dir, 'err'), 'w');
   let result;
@@ -118,4 +115,4 @@ function spawnCapturedGroup(command, args, { input, cwd, timeoutMs, env }) {
   return { result, stdout, stderr };
 }
 
-module.exports = { runClaude, spawnCapturedGroup, HARNESS_ROOT };
+module.exports = { runOpencode, spawnCapturedGroup, HARNESS_ROOT };

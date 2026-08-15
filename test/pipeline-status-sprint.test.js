@@ -40,7 +40,7 @@ function makeProject(files = {}) {
 
 test('buildSnapshot surfaces sprint number and phase when /sprint has written state markers', () => {
   const dir = makeProject({
-    'claude-progress.txt': PROGRESS_MINIMAL,
+    'harness-progress.txt': PROGRESS_MINIMAL,
     'features.json': FEATURES_MINIMAL,
     '.opencode/state/current-sprint': '2',
     '.opencode/state/sprint-phase': 'design-delta',
@@ -57,7 +57,7 @@ test('buildSnapshot surfaces sprint number and phase when /sprint has written st
 
 test('buildSnapshot omits sprint when no /sprint state markers exist', () => {
   const dir = makeProject({
-    'claude-progress.txt': PROGRESS_MINIMAL,
+    'harness-progress.txt': PROGRESS_MINIMAL,
     'features.json': FEATURES_MINIMAL,
   });
   try {

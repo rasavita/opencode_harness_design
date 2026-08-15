@@ -16,7 +16,7 @@ test('live adversarial E2E runs Claude against every brownfield fixture and re-r
   assert.ok(fs.existsSync(LIVE_E2E), 'test/e2e/harness-adversarial-live.test.js must exist');
   const e2e = fs.readFileSync(LIVE_E2E, 'utf8');
 
-  assert.match(e2e, /runClaude\(/);
+  assert.match(e2e, /runOpencode\(/);
   assert.match(e2e, /loadManifest\(/);
   assert.match(e2e, /scenario\.lane === 'brownfield'/);
   assert.match(e2e, /copyFixture\(/);

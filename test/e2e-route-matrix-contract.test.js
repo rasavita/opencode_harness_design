@@ -20,8 +20,8 @@ test('live e2e route matrix covers scaffold plus build and feature routes', () =
 
 test('brownfield live route runs the real /brownfield --seams and asserts its artifacts', () => {
   const file = read('test/e2e/harness-brownfield-run.test.js');
-  assert.match(file, /runClaude\('\/scaffold --yes existing/);
-  assert.match(file, /runClaude\('\/brownfield --seams/);
+  assert.match(file, /runOpencode\('\/scaffold --yes existing/);
+  assert.match(file, /runOpencode\('\/brownfield --seams/);
   assert.match(file, /'code-graph\.json'/);
   assert.match(file, /'wiki', 'WIKI\.md'/);
   assert.match(file, /'change-strategy\.md'/);
@@ -30,8 +30,8 @@ test('brownfield live route runs the real /brownfield --seams and asserts its ar
 
 test('vibe live route scaffolds an existing repo and runs /vibe with a vibe-log assertion', () => {
   const file = read('test/e2e/harness-vibe-run.test.js');
-  assert.match(file, /runClaude\('\/scaffold --yes existing/);
-  assert.match(file, /runClaude\('\/vibe /);
+  assert.match(file, /runOpencode\('\/scaffold --yes existing/);
+  assert.match(file, /runOpencode\('\/vibe /);
   assert.match(file, /state', 'vibe-log\.md/);
   assert.match(file, /runProjectSuite/);
 });
@@ -50,14 +50,14 @@ test('gated live route uses plain /build and asserts it stops before autonomous 
   const file = read('test/e2e/harness-gated-build.test.js');
   // Non-interactive scaffold (--yes) — interactive /scaffold only prints Q1 in claude -p.
   assert.match(file, /\/scaffold --yes/);
-  assert.match(file, /runClaude\('\/build prd\.md'/);
+  assert.match(file, /runOpencode\('\/build prd\.md'/);
   assert.match(file, /specs\/brd\/brd\.md/);
   assert.match(file, /must not enter autonomous build before approval/);
 });
 
 test('feature live route scaffolds an existing repo and runs /feature --auto', () => {
   const file = read('test/e2e/harness-feature-route.test.js');
-  assert.match(file, /runClaude\('\/scaffold --yes existing small Node library/);
+  assert.match(file, /runOpencode\('\/scaffold --yes existing small Node library/);
   // Headless: default /feature stops at human gates in claude -p.
   assert.match(file, /\/feature --auto /);
   assert.match(file, /specs', 'brownfield', 'code-graph\.json/);

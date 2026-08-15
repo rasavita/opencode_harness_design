@@ -81,7 +81,7 @@ Use `/brownfield` directly only when you want discovery without implementation. 
 | `.opencode/settings.json` | Hooks, permissions, env for interactive runs |
 | `.opencode/settings.auto.json` | Headless `--auto` profile; use only in an isolated runner |
 | `specs/` | BRD, stories, design, test plan, reviews, brownfield maps |
-| `claude-progress.txt` | Current pipeline state |
+| `harness-progress.txt` | Current pipeline state |
 
 ## Optional Power-Ups
 

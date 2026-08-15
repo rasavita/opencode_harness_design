@@ -146,7 +146,7 @@ test('matrix backstop: announces a skip when no matrix rows are in scope for the
   // a vacuous pass must never be silent.
   const projectDir = makeGitProject();
   stage(projectDir, 'src/types/models.py', 'X = 1\n');
-  armGreenContractGate(projectDir); // claude-progress.txt: current_group: group-01
+  armGreenContractGate(projectDir); // harness-progress.txt: current_group: group-01
   installMatrixGate(projectDir);
   armMatrixGate(projectDir, { group: 'group-99' });
   const result = await runGitHook(projectDir, HOOK, { HARNESS_COVERAGE_GATE: 'off' });

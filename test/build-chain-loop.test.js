@@ -3,7 +3,7 @@
 
 const assert = require('assert');
 const { test } = require('node:test');
-const { runChain, claudeArgsFor, promptFor } = require('../.opencode/scripts/build-chain.js');
+const { runChain, opencodeArgsFor, promptFor } = require('../.opencode/scripts/build-chain.js');
 const { STATES } = require('../.opencode/scripts/build-chain-state.js');
 const { parseBuildInvocation } = require('../.opencode/scripts/build-lane.js');
 
@@ -132,23 +132,19 @@ test('a failed FINALIZE link is terminal STUCK', async () => {
   assert.match(res.reason, /finalize/i);
 });
 
-test('real claude args use the unattended settings profile when requested', () => {
-  const args = claudeArgsFor({
-    model: 'opus',
-    pluginDir: '/tmp/harness/.opencode',
-    settings: '.opencode/settings.auto.json',
-    strictMcp: true,
-    maxBudgetUsd: '25',
-  });
-
-  assert.deepStrictEqual(args, [
-    '-p',
-    '--model', 'opus',
-    '--plugin-dir', '/tmp/harness/.opencode',
-    '--settings', '.opencode/settings.auto.json',
-    '--strict-mcp-config',
-    '--max-budget-usd', '25',
-  ]);
+test('real opencode args map slash prompts to run --command', () => {
+  assert.deepStrictEqual(
+    opencodeArgsFor('/auto --once --sequential', { model: 'anthropic/claude-opus-5' }),
+    ['run', '-m', 'anthropic/claude-opus-5', '--command', 'auto', '--once --sequential']
+  );
+  assert.deepStrictEqual(
+    opencodeArgsFor('/gate', {}),
+    ['run', '-m', 'anthropic/claude-sonnet-5', '--command', 'gate']
+  );
+  assert.deepStrictEqual(
+    opencodeArgsFor('continue the build', {}),
+    ['run', '-m', 'anthropic/claude-sonnet-5', 'continue the build']
+  );
 });
 
 test('build-chain PLAN and FINALIZE prompts parse as valid build lanes', () => {

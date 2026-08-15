@@ -10,7 +10,7 @@
 // hijacked — you flip it on for an /auto run and off again afterwards.
 //
 // It nudges ONLY when harness state proves work remains (an incomplete
-// current_group/groups_remaining in claude-progress.txt, or a features.json
+// current_group/groups_remaining in harness-progress.txt, or a features.json
 // feature still failing) AND the build is making progress. The bound is on
 // *no feature progress*: while the passing-feature count keeps rising the
 // budget resets and it continues indefinitely (it's working); once the count
@@ -109,7 +109,7 @@ try {
   const countPath = path.join(stateDir, 'auto-continue-count');
   const progressPath = path.join(stateDir, 'auto-continue-progress');
 
-  const progress = readText(path.join(projectDir, 'claude-progress.txt'));
+  const progress = readText(path.join(projectDir, 'harness-progress.txt'));
   const feats = passingFeatures(projectDir);
 
   if (!hasUnfinishedWork(progress, feats)) {
@@ -134,7 +134,7 @@ try {
     const reason =
       `Autonomous build is progressing (${remainingNote}) but the turn ended with work remaining.\n` +
       `Resume the build: pick up the next unfinished group/story and continue the /auto loop.\n` +
-      `This gate clears when all features pass (write "next_action: DONE …" in claude-progress.txt). ` +
+      `This gate clears when all features pass (write "next_action: DONE …" in harness-progress.txt). ` +
       `If you are genuinely BLOCKED on a decision only the user can make, STOP and state the blocker plainly instead of continuing.`;
     process.stdout.write(JSON.stringify({ decision: 'block', reason }));
     process.exit(0);
@@ -153,7 +153,7 @@ try {
     process.stdout.write(
       `WARNING: auto-continue watchdog gave up after ${count} consecutive turns with no feature progress.\n` +
       `Build appears STUCK, not idle (${remainingNote}). Stopping for human intervention — ` +
-      `check claude-progress.txt (blocked_stories / next_action) and .opencode/state/hook-errors.log.\n`
+      `check harness-progress.txt (blocked_stories / next_action) and .opencode/state/hook-errors.log.\n`
     );
     process.exit(0);
   }
@@ -163,7 +163,7 @@ try {
     `Autonomous build has unfinished work but the turn ended (${remainingNote}).\n` +
     `Resume the build: pick up the next unfinished group/story and continue the /auto loop ` +
     `[auto-continue ${count + 1}/${MAX_NO_PROGRESS_CONTINUES} with no new passing feature].\n` +
-    `This gate clears when all features pass (write "next_action: DONE …" in claude-progress.txt). ` +
+    `This gate clears when all features pass (write "next_action: DONE …" in harness-progress.txt). ` +
     `If you are genuinely BLOCKED — stuck without new information, or waiting on a decision only the user can make — ` +
     `do NOT spin: STOP and state exactly what you are blocked on.`;
   process.stdout.write(JSON.stringify({ decision: 'block', reason }));

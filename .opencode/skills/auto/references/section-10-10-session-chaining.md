@@ -1,6 +1,6 @@
 ## SECTION 10: Session Chaining
 
-`claude-progress.txt` is the memory bridge between context windows. Each iteration appends a new session block.
+`harness-progress.txt` is the memory bridge between context windows. Each iteration appends a new session block.
 
 ### Format
 

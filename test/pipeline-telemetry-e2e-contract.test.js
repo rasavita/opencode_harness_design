@@ -2,7 +2,7 @@
 
 // Static contract for Part B of the pipeline-progress proposal: the e2e suite
 // must prove that a real build's run receipts reach the telemetry dashboard.
-// Runs in the cheap main suite (no live `claude -p`, no docker) and asserts the
+// Runs in the cheap main suite (no live `opencode run`, no docker) and asserts the
 // wiring is present:
 //   1. the shared opencode-runner sets HARNESS_PUSHGATEWAY_URL so e2e builds push
 //      their receipts live via the record-run hook (same path as production);
@@ -27,13 +27,13 @@ test('opencode-runner enables harness telemetry alongside native OTEL', () => {
   assert.match(
     runner,
     /HARNESS_PUSHGATEWAY_URL:\s*process\.env\.HARNESS_PUSHGATEWAY_URL\s*\|\|\s*['"]http:\/\/localhost:9091['"]/,
-    'buildClaudeEnv must point the record-run hook at the pushgateway so e2e builds push receipts'
+    'buildOpencodeEnv must point the record-run hook at the pushgateway so e2e builds push receipts'
   );
 });
 
-test('the pushgateway URL is set inside buildClaudeEnv, not only documented', () => {
+test('the pushgateway URL is set inside buildOpencodeEnv, not only documented', () => {
   const runner = read(RUNNER);
-  const start = runner.indexOf('function buildClaudeEnv');
+  const start = runner.indexOf('function buildOpencodeEnv');
   const envFn = runner.slice(start, runner.indexOf('\n}', start));
   assert.match(envFn, /HARNESS_PUSHGATEWAY_URL/, 'lives in the env builder');
 });

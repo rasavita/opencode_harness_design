@@ -1,14 +1,14 @@
 // .opencode/scripts/build-chain.js
 'use strict';
 
-// Cross-process session-chaining driver. Spawns a FRESH `claude -p` per link so
-// a long /build --auto run survives past a single process's lifetime:
+// Cross-process session-chaining driver. Spawns a FRESH `opencode run` per link
+// so a long /build --auto run survives past a single process's lifetime:
 //
 //   PLAN  ->  /build --auto --plan-only <prd>     (writes specs/, features.json)
 //   BUILD ->  /auto --once                        (one wave, commit, checkpoint, exit)  [loop]
 //   FINAL ->  /build --auto --finalize            (Phases 9 -> 9.5 -> 10 -> 11, open PR)
 //
-// Between links it reads only state the harness already writes (claude-progress.txt
+// Between links it reads only state the harness already writes (harness-progress.txt
 // + features.json). Decision logic lives in build-chain-state.js (pure, unit-tested).
 
 const path = require('path');
@@ -68,30 +68,37 @@ function promptFor(kind, prd, opts = {}) {
   return `/auto --once${opts.sequential ? ' --sequential' : ''}${single}`; // BUILD
 }
 
-function claudeArgsFor(opts = {}) {
-  const args = ['-p', '--model', opts.model || 'sonnet'];
-  if (opts.pluginDir) args.push('--plugin-dir', opts.pluginDir);
-  if (opts.settings) args.push('--settings', opts.settings);
-  if (opts.strictMcp) args.push('--strict-mcp-config');
-  if (opts.maxBudgetUsd) args.push('--max-budget-usd', String(opts.maxBudgetUsd));
+// Translate a harness prompt like `/auto --once` into `opencode run` argv.
+// opencode has no --settings/--plugin-dir/--max-budget-usd equivalents: the
+// unattended profile travels via the HARNESS_SETTINGS env var (read by the
+// plugin adapter), the plugin loads from the project's .opencode/, and spend
+// is metered in-harness by checkBudget between links.
+function opencodeArgsFor(prompt, opts = {}) {
+  const args = ['run', '-m', opts.model || 'anthropic/claude-sonnet-5'];
+  const m = /^\/(\S+)\s*(.*)$/.exec(prompt || '');
+  if (m) {
+    args.push('--command', m[1]);
+    if (m[2]) args.push(m[2]);
+  } else {
+    args.push(prompt);
+  }
   return args;
 }
 
 function realSpawnLink(cwd, prd, runOpts = {}) {
-  const model = process.env.BUILD_CHAIN_MODEL || 'sonnet';
+  const model = process.env.BUILD_CHAIN_MODEL
+    || process.env.HARNESS_MODEL_GENERATION
+    || 'anthropic/claude-sonnet-5';
   const timeout = parseInt(process.env.BUILD_CHAIN_LINK_TIMEOUT_MS || '1800000', 10); // 30 min < wall
-  const pluginDir = process.env.HARNESS_PLUGIN_DIR || null;
-  const settings = process.env.BUILD_CHAIN_SETTINGS || (
+  const settings = process.env.HARNESS_SETTINGS || process.env.BUILD_CHAIN_SETTINGS || (
     fs.existsSync(path.join(cwd, '.opencode', 'settings.auto.json')) ? '.opencode/settings.auto.json' : null
   );
-  const strictMcp = process.env.BUILD_CHAIN_STRICT_MCP !== '0';
-  const maxBudgetUsd = process.env.BUILD_CHAIN_MAX_BUDGET_USD || null;
   return (kind, opts = {}) => {
-    const args = claudeArgsFor({ model, pluginDir, settings, strictMcp, maxBudgetUsd });
-    const r = spawnSync('claude', args, {
-      input: promptFor(kind, prd, { ...opts, singlePr: runOpts.singlePr, autoMerge: runOpts.autoMerge }),
+    const prompt = promptFor(kind, prd, { ...opts, singlePr: runOpts.singlePr, autoMerge: runOpts.autoMerge });
+    const r = spawnSync('opencode', opencodeArgsFor(prompt, { model }), {
       cwd, encoding: 'utf8', timeout, killSignal: 'SIGKILL',
-      stdio: ['pipe', 'inherit', 'inherit'],
+      env: settings ? { ...process.env, HARNESS_SETTINGS: settings } : process.env,
+      stdio: ['ignore', 'inherit', 'inherit'],
     });
     return { ok: r.status === 0 && !r.signal };
   };
@@ -100,7 +107,7 @@ function realSpawnLink(cwd, prd, runOpts = {}) {
 function realLoadState(cwd) {
   return () => {
     let text = '';
-    try { text = fs.readFileSync(path.join(cwd, 'claude-progress.txt'), 'utf8'); } catch (_) { /* none yet */ }
+    try { text = fs.readFileSync(path.join(cwd, 'harness-progress.txt'), 'utf8'); } catch (_) { /* none yet */ }
     return S.parseLastBlock(text);
   };
 }
@@ -140,4 +147,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { runChain, claudeArgsFor, promptFor };
+module.exports = { runChain, opencodeArgsFor, promptFor };

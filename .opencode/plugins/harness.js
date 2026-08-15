@@ -53,15 +53,24 @@ function mapToolInput(tool, args) {
   return out
 }
 
-function loadHookManifest(projectDir) {
+function readSettings(file) {
   try {
-    const settings = JSON.parse(
-      fs.readFileSync(path.join(projectDir, ".opencode", "settings.json"), "utf8")
-    )
-    return settings.hooks || {}
+    return JSON.parse(fs.readFileSync(file, "utf8"))
   } catch {
     return {}
   }
+}
+
+// Base manifest is .opencode/settings.json. An unattended run opts into an
+// override profile via HARNESS_SETTINGS (e.g. .opencode/settings.auto.json),
+// which merges over the base at the top level.
+function loadHookManifest(projectDir) {
+  const base = readSettings(path.join(projectDir, ".opencode", "settings.json"))
+  const overridePath = process.env.HARNESS_SETTINGS
+  const override = overridePath
+    ? readSettings(path.resolve(projectDir, overridePath))
+    : {}
+  return { ...base, ...override }.hooks || {}
 }
 
 // Extract the hook script path from a manifest command like

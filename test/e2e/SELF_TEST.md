@@ -1,7 +1,7 @@
-# E2E self-test harnesses (live `claude -p`)
+# E2E self-test harnesses (live `opencode run`)
 
 All live end-to-end harnesses live here under `test/e2e/`. They run real
-`claude -p` against the harness plugin, cost tokens, and are **not** part of
+`opencode run` against the harness plugin, cost tokens, and are **not** part of
 `npm test` (the fast unit/contract suite). Each has a cheap static **contract**
 in `test/*-contract.test.js` that pins its shape in CI without a live run.
 
@@ -45,7 +45,7 @@ Plus the pre-existing certification layers (`harness-real-workflow`,
   `fixtures/sample-prd.md` (bookmarks, for plan-only).
 - **Output** (gitignored): `*-output/` dirs + `screenshots/`.
 - **Reused, not reinvented:** every harness uses the shared
-  `helpers/opencode-runner.js` (budgeted, MCP-isolated `claude -p`); only the
+  `helpers/opencode-runner.js` (budgeted, MCP-isolated `opencode run`); only the
   browser oracle (`helpers/app-runtime.js`) and the `specs/` summary
   (`helpers/specs-summary.js`) are harness-specific. Both have unit tests that
   run in `npm test`.

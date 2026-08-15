@@ -25,7 +25,7 @@ const WITH_DATA = {
     { id: 'a', group: 'A', passes: true },
     { id: 'b', group: 'A', passes: false },
   ]),
-  'claude-progress.txt': '=== Session 0 ===\ncoverage: 88%\nnext_action: go\n',
+  'harness-progress.txt': '=== Session 0 ===\ncoverage: 88%\nnext_action: go\n',
   '.opencode/state/coverage-baseline.txt': '80\n',
 };
 

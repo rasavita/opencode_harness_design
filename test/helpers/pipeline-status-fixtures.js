@@ -72,7 +72,7 @@ const MID_BUILD_FILES = {
   '.opencode/state/current-iteration': '2\n',
   '.opencode/state/current-group': 'B\n',
   '.opencode/state/current-story': 'E1-S3\n',
-  'claude-progress.txt': PROGRESS_TWO_SESSIONS,
+  'harness-progress.txt': PROGRESS_TWO_SESSIONS,
   'features.json': FEATURES_FOUR,
   'specs/stories/dependency-graph.md': GRAPH_TWO_GROUPS,
   '.opencode/state/iteration-log.md': ITERATION_LOG_PASS,

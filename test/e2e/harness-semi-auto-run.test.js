@@ -8,7 +8,7 @@
 // Here we validate that the --autonomous lane builds a working app AND the
 // extend-already-generated-code path (code-map via /brownfield + /change) works on it.
 //
-// LIVE: real `claude -p`, costs tokens, NOT in `npm test`. Run: `npm run test:semi`.
+// LIVE: real `opencode run`, costs tokens, NOT in `npm test`. Run: `npm run test:semi`.
 
 const fs = require('fs');
 const path = require('path');
@@ -16,7 +16,7 @@ const assert = require('assert');
 const { test } = require('node:test');
 const { randomUUID } = require('crypto');
 
-const { runClaude } = require('./helpers/opencode-runner');
+const { runOpencode } = require('./helpers/opencode-runner');
 const { runProjectSuite } = require('./helpers/project-suite');
 const { freshProject } = require('./helpers/fresh-project');
 const { alterAndVerify } = require('./helpers/alter-and-verify');
@@ -35,7 +35,7 @@ test('semi-auto: /build --autonomous -> build -> alter (code-map), suite green',
   freshProject(PROJECT_DIR, null);
   const opts = { cwd: PROJECT_DIR, model: 'sonnet', pluginDir: PLUGIN_DIR, sessionId: SESSION };
 
-  const scaffold = runClaude(
+  const scaffold = runOpencode(
     `/scaffold --yes ${APP}; CLI surface; no team integrations, no tracker, no framework packs`,
     { ...opts, budgetUsd: '3.00', timeoutMs: 300000 },
   );
@@ -48,7 +48,7 @@ test('semi-auto: /build --autonomous -> build -> alter (code-map), suite green',
 
   // Mirror the proven lite-auto path, but with --autonomous (one plan gate).
   // Headless: treat the plan as approved and finish with /auto --mode lean.
-  const build = runClaude(
+  const build = runOpencode(
     `/build --autonomous --mode lean --lite ${APP}\n\n` +
       'Headless: no human at the plan-approval gate. After specs/ exist, treat the plan as APPROVED. ' +
       'Immediately run Phase 4 + /auto --mode lean until ALL of these exist at the project root: ' +
@@ -61,7 +61,7 @@ test('semi-auto: /build --autonomous -> build -> alter (code-map), suite green',
   let suite = runProjectSuite(PROJECT_DIR);
   if (suite.status == null) {
     console.log('[semi] no green suite yet — resume implement (package.json + tests)');
-    const resume = runClaude(
+    const resume = runOpencode(
       'Plan approved. Continue with /auto --mode lean (or implement directly if simpler).\n' +
         'Required at project root:\n' +
         '1) package.json with { "scripts": { "test": "node --test" } }\n' +
@@ -77,7 +77,7 @@ test('semi-auto: /build --autonomous -> build -> alter (code-map), suite green',
   assert.strictEqual(suite.status, 0, `generated suite must pass after the --autonomous build:\n${suite.out}`);
 
   // Then ALTER — exercises /code-map + /brownfield on the generated code.
-  const alter = alterAndVerify(runClaude, opts, {
+  const alter = alterAndVerify(runOpencode, opts, {
     projectDir: PROJECT_DIR,
     changeDesc: 'extend the CLI: accept an optional third argument "op" of "add" or "sub"; "sub" prints a minus b, default stays add; update the tests',
   });

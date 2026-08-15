@@ -49,7 +49,7 @@ If `--sequential`, skip branch creation entirely and commit directly to `WAVE_BA
 Concurrent group-orchestrators MUST NOT write to shared state files. The parent owns shared state and merges per-group artifacts between waves.
 
 **Parent-owned (read-write only by parent orchestrator):**
-- `claude-progress.txt`
+- `harness-progress.txt`
 - `.opencode/state/learned-rules.md`
 - `features.json` (parent rolls up per-group status updates between waves)
 
@@ -65,7 +65,7 @@ The parent creates `.opencode/state/wave-{N}/` before dispatch and rolls per-gro
 1. Append each `iteration-log.md` section to the canonical `.opencode/state/iteration-log.md` (preserving group tags).
 2. Merge each `features-update.json` into `features.json` (key-disjoint by story ID — no conflicts possible if file ownership held).
 3. Triage each `learned-rule-candidates.md` — promote the strong ones to `.opencode/state/learned-rules.md`; discard duplicates and weak signals.
-4. Update `claude-progress.txt` with the wave summary (groups completed, stories passing, next wave preview).
+4. Update `harness-progress.txt` with the wave summary (groups completed, stories passing, next wave preview).
 
 ### Group-Orchestrator Spawn Protocol
 
@@ -80,7 +80,7 @@ Mandatory steps:
 1. Read sprint-contracts/group-{G}.json. If missing, propose one (Section 3 of /auto), get evaluator approval, then proceed.
 2. Switch to branch auto/group-{G} (parent has already created it from {WAVE_BASE}).
 3. Run the in-group flow: micro-DAG → teammate dispatch (Rule 2 in generator.md) → ratchet gate for this group only.
-4. Write per-group state to .opencode/state/wave-{N}/group-{G}/ ONLY. Do not write to claude-progress.txt, learned-rules.md, or features.json directly.
+4. Write per-group state to .opencode/state/wave-{N}/group-{G}/ ONLY. Do not write to harness-progress.txt, learned-rules.md, or features.json directly.
 5. Commit all work to auto/group-{G}. Do NOT merge — the parent handles merging after the wave.
 6. Return a structured summary: { "group": "{G}", "passes": <bool>, "stories_passing": [...], "stories_failing": [...], "rule_candidates_path": "...", "iteration_log_path": "..." }
 

@@ -7,7 +7,7 @@ const path = require('path');
 const { describe, test, before } = require('node:test');
 const { execFileSync } = require('child_process');
 
-const { runClaude, HARNESS_ROOT } = require('./helpers/opencode-runner');
+const { runOpencode, HARNESS_ROOT } = require('./helpers/opencode-runner');
 const { runProjectSuite } = require('./helpers/project-suite');
 const { isPrometheusUp, assertMetricExists, pollMetric } = require('./helpers/prometheus-checker');
 const { isGrafanaUp, getDashboard, listDashboards } = require('./helpers/grafana-checker');
@@ -77,7 +77,7 @@ describe('Harness E2E — Brownfield + Telemetry', { timeout: 1200000 }, () => {
       '2. specs/brownfield/test-map.md — test commands, test file locations\n' +
       '3. specs/brownfield/risk-map.md — fragile areas, missing tests, coupling concerns\n' +
       'Base findings on the actual files in this directory and cite real file paths in every map.';
-    const result = runClaude(prompt, {
+    const result = runOpencode(prompt, {
       cwd: PROJECT_DIR,
       model: 'sonnet',
       budgetUsd: '2.00',
@@ -179,7 +179,7 @@ describe('Harness E2E — Brownfield + Telemetry', { timeout: 1200000 }, () => {
       'Return exit code 0 if matches found, exit code 1 if no matches. ' +
       'Also add a test for the search command in the existing test file. ' +
       'Do NOT break existing commands — only add the new search feature.';
-    const result = runClaude(prompt, {
+    const result = runOpencode(prompt, {
       cwd: PROJECT_DIR,
       model: 'sonnet',
       budgetUsd: '2.00',

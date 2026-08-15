@@ -109,7 +109,7 @@ The harness is now an **agent factory**: one scaffold, optional framework skill 
 │   3. Spawn agent team (phased DAG, ≤5 parallel teammates)                  │
 │   4. Run 8 ratchet gates (tests→lint→coverage→arch→eval→critic→sec→diff)  │
 │   5. Self-heal failed gates (max 3 attempts; different strategy each)      │
-│   6. Update features.json, learned-rules.md, claude-progress.txt           │
+│   6. Update features.json, learned-rules.md, harness-progress.txt           │
 │   7. Commit. Hooks enforce length, secrets, layers, review.                │
 └────────────────────────────────────┬──────────────────────────────────────┘
                                      │
@@ -385,7 +385,7 @@ Recovery cost ≈ 700–1000 tokens per iteration. `/auto` reads:
 
 1. `.opencode/program.md` — constraints may have changed mid-run
 2. `.opencode/state/learned-rules.md` — inject verbatim into all agent prompts
-3. `claude-progress.txt` — last session block only
+3. `harness-progress.txt` — last session block only
 4. `features.json` — what's passing, what's failing
 5. `specs/stories/dependency-graph.md` — what's the next unblocked group
 
@@ -592,7 +592,7 @@ Blocked:
 | `.opencode/state/pending-reviews.jsonl` | Recreated/cleared by hooks | Files changed this turn that require reviewer agents |
 | `coverage-baseline.txt` | Ratcheted upward | Never drops; floor is 80% |
 | `features.json` | Updated per evaluation | Granular pass/fail with failure_layer and timestamps |
-| `claude-progress.txt` | Appended per session | Session chaining recovery context |
+| `harness-progress.txt` | Appended per session | Session chaining recovery context |
 | `sprint-contracts/` | One file per group | Negotiated done-criteria; immutable after negotiation |
 | `specs/reviews/eval-scores.json` | Appended per critique | User-visible design scores over time |
 | `calibration-profile.json` | Edited by human/scaffold | Scoring weights, threshold, plateau detection config |

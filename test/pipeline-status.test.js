@@ -70,7 +70,7 @@ test('health is on_track when latest coverage is at or above baseline', () => {
 
 test('health is failing when coverage dropped below baseline', () => {
   const dir = makeProject({
-    'claude-progress.txt': [
+    'harness-progress.txt': [
       '=== Session 0 ===',
       'groups_completed: [A]',
       'groups_remaining: [B]',
@@ -88,7 +88,7 @@ test('health is failing when coverage dropped below baseline', () => {
 
 test('health is blocked when a story is blocked', () => {
   const dir = makeProject({
-    'claude-progress.txt': [
+    'harness-progress.txt': [
       '=== Session 0 ===',
       'groups_completed: []',
       'groups_remaining: [A]',

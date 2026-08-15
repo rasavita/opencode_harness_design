@@ -11,7 +11,7 @@ const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 const { randomUUID } = require('crypto');
 
-const { runClaude } = require('./helpers/opencode-runner');
+const { runOpencode } = require('./helpers/opencode-runner');
 const { runProjectSuite } = require('./helpers/project-suite');
 
 const PROJECT_DIR = path.join(__dirname, 'feature-output');
@@ -58,7 +58,7 @@ test('feature: existing repo -> /feature changes behavior and keeps suite green'
   resetExistingProject();
   const opts = { cwd: PROJECT_DIR, model: 'sonnet', pluginDir: PLUGIN_DIR, sessionId: SESSION };
 
-  const scaffold = runClaude('/scaffold --yes existing small Node library with calculator behavior and tests', {
+  const scaffold = runOpencode('/scaffold --yes existing small Node library with calculator behavior and tests', {
     ...opts,
     budgetUsd: '3.00',
     timeoutMs: 300000,
@@ -66,8 +66,8 @@ test('feature: existing repo -> /feature changes behavior and keeps suite green'
   console.log('[feature] scaffold exit:', scaffold.exitCode);
 
   // Default /feature has 3 human gates and will stop after decomposition in
-  // claude -p. Use --auto so the e2e can prove implement → green suite headless.
-  const result = runClaude(
+  // opencode run. Use --auto so the e2e can prove implement → green suite headless.
+  const result = runOpencode(
     '/feature --auto add a multiply(a, b) function exported from calc.js and covered by node:test; keep add(a, b) unchanged',
     {
       ...opts,

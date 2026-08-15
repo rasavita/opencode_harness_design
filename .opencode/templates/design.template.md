@@ -22,7 +22,7 @@ Planner   Generator  Evaluator  Test Eng  Security Rev
               ┌──────────▼──────────┐
               │     State Layer      │
               │  features.json       │
-              │  claude-progress.txt │
+              │  harness-progress.txt │
               │  learned-rules.md    │
               │  failures.md         │
               │  iteration-log.md    │
@@ -110,7 +110,7 @@ Commit-time gates are real **git hooks** (installed in Step 8), not Claude Code 
 |-----------------------|------------------------------------------------------|
 | `features.json`       | Feature registry with status tracking                |
 | `specs/brownfield/`   | Existing-codebase maps for brownfield work           |
-| `claude-progress.txt` | Session progress and current pipeline position       |
+| `harness-progress.txt` | Session progress and current pipeline position       |
 | `learned-rules.md`    | Accumulated rules from past failures (ratchet memory)|
 | `vibe-log.md`         | Micro-contract history for controlled small changes  |
 | `pending-reviews.jsonl` | Hook-created review ledger for files changed this turn |

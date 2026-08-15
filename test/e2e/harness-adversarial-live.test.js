@@ -7,7 +7,7 @@ const path = require('path');
 const { spawnSync, execFileSync } = require('child_process');
 const { describe, test, before } = require('node:test');
 
-const { runClaude } = require('./helpers/opencode-runner');
+const { runOpencode } = require('./helpers/opencode-runner');
 
 const ROOT = path.join(__dirname, '..', '..');
 const MANIFEST_PATH = path.join(__dirname, 'fixtures', 'adversarial', 'manifest.json');
@@ -111,7 +111,7 @@ describe('Harness E2E — Live Adversarial Mutation', { timeout: 1200000 }, () =
         `${scenario.id} fixture must be passing before live mutation:\n${beforeSuite.stdout}${beforeSuite.stderr}`
       );
 
-      const result = runClaude(buildMutationPrompt(scenario, contract), {
+      const result = runOpencode(buildMutationPrompt(scenario, contract), {
         cwd: projectDir,
         model: 'sonnet',
         budgetUsd: '2.00',

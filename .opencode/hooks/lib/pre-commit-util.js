@@ -125,7 +125,7 @@ function stagedFiles(projectDir) {
 
 function inAutoBuild(projectDir) {
   try {
-    const progress = fs.readFileSync(path.join(projectDir, 'claude-progress.txt'), 'utf8');
+    const progress = fs.readFileSync(path.join(projectDir, 'harness-progress.txt'), 'utf8');
     const m = progress.match(/^current_group:\s*(.+)$/m);
     return !!(m && m[1].trim());
   } catch (_) {

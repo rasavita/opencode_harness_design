@@ -33,7 +33,7 @@ One-way dependencies only. See `.opencode/architecture.md` for full rules.
 | Small work lane | `.opencode/skills/vibe/SKILL.md` |
 | Code graph mapping | `.opencode/skills/code-map/SKILL.md` |
 | Seam ranking | `.opencode/skills/seam-finder/SKILL.md` |
-| Session recovery | `claude-progress.txt` |
+| Session recovery | `harness-progress.txt` |
 | Feature tracking | `features.json` |
 | Learned rules | `.opencode/state/learned-rules.md` |
 | Controlled vibe log | `.opencode/state/vibe-log.md` |

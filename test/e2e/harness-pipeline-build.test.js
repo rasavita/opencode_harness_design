@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { describe, test, before, after } = require('node:test');
 
-const { runClaude, HARNESS_ROOT } = require('./helpers/opencode-runner');
+const { runOpencode, HARNESS_ROOT } = require('./helpers/opencode-runner');
 const { assertMetricExists, isPrometheusUp, pollMetric } = require('./helpers/prometheus-checker');
 const { isGrafanaUp, getDashboard, listDashboards } = require('./helpers/grafana-checker');
 
@@ -66,7 +66,7 @@ describe('Harness E2E Pipeline — Build + Observability', { timeout: 900000 }, 
       'FILE 3: storage.js — module that reads/writes todos.json. Each todo: {id, text, completed, createdAt}.\n' +
       'FILE 4: todo.js — CLI entry point parsing process.argv: add <text>, list, complete <id>, delete <id>.\n\n' +
       'Use only Node.js built-ins. Exit 0 on success, 1 on error. Write tests first, then implementation.';
-    const result = runClaude(autoPrompt, {
+    const result = runOpencode(autoPrompt, {
       cwd: PROJECT_DIR, model: 'sonnet', budgetUsd: '1.00', timeoutMs: 170000,
     });
 

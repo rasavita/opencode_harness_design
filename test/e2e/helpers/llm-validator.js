@@ -12,14 +12,11 @@ function llmValidate(artifactPath, criteria) {
     'ARTIFACT:\n' + trimmed + '\n\n' +
     'Respond with ONLY valid JSON matching: {"pass": true/false, "failures": ["..."]}';
 
-  const result = spawnSync('claude', [
-    '-p',
-    '--model', 'haiku',
-    '--no-session-persistence',
-    '--max-budget-usd', '0.15',
-    '--bare',
+  const result = spawnSync('opencode', [
+    'run',
+    '-m', process.env.HARNESS_MODEL_EXPLORATION || 'anthropic/claude-haiku-4-5',
+    prompt,
   ], {
-    input: prompt,
     encoding: 'utf8',
     timeout: 45000,
   });

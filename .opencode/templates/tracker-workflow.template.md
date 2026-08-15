@@ -1,11 +1,11 @@
 ---
 agent:
-  runner: claude_code
+  runner: opencode
   max_turns: 3
 workspace:
   root: /workspaces
-claude_code:
-  command: claude --print --permission-mode bypassPermissions
+opencode:
+  command: opencode run --auto
 ---
 
 You are running an unattended OpenCode Harness execution for tracker group `{{ group.id }}`.

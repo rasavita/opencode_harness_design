@@ -109,7 +109,7 @@ Also write the machine-readable verdict to `specs/reviews/code-review-verdict.js
 
 ## Gotchas
 
-- **Stay cold.** Do not read `claude-progress.txt`, `iteration-log.md`, or the builder's transcripts — importing the builder's assumptions defeats the fresh-context design. The story acceptance criteria (if the spawn prompt names them) are the only intent you take as given.
+- **Stay cold.** Do not read `harness-progress.txt`, `iteration-log.md`, or the builder's transcripts — importing the builder's assumptions defeats the fresh-context design. The story acceptance criteria (if the spawn prompt names them) are the only intent you take as given.
 - **Review the diff, not the legacy.** Pre-existing violations in untouched lines are out of scope — unless the diff makes them worse. Note them as INFO at most.
 - **Generated and vendored files** (migrations, lockfiles, fixtures, `node_modules/`) are out of scope.
 - **Brownfield context:** If `specs/brownfield/risk-map.md` exists, read it — a WARN in a file the risk map flags as high-risk escalates to BLOCK.

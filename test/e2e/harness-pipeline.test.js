@@ -7,7 +7,7 @@ const path = require('path');
 const { describe, test, before, after } = require('node:test');
 const { execFileSync } = require('child_process');
 
-const { runClaude, HARNESS_ROOT } = require('./helpers/opencode-runner');
+const { runOpencode, HARNESS_ROOT } = require('./helpers/opencode-runner');
 const { assertMetricExists, isPrometheusUp, pollMetric } = require('./helpers/prometheus-checker');
 const { isGrafanaUp, getDashboard, listDashboards } = require('./helpers/grafana-checker');
 
@@ -89,10 +89,10 @@ describe('Harness E2E Pipeline', { timeout: 1500000 }, () => {
   test('Stage 0 - Scaffold: /scaffold initializes the harness project', { timeout: 600000 }, () => {
     const pluginDir = path.join(HARNESS_ROOT, '..', '.opencode');
     const sessionId = require('crypto').randomUUID();
-    runClaude('/scaffold', {
+    runOpencode('/scaffold', {
       cwd: PROJECT_DIR, model: 'sonnet', budgetUsd: '1.00', timeoutMs: 90000, pluginDir, sessionId,
     });
-    const result = runClaude(
+    const result = runOpencode(
       'A Node.js CLI todo application using only Node built-ins; project shape: ' +
       'script/CLI; user surface: CLI; no team integrations, no tracker, no framework ' +
       'packs. I will not answer further questions — accept the inferred profile ' +
@@ -133,7 +133,7 @@ describe('Harness E2E Pipeline', { timeout: 1500000 }, () => {
       'Write ALL of the following sections: Executive Summary, Goals, Target Users, Success Metrics, ' +
       'Scope, MVP Definition, Alternatives, Technical Architecture, Data Model, Integrations, ' +
       'Constraints, UI Context, Open Questions.\n\nRequirements:\n\n' + brdRequirements;
-    const result = runClaude(prompt, {
+    const result = runOpencode(prompt, {
       cwd: PROJECT_DIR, model: 'sonnet', budgetUsd: '0.50', timeoutMs: 110000,
     });
 
@@ -177,7 +177,7 @@ describe('Harness E2E Pipeline', { timeout: 1500000 }, () => {
       '3. specs/stories/dependency-graph.md.\n' +
       '4. features.json array (id, category, story, group, description, steps, passes: false).\n\n' +
       'Decompose this BRD into at least 3 stories:\n\n' + brdContent.slice(0, 4000);
-    const result = runClaude(specPrompt, {
+    const result = runOpencode(specPrompt, {
       cwd: PROJECT_DIR, model: 'sonnet', budgetUsd: '1.00', timeoutMs: 180000, continueSession: true,
     });
     const storyFiles = findFilesInProject('specs/stories', /^E\d+-S\d+.*\.md$/);
@@ -226,7 +226,7 @@ describe('Harness E2E Pipeline', { timeout: 1500000 }, () => {
       '1. specs/design/architecture.md\n2. specs/design/api-contracts.md\n' +
       '3. specs/design/data-models.md\n4. specs/design/folder-structure.md\n' +
       '5. specs/design/component-map.md\nEach 10-30 lines.';
-    const result = runClaude(designPrompt, {
+    const result = runOpencode(designPrompt, {
       cwd: PROJECT_DIR, model: 'sonnet', budgetUsd: '0.50', timeoutMs: 110000, continueSession: true,
     });
     const designDir = path.join(PROJECT_DIR, 'specs/design');

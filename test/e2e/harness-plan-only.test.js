@@ -6,7 +6,7 @@
 // graph, design, test plan) for a human to eyeball — no code, no PR, no tracker.
 // This is the cheap "is the plan good?" check before any semi-/full-auto run.
 //
-// Runs LIVE `claude -p`; costs tokens; NOT part of `npm test`. Run with
+// Runs LIVE `opencode run`; costs tokens; NOT part of `npm test`. Run with
 // `npm run plan`. Static contract: ../test/plan-only-contract.test.js.
 
 const fs = require('fs');
@@ -15,7 +15,7 @@ const assert = require('assert');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const { runClaude } = require('./helpers/opencode-runner');
+const { runOpencode } = require('./helpers/opencode-runner');
 const { summarizeSpecs, formatSummary } = require('./helpers/specs-summary');
 
 const PROJECT_DIR = path.join(__dirname, 'plan-output');
@@ -40,7 +40,7 @@ test('plan-only: PRD -> specs/ for inspection (no code, no PR)', { timeout: 1200
   resetProject();
   const opts = { cwd: PROJECT_DIR, model: 'sonnet', pluginDir: HARNESS_PLUGIN_DIR, sessionId: SESSION_ID };
 
-  const scaffold = runClaude(
+  const scaffold = runOpencode(
     '/scaffold --yes a Node.js bookmarks CLI from prd.md; CLI surface; no team integrations, no tracker, no framework packs',
     { ...opts, budgetUsd: '3.00', timeoutMs: 300000 },
   );
@@ -51,7 +51,7 @@ test('plan-only: PRD -> specs/ for inspection (no code, no PR)', { timeout: 1200
     'scaffold must install harness before /build',
   );
 
-  const plan = runClaude('/build --autonomous --plan-only prd.md', {
+  const plan = runOpencode('/build --autonomous --plan-only prd.md', {
     ...opts, continueSession: true, budgetUsd: '6.00', timeoutMs: 900000,
   });
   console.log('[plan] build --plan-only exit:', plan.exitCode);

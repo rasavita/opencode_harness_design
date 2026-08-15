@@ -78,7 +78,7 @@ For each missing or partial pack, print this verbatim — substituting `<repo>`,
   Open a normal terminal (NOT Claude Code) and run:
 
     cd <project-root>
-    npx --yes skills add <repo> -a claude-code -s '*' -y
+    npx --yes skills add <repo> -a opencode -s '*' -y
 
   Verify:
 
@@ -113,7 +113,7 @@ This is informational only — the skill does not depend on it for correctness; 
 ## When NOT to use this skill
 
 - The framework pack is published as a Claude Code marketplace plugin (use `enabledPlugins` in `settings.json` instead).
-- You want to install a one-off, unregistered pack from a different repository (run `npx skills add <repo> -a claude-code -s '*' -y` directly instead).
+- You want to install a one-off, unregistered pack from a different repository (run `npx skills add <repo> -a opencode -s '*' -y` directly instead).
 - You're auditing what's installed — `--list` is fine; otherwise use `ls .opencode/skills/` directly.
 
 ## Safety notes

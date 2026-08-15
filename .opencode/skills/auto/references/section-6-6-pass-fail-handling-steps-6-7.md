@@ -6,7 +6,7 @@
 
 1. **Commit:** `git add -A && git commit -m "feat: implement group {group}"`
 2. **Update features.json:** Set `passes: true` for all features in this group's sprint contract.
-3. **Update claude-progress.txt:** Append a new session block (see SECTION 10 for format).
+3. **Update harness-progress.txt:** Append a new session block (see SECTION 10 for format).
 4. **Update iteration-log.md:** Append entry with group ID, timestamp, verdict, and summary.
 5. **Update coverage-baseline.txt:** Write the new coverage percentage (ratchet up).
 6. **Next group:** Return to SECTION 2 (context recovery) for the next iteration.
@@ -23,7 +23,7 @@ The above steps are split across the group-orchestrator subagent and the parent 
 *Parent (after all group-orchestrators in the wave return):*
 4. **Roll-up state** (Section 4B Wait + Merge Protocol): merge per-group `features-update.json` files into `features.json`, append per-group `iteration-log.md` sections to the canonical log, triage `learned-rule-candidates.md` into `learned-rules.md`.
 5. **Merge branches sequentially** into `WAVE_BASE` in dependency-graph order (passing groups only).
-6. **Update parent state:** append a new session block to `claude-progress.txt` with the wave summary; ratchet `coverage-baseline.txt` to the new repo-wide coverage after all merges.
+6. **Update parent state:** append a new session block to `harness-progress.txt` with the wave summary; ratchet `coverage-baseline.txt` to the new repo-wide coverage after all merges.
 7. **Next wave:** Return to SECTION 2 (context recovery) to compute the next wave.
 
 ### On FAIL — Self-Healing Loop (Max 3 Attempts)
@@ -79,7 +79,7 @@ Do not immediately revert. Attempt targeted self-healing first.
    - Revert ONLY this group's files, scoped via the file ownership list in `specs/design/component-map.md`: `git checkout -- {file1} {file2} ...`. Never `git checkout -- .` — in parallel-group mode that discards other groups' in-flight work.
    - Log the failure to `.opencode/state/failures.md` with group ID, failure category, all three attempt summaries.
    - Extract a learned rule (see SECTION 12).
-   - Mark the group as BLOCKED in `claude-progress.txt`.
+   - Mark the group as BLOCKED in `harness-progress.txt`.
    - Escalate to the user with a summary.
    - Continue to the next unblocked group.
 

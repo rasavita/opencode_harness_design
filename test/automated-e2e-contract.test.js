@@ -21,15 +21,15 @@ test('smoke harness exists and reuses the shared opencode-runner (no reinvented 
   assert.ok(fs.existsSync(SMOKE), 'test/e2e/harness-selfheal-smoke.test.js must exist');
   const smoke = read(SMOKE);
   assert.match(smoke, /require\(['"]\.\/helpers\/opencode-runner['"]\)/);
-  assert.match(smoke, /runClaude\(/);
+  assert.match(smoke, /runOpencode\(/);
 });
 
 test('smoke runs the full lifecycle: scaffold -> lite build -> modify via /change', () => {
   const smoke = read(SMOKE);
-  assert.match(smoke, /runClaude\([`'"]\/scaffold --yes/, 'must scaffold non-interactively via /scaffold --yes');
+  assert.match(smoke, /runOpencode\([`'"]\/scaffold --yes/, 'must scaffold non-interactively via /scaffold --yes');
   assert.match(smoke, /project-manifest\.json/, 'must verify /scaffold produced real artifacts, not just exit 0');
-  assert.match(smoke, /runClaude\([`'"]\/build --lite/);
-  assert.match(smoke, /runClaude\(\s*['"`]\/change/, 'must modify already-generated code via /change');
+  assert.match(smoke, /runOpencode\([`'"]\/build --lite/);
+  assert.match(smoke, /runOpencode\(\s*['"`]\/change/, 'must modify already-generated code via /change');
 });
 
 test('smoke verifies behavior in a real browser, not just unit tests', () => {

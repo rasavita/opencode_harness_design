@@ -74,7 +74,7 @@ function readHookInputAsync(timeoutMs = 4000) {
     stdin.on('data', (c) => { data += c; });
     stdin.on('end', () => {
       detachStdin(stdin, timer);
-      // No event at all means the hook was not invoked by Claude Code (a fixture,
+      // No event at all means the hook was not invoked by the plugin adapter (a fixture,
       // a manual run). That is not a control-health signal, so it is tagged and
       // kept out of the sensor ledger — otherwise every test run would leave the
       // ERRORED bucket non-empty and the operator would learn to ignore it.
@@ -220,13 +220,13 @@ function persistFailure(hookName, message, record) {
   }
 }
 
-// No event on stdin means the hook was never invoked by Claude Code — a fixture or
+// No event on stdin means the hook was never invoked by the plugin adapter — a fixture or
 // a manual run. Nothing crashed and there is no control outcome, so it stays out of
 // BOTH the ledger and the log: a signal that fires on every test run is a signal the
 // operator stops reading. A genuinely mis-wired hook surfaces as never-ran instead.
 function reportFailure(hookName, err, { record = true } = {}) {
   if (err && err.code === 'EMPTY_HOOK_INPUT') {
-    warnToStderr(`[hook: ${hookName}] no event on stdin — not invoked by Claude Code\n`);
+    warnToStderr(`[hook: ${hookName}] no event on stdin — not invoked by the plugin adapter\n`);
     return;
   }
   const message = err && err.message ? err.message : String(err);

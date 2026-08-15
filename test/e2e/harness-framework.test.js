@@ -7,7 +7,7 @@ const path = require('path');
 const { describe, test, before, after } = require('node:test');
 const { spawnSync, execFileSync } = require('child_process');
 
-const { runClaude } = require('./helpers/opencode-runner');
+const { runOpencode } = require('./helpers/opencode-runner');
 const { readSkillCorpus } = require('../helpers/skill-corpus');
 
 const HARNESS_ROOT = path.join(__dirname, '..', '..');
@@ -54,10 +54,10 @@ describe('Harness Framework Validation', { timeout: 600000 }, () => {
   test('Scaffold: /scaffold creates correct project structure', { timeout: 600000 }, () => {
     const pluginDir = path.join(HARNESS_ROOT, '.opencode');
     const sessionId = require('crypto').randomUUID();
-    runClaude('/scaffold', {
+    runOpencode('/scaffold', {
       cwd: PROJECT_DIR, model: 'sonnet', budgetUsd: '1.00', timeoutMs: 90000, pluginDir, sessionId,
     });
-    const result = runClaude(
+    const result = runOpencode(
       'A Node.js CLI todo application using only Node built-ins; project shape: ' +
       'script/CLI; user surface: CLI; no team integrations, no tracker, no framework ' +
       'packs. I will not answer further questions — accept the inferred profile ' +

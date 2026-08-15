@@ -16,7 +16,7 @@ const path = require('path');
 const { describe, test, before } = require('node:test');
 const { execFileSync } = require('child_process');
 
-const { runClaude } = require('./helpers/opencode-runner');
+const { runOpencode } = require('./helpers/opencode-runner');
 const { runProjectSuite } = require('./helpers/project-suite');
 
 const OUTPUT_DIR = path.join(__dirname, 'output');
@@ -99,7 +99,7 @@ describe('Harness E2E — Native command integration (/refactor→/simplify, /ga
       '/simplify mechanical-cleanup pass — followed by the code-reviewer. ' +
       'This is a behavior-preserving refactor: do NOT change observable behavior, and every existing ' +
       'test must still pass. Commit the result as a pure refactor (HARNESS_COMMIT_KIND=refactor).';
-    const result = runClaude(prompt, { cwd: PROJECT_DIR, model: 'sonnet', budgetUsd: '2.00', timeoutMs: 290000 });
+    const result = runOpencode(prompt, { cwd: PROJECT_DIR, model: 'sonnet', budgetUsd: '2.00', timeoutMs: 290000 });
 
     // The runtime guarantee that matters: behavior preserved (suite green).
     // Whether /simplify changed anything and whether a refactor commit landed
@@ -135,7 +135,7 @@ describe('Harness E2E — Native command integration (/refactor→/simplify, /ga
       'Run the harness /gate command — the on-demand pre-merge quality gate, NOT GitHub PR review — ' +
       'on the most recent change in this repo. It must spawn the security-reviewer and write the ' +
       'canonical verdict to specs/reviews/security-verdict.json.';
-    const result = runClaude(prompt, { cwd: PROJECT_DIR, model: 'sonnet', budgetUsd: '2.00', timeoutMs: 290000 });
+    const result = runOpencode(prompt, { cwd: PROJECT_DIR, model: 'sonnet', budgetUsd: '2.00', timeoutMs: 290000 });
 
     const verdictWritten = fileExists(verdictRel);
     let verdictValid = false;

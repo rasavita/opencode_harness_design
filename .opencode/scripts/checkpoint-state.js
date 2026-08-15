@@ -11,7 +11,7 @@ const { lifecycleStatus } = require('../hooks/lib/task-lifecycle');
 const { computeBudget, gatherSpend } = require('./budget-state');
 
 const SNAPSHOT_PATHS = [
-  'claude-progress.txt',
+  'harness-progress.txt',
   'features.json',
   '.opencode/state/task-envelope.json',
   '.opencode/state/task-lifecycle.jsonl',

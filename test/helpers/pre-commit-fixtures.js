@@ -30,7 +30,7 @@ function installContractSchema(projectDir) {
 }
 
 function armContractGate(projectDir, contractJson) {
-  fs.writeFileSync(path.join(projectDir, 'claude-progress.txt'), 'current_group: group-01\n');
+  fs.writeFileSync(path.join(projectDir, 'harness-progress.txt'), 'current_group: group-01\n');
   fs.mkdirSync(path.join(projectDir, 'sprint-contracts'), { recursive: true });
   fs.writeFileSync(path.join(projectDir, 'sprint-contracts', 'group-01.json'), contractJson);
   fs.mkdirSync(path.join(projectDir, 'specs', 'reviews'), { recursive: true });

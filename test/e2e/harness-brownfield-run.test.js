@@ -14,7 +14,7 @@
 //   4. specs/brownfield/seams-*.md        — the ranked seam candidates (--seams)
 //   5. a map cites a real source basename — discovery is grounded, not invented
 //
-// Runs LIVE `claude -p` and costs tokens, so it is NOT part of `npm test`; run it
+// Runs LIVE `opencode run` and costs tokens, so it is NOT part of `npm test`; run it
 // with `npm run test:e2e:live --only brownfield-run`. The cheap static contract
 // lives in ../e2e-route-matrix-contract.test.js.
 
@@ -24,7 +24,7 @@ const assert = require('assert');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const { runClaude } = require('./helpers/opencode-runner');
+const { runOpencode } = require('./helpers/opencode-runner');
 
 const PROJECT_DIR = path.join(__dirname, 'brownfield-run-output');
 const PLUGIN_DIR = path.join(__dirname, '..', '..', '.opencode');
@@ -88,14 +88,14 @@ test('brownfield: /brownfield --seams discovers an existing repo and ranks seams
   resetExistingProject();
   const opts = { cwd: PROJECT_DIR, model: 'sonnet', pluginDir: PLUGIN_DIR, sessionId: SESSION };
 
-  const scaffold = runClaude('/scaffold --yes existing small Node library with a calculator module and a main entry point', {
+  const scaffold = runOpencode('/scaffold --yes existing small Node library with a calculator module and a main entry point', {
     ...opts,
     budgetUsd: '3.00',
     timeoutMs: 300000,
   });
   console.log('[brownfield-run] scaffold exit:', scaffold.exitCode);
 
-  const result = runClaude('/brownfield --seams "add a subtract command to the calculator"', {
+  const result = runOpencode('/brownfield --seams "add a subtract command to the calculator"', {
     ...opts,
     continueSession: true,
     budgetUsd: '8.00',

@@ -1274,7 +1274,7 @@ Always before merge ────────────────────
           <path d="M795 126 V175 H85 V126" fill="none" stroke="url(#ring)" stroke-width="2" stroke-dasharray="4 3"/>
           <text x="450" y="200" text-anchor="middle" fill="#9aabbf" font-size="12">Next unblocked group · until features.json all pass or budget/stop</text>
         </svg>
-        <div class="cap">Recovery ~700–1000 tokens/iteration reads: program.md · learned-rules.md · claude-progress.txt · features.json · dependency-graph.md</div>
+        <div class="cap">Recovery ~700–1000 tokens/iteration reads: program.md · learned-rules.md · harness-progress.txt · features.json · dependency-graph.md</div>
       </div>
 
       <div class="two-col">
@@ -1290,7 +1290,7 @@ Always before merge ────────────────────
         <div>
           <h4>State files that matter</h4>
           <ul>
-            <li><code>claude-progress.txt</code> — append-only resume log</li>
+            <li><code>harness-progress.txt</code> — append-only resume log</li>
             <li><code>features.json</code> — pass/fail registry</li>
             <li><code>learned-rules.md</code> — monotonic institutional memory</li>
             <li><code>.opencode/program.md</code> — human steering input</li>
@@ -2126,7 +2126,7 @@ node .opencode/scripts/cost-report.js</code></pre>
       <p class="lede">Runs are resumable by design. A killed session loses nothing that was committed.</p>
 
       <div class="cards">
-        <div class="card"><div class="tag">Resume</div><h4>Just re-invoke /auto</h4><p>Reads claude-progress.txt, features.json, git state; resume smoke check first.</p></div>
+        <div class="card"><div class="tag">Resume</div><h4>Just re-invoke /auto</h4><p>Reads harness-progress.txt, features.json, git state; resume smoke check first.</p></div>
         <div class="card"><div class="tag">Budget stop</div><h4>Clean stop at iteration boundary</h4><p>next_action: "BUDGET — …". Raise caps or resume later.</p></div>
         <div class="card"><div class="tag">Long PRD→PR</div><h4>build-chain.js</h4><p>Fresh claude -p process per wave through the same progress file.</p></div>
       </div>
@@ -2253,7 +2253,7 @@ node .opencode/scripts/build-chain.js docs/prd.md
             <tr><td><code>AGENTS.md</code></td><td>Always-on project rules (prompt-cache prefix — edit between sessions)</td></tr>
             <tr><td><code>.opencode/program.md</code></td><td>Human steering input for <code>/auto</code></td></tr>
             <tr><td><code>.opencode/state/learned-rules.md</code></td><td>Monotonic failure-derived rules</td></tr>
-            <tr><td><code>claude-progress.txt</code></td><td>Append-only resume log</td></tr>
+            <tr><td><code>harness-progress.txt</code></td><td>Append-only resume log</td></tr>
             <tr><td><code>features.json</code></td><td>Pass/fail feature registry</td></tr>
             <tr><td><code>specs/stories/</code></td><td>Epics, stories, dependency-graph</td></tr>
             <tr><td><code>specs/design/</code></td><td>Architecture, component-map, REASONS Canvas, schemas</td></tr>

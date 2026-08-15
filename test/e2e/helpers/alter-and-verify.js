@@ -14,9 +14,9 @@ const fs = require('fs');
 const path = require('path');
 const { runProjectSuite } = require('./project-suite');
 
-function alterAndVerify(runClaude, baseOpts, { projectDir, changeDesc }) {
+function alterAndVerify(runOpencode, baseOpts, { projectDir, changeDesc }) {
   const t0 = Date.now();
-  const map = runClaude('/code-map build the dependency graph for this generated codebase', {
+  const map = runOpencode('/code-map build the dependency graph for this generated codebase', {
     ...baseOpts, continueSession: true, budgetUsd: '2.00', timeoutMs: 240000,
   });
   const mapSec = ((Date.now() - t0) / 1000).toFixed(1);
@@ -25,7 +25,7 @@ function alterAndVerify(runClaude, baseOpts, { projectDir, changeDesc }) {
   const wiki = path.join(projectDir, 'specs', 'brownfield', 'wiki', 'WIKI.md');
 
   const t1 = Date.now();
-  const change = runClaude(`/change ${changeDesc}`, {
+  const change = runOpencode(`/change ${changeDesc}`, {
     ...baseOpts, continueSession: true, budgetUsd: '5.00', timeoutMs: 540000,
   });
   console.log(`[alter] /change took ${((Date.now() - t1) / 1000).toFixed(1)}s`);

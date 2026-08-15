@@ -1136,7 +1136,7 @@
       "scope": "runtime",
       "wired_at": ".opencode/scripts/checkpoint-state.js",
       "signal": "resume state is corrupt, diverged from the committed checkpoint, partially written, bound to an inactive task, or ambiguous about its next action",
-      "net_add_justification": "claude-progress.txt was prose-only recovery state and session commits were described as checkpoints without a machine-verifiable snapshot. This adds one atomic, hash-chained recovery authority over existing progress/features/git/task/budget state and classifies recovery deterministically instead of creating a second orchestrator.",
+      "net_add_justification": "harness-progress.txt was prose-only recovery state and session commits were described as checkpoints without a machine-verifiable snapshot. This adds one atomic, hash-chained recovery authority over existing progress/features/git/task/budget state and classifies recovery deterministically instead of creating a second orchestrator.",
       "description": "Atomic checkpoint and deterministic resume state machine. Each iteration-boundary checkpoint binds git HEAD/status, task/lifecycle/budget and progress artifact hashes, group, and exact next action into an immutable hash chain. Resume returns fresh_start, resume_exact, repair_partial_iteration, diverged_after_checkpoint, or fail-closed blocked states. Temp-write plus atomic rename prevents a killed write from replacing the last good current checkpoint."
     },
     {

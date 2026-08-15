@@ -87,7 +87,7 @@ function parseLatestSession(text) {
 }
 
 function readProgress(projectDir) {
-  return parseLatestSession(readText(path.join(projectDir, 'claude-progress.txt')));
+  return parseLatestSession(readText(path.join(projectDir, 'harness-progress.txt')));
 }
 
 function tallyFeatures(arr) {

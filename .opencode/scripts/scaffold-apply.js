@@ -5,7 +5,7 @@
 // scaffold-apply.js — deterministic file generation for /scaffold (Steps 2-9).
 //
 // The interactive /scaffold command (.opencode/commands/scaffold.md) is a
-// model-executed procedure. In headless `claude -p` mode the model can emit the
+// model-executed procedure. In headless `opencode run` mode the model can emit the
 // Step 10 "scaffolded successfully" report without writing anything. This script
 // is the part that MUST NOT be skipped or hallucinated: given a profile JSON, it
 // copies the harness `.opencode` tree (via scaffold-copy.js) and writes the
@@ -217,7 +217,7 @@ function progressText(profile) {
 
 function writeStateFiles(target, profile) {
   fs.writeFileSync(path.join(target, 'features.json'), '[]\n');
-  fs.writeFileSync(path.join(target, 'claude-progress.txt'), progressText(profile));
+  fs.writeFileSync(path.join(target, 'harness-progress.txt'), progressText(profile));
 }
 
 // Calibration profile is skipped for type C (api-only) and D (minimal).
@@ -280,7 +280,7 @@ function report(result) {
   for (const f of result.written) process.stdout.write(`  wrote ${path.relative(result.target, f)}\n`);
   process.stdout.write(`  created output dirs: ${OUTPUT_DIRS.join(', ')}\n`);
   process.stdout.write('  wrote .mcp.json, .gitignore, .opencode/security-guidance.md, .opencode/security-patterns.yaml, specs/design/constitution.md\n');
-  process.stdout.write('  wrote features.json, claude-progress.txt\n');
+  process.stdout.write('  wrote features.json, harness-progress.txt\n');
   process.stdout.write(`  navigation: ${result.navigation.status} (${result.navigation.graph}/${result.navigation.wiki})\n`);
 }
 

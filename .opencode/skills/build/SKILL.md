@@ -30,7 +30,7 @@ The delegated sub-skills (`/brownfield`, the three `*-render` skills, `/test`,
 stays in the main conversation loop. Same rule, same reason, as `/feature` and
 `/sprint`. Nothing else depends on the fork: resumability is file-existence
 checks (Phase 4 re-entry rule), and headless session chaining spawns its own
-`claude -p` links via `build-chain.js`.
+`opencode run` links via `build-chain.js`.
 
 ---
 

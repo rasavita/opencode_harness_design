@@ -298,9 +298,9 @@ For long unattended PRD-to-PR runs, prefer the resilient chain launcher — see 
 
 `/auto` runs are resumable by design — a killed session, closed laptop, or budget stop loses nothing that was committed:
 
-- **Just re-invoke `/auto`.** It resumes from `claude-progress.txt` (the append-only progress log every iteration writes), re-reads `features.json` and git state, and runs a startup smoke check before building on prior work. Nothing needs exporting from the dead session. (Wall-clock is metered from `.opencode/state/budget-start`, which survives the dead session — a long gap counts as spend.)
+- **Just re-invoke `/auto`.** It resumes from `harness-progress.txt` (the append-only progress log every iteration writes), re-reads `features.json` and git state, and runs a startup smoke check before building on prior work. Nothing needs exporting from the dead session. (Wall-clock is metered from `.opencode/state/budget-start`, which survives the dead session — a long gap counts as spend.)
 - **See where it stopped** with `/status` (or `node .opencode/scripts/pipeline-status.js status`), which reads the same state files.
-- **Budget stops are clean stops.** Every run is metered (wall-clock, agent spawns, estimated cost via `node .opencode/scripts/budget-state.js`) and stops at an iteration boundary when a cap is hit, setting `next_action: "BUDGET — …"` in `claude-progress.txt`. Raise the cap via `project-manifest.json#execution.budget` (or relaunch through `/build … --budget <spec>` / `--budget off`), then re-invoke `/auto` to resume.
+- **Budget stops are clean stops.** Every run is metered (wall-clock, agent spawns, estimated cost via `node .opencode/scripts/budget-state.js`) and stops at an iteration boundary when a cap is hit, setting `next_action: "BUDGET — …"` in `harness-progress.txt`. Raise the cap via `project-manifest.json#execution.budget` (or relaunch through `/build … --budget <spec>` / `--budget off`), then re-invoke `/auto` to resume.
 - **For long unattended PRD-to-PR runs**, prefer `node .opencode/scripts/build-chain.js docs/prd.md` — it starts a fresh `claude -p` process per build wave through the same progress file, so a killed process resumes at the next wave.
 
 Default budget caps by model tier (`.opencode/scripts/budget-state.js`):

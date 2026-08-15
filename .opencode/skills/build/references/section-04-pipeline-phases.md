@@ -124,7 +124,7 @@ Create the following state files before entering the autonomous loop. **Re-entry
 1. `.opencode/state/coverage-baseline.txt` — **Preserve if present.** Write `0` only when the file does not yet exist; if it already holds a value (a prior run ratcheted it up), leave it — resetting it to `0` would discard the coverage floor the ratchet has earned.
 2. `.opencode/state/iteration-log.md` — **Preserve if present.** Write the header `# Iteration Log\n\nTracking all autonomous build iterations.\n` only when the file does not exist; otherwise append, never overwrite — the log is the audit trail across sessions.
 2b. `.opencode/state/budget-start` — **Always reset.** Write the current epoch-ms with `node -e 'process.stdout.write(String(Date.now()))' > .opencode/state/budget-start` (portable; do **not** use `date +%s%3N`, which is GNU-only and on macOS/BSD writes a malformed `…N`-suffixed value). Stamps the run origin for budget metering (SECTION 11 of `auto/SKILL.md`); overwrite on each fresh `/build` so a new run resets the clock.
-3. `claude-progress.txt` — Write session 0 block:
+3. `harness-progress.txt` — Write session 0 block:
    ```
    === Session 0 ===
    date: {ISO 8601 now}

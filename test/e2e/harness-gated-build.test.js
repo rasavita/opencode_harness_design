@@ -10,7 +10,7 @@ const assert = require('assert');
 const { test } = require('node:test');
 const { randomUUID } = require('crypto');
 
-const { runClaude } = require('./helpers/opencode-runner');
+const { runOpencode } = require('./helpers/opencode-runner');
 const { freshProject } = require('./helpers/fresh-project');
 
 const PROJECT_DIR = path.join(__dirname, 'gated-build-output');
@@ -27,9 +27,9 @@ test('gated build: /build prd.md stops at the first human approval gate', { time
   freshProject(PROJECT_DIR, PRD);
   const opts = { cwd: PROJECT_DIR, model: 'sonnet', pluginDir: PLUGIN_DIR, sessionId: SESSION };
 
-  // Non-interactive scaffold: interactive /scaffold only prints Q1 in claude -p
+  // Non-interactive scaffold: interactive /scaffold only prints Q1 in opencode run
   // and may exit 0 with no files — same pattern as feature/smoke e2e.
-  const scaffold = runClaude(
+  const scaffold = runOpencode(
     '/scaffold --yes a minimal Node.js HTTP counter API from prd.md; API surface; no team integrations, no tracker, no framework packs',
     { ...opts, budgetUsd: '3.00', timeoutMs: 300000 },
   );
@@ -39,7 +39,7 @@ test('gated build: /build prd.md stops at the first human approval gate', { time
     'scaffold must install harness (project-manifest.json or AGENTS.md) before /build',
   );
 
-  const build = runClaude('/build prd.md', {
+  const build = runOpencode('/build prd.md', {
     ...opts,
     continueSession: true,
     budgetUsd: '4.00',
@@ -50,7 +50,7 @@ test('gated build: /build prd.md stops at the first human approval gate', { time
   t.after(() => console.log('[gated] artifacts: ' + PROJECT_DIR));
 
   assert.ok(exists('specs/brd/brd.md'), 'default /build must generate BRD artifact');
-  // Scaffold may seed claude-progress.txt / features.json; gated /build must not
+  // Scaffold may seed harness-progress.txt / features.json; gated /build must not
   // run the autonomous tail (no evaluator PASS report / sprint contracts filled).
   assert.ok(
     !exists('specs/reviews/eval-report.md') && !exists('.opencode/state/auto-build'),

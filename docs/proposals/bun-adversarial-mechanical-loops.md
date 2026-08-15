@@ -281,7 +281,7 @@ Every adversarial reviewer spawn prompt **MUST** include only:
 **MUST NOT** include:
 
 - Builder chain-of-thought or “we already verified X”  
-- Full `claude-progress.txt` transcript  
+- Full `harness-progress.txt` transcript  
 - Teammate chat dumps  
 
 Enforce with a wiring test that `/implement` and Gate 8 templates contain the forbid language (pattern already used for Gate 8).

@@ -8,7 +8,7 @@ const path = require('path');
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { runClaude } = require('./helpers/opencode-runner');
+const { runOpencode } = require('./helpers/opencode-runner');
 const { runProjectSuite } = require('./helpers/project-suite');
 const { freshProject } = require('./helpers/fresh-project');
 
@@ -24,7 +24,7 @@ test('full-auto: /build --auto prd.md runs the non-lite route and leaves a green
   freshProject(PROJECT_DIR, PRD);
   const opts = { cwd: PROJECT_DIR, model: 'sonnet', pluginDir: PLUGIN_DIR, sessionId: SESSION };
 
-  const scaffold = runClaude(
+  const scaffold = runOpencode(
     '/scaffold --yes a minimal Node.js HTTP counter API from prd.md; API surface; no team integrations, no tracker, no framework packs',
     { ...opts, budgetUsd: '3.00', timeoutMs: 300000 },
   );
@@ -36,7 +36,7 @@ test('full-auto: /build --auto prd.md runs the non-lite route and leaves a green
   );
 
   // Keep non-lite ceremony but constrain decomposition so one session can finish.
-  const build = runClaude(
+  const build = runOpencode(
     '/build --auto --mode lean prd.md\n\n' +
       'Headless iron law: after the plan (specs/brd, stories, design) exists, ' +
       'immediately run Phase 4 + /auto --mode lean until package.json and npm test exist and pass. ' +
@@ -57,7 +57,7 @@ test('full-auto: /build --auto prd.md runs the non-lite route and leaves a green
   let suite = runProjectSuite(PROJECT_DIR);
   if (suite.status == null && fs.existsSync(path.join(PROJECT_DIR, 'features.json'))) {
     console.log('[full-auto] no package yet after /build — resume with /auto --mode lean');
-    const resume = runClaude(
+    const resume = runOpencode(
       '/auto --mode lean\nImplement all open groups until root package.json exists and npm test passes. ' +
         'Do not replan. Prefer a single server.js + package.json if that satisfies the PRD.',
       { ...opts, continueSession: true, budgetUsd: '15.00', timeoutMs: 1500000 },

@@ -2,7 +2,7 @@
 
 // Pure decision logic for the build-chain driver. No process spawning and no
 // file I/O — every function takes already-read text or plain numbers so the
-// cross-process orchestration can be unit-tested without invoking `claude`.
+// cross-process orchestration can be unit-tested without invoking `opencode`.
 //
 // The parsing conventions mirror .opencode/hooks/auto-continue-on-stop.js so the
 // cross-process chain makes the same "is there work left / did it progress"

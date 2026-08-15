@@ -3,8 +3,8 @@
 'use strict';
 
 // Emit installable SKU trees for harness-core / harness-lite (Phase 3 packaging).
-// Does not publish to a marketplace — produces a local directory you can point
-// claude --plugin-dir at, or zip for distribution.
+// Does not publish to a registry — produces a local project directory you can
+// open in opencode (`cd <pkg> && opencode`), or zip for distribution.
 //
 // Usage:
 //   node .opencode/scripts/package-sku.js core|lite|full|all [--out dir] [--clean]
@@ -27,21 +27,21 @@ const LITE_SOURCE = path.join(REPO_ROOT, 'harness-lite');
 const SKU_META = {
   core: {
     dirName: 'harness-core',
-    pluginName: 'claude-harness-core',
+    pluginName: 'opencode-harness-core',
     description:
       'Lean product harness: /build, /feature, /gate, brownfield spine. No vertical/framework optional skills.',
     profile: 'core',
   },
   full: {
     dirName: 'harness-full',
-    pluginName: 'claude-harness-full',
+    pluginName: 'opencode-harness-full',
     description:
       'Full harness surface including optional skills, workflows slot, and ops extras.',
     profile: 'full',
   },
   lite: {
     dirName: 'harness-lite',
-    pluginName: 'claude-harness-lite',
+    pluginName: 'opencode-harness-lite',
     description:
       'Artifact-only loadout: mockups, ARB docs, research. No SDLC pipeline or quality hooks.',
     profile: null, // special: copy harness-lite/
@@ -63,8 +63,9 @@ function readRootVersion() {
 }
 
 function writePluginJson(skuRoot, meta, version) {
-  // Claude plugin dir is the folder containing .opencode-plugin/plugin.json
-  // For core/full we emit a ready-to-load .opencode tree; plugin.json lives inside it.
+  // SKU metadata stamp: .opencode-plugin/plugin.json identifies the package
+  // (name/version/sku) for humans and tooling; opencode itself loads the
+  // nested .opencode/ tree when the package dir is opened as a project.
   const pluginDir = path.join(skuRoot, '.opencode-plugin');
   fs.mkdirSync(pluginDir, { recursive: true });
   const body = {
@@ -81,25 +82,17 @@ function packageCoreOrFull(sku, outRoot, version) {
   const meta = SKU_META[sku];
   const dest = path.join(outRoot, meta.dirName);
   fs.mkdirSync(dest, { recursive: true });
-  // copyScaffoldTree writes into <target>/.opencode — for a plugin-dir loadout we
-  // want the contents of .opencode at the package root (claude --plugin-dir <pkg>).
-  const staging = path.join(dest, '_staging');
-  fs.rmSync(staging, { recursive: true, force: true });
-  fs.mkdirSync(staging, { recursive: true });
+  // copyScaffoldTree writes into <target>/.opencode — keep that nesting: the
+  // package is a ready-to-open opencode project dir (`cd <pkg> && opencode`).
   const profile = resolveScaffoldProfile({}, { scaffoldProfile: meta.profile });
-  copyScaffoldTree(PLUGIN_SOURCE, staging, profile);
-  // Move staged .opencode/* up to package root
-  const stagedClaude = path.join(staging, '.opencode');
-  for (const entry of fs.readdirSync(stagedClaude)) {
-    fs.cpSync(path.join(stagedClaude, entry), path.join(dest, entry), { recursive: true });
-  }
-  fs.rmSync(staging, { recursive: true, force: true });
+  fs.rmSync(path.join(dest, '.opencode'), { recursive: true, force: true });
+  copyScaffoldTree(PLUGIN_SOURCE, dest, profile);
   writePluginJson(dest, meta, version);
   // Manifest stamp for humans
   fs.writeFileSync(
     path.join(dest, 'SKU.md'),
     `# ${meta.dirName}\n\n${meta.description}\n\nVersion: ${version}\nProfile: ${meta.profile}\n\n` +
-      `Load: \`claude --plugin-dir ${meta.dirName}\`\n` +
+      `Load: \`cd ${meta.dirName} && opencode\`\n` +
       (sku === 'core'
         ? `\nCore skills (${CORE_SKILLS.length}). Optional not included: ${OPTIONAL_SKILLS.join(', ')}.\n`
         : '')
@@ -114,14 +107,12 @@ function packageLite(outRoot, version) {
   if (!fs.existsSync(LITE_SOURCE)) {
     throw new Error(`harness-lite source missing at ${LITE_SOURCE}`);
   }
-  // lite lives as harness-lite/.opencode — emit flat plugin dir
-  const liteClaude = path.join(LITE_SOURCE, '.opencode');
+  // lite lives as harness-lite/.opencode — keep the nested project layout
+  const liteTree = path.join(LITE_SOURCE, '.opencode');
   const litePlugin = path.join(LITE_SOURCE, '.opencode-plugin');
   fs.mkdirSync(dest, { recursive: true });
-  if (fs.existsSync(liteClaude)) {
-    for (const entry of fs.readdirSync(liteClaude)) {
-      fs.cpSync(path.join(liteClaude, entry), path.join(dest, entry), { recursive: true });
-    }
+  if (fs.existsSync(liteTree)) {
+    fs.cpSync(liteTree, path.join(dest, '.opencode'), { recursive: true });
   }
   // Prefer packaging SKU metadata; fall back to source plugin.json fields
   let description = meta.description;
@@ -132,7 +123,7 @@ function packageLite(outRoot, version) {
   writePluginJson(dest, { ...meta, description }, version);
   fs.writeFileSync(
     path.join(dest, 'SKU.md'),
-    `# harness-lite\n\n${description}\n\nVersion: ${version}\n\nLoad: \`claude --plugin-dir harness-lite\`\n`
+    `# harness-lite\n\n${description}\n\nVersion: ${version}\n\nLoad: \`cd harness-lite && opencode\`\n`
   );
   // README for operators
   if (fs.existsSync(path.join(LITE_SOURCE, 'README.md'))) {

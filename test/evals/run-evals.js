@@ -52,24 +52,24 @@ function runAll(tasks, opts) {
   return { results, passed: results.filter((r) => r.pass).length, failed: results.filter((r) => !r.pass).length };
 }
 
-// The isolated, brittle part: shell out to the Claude Code CLI in print mode.
-// Flags may vary by CLI version; override the binary with EVAL_CLAUDE_BIN.
-function claudeInvoke({ prompt, cwd, plugin, model }) {
-  const args = ['-p', prompt, '--output-format', 'text', '--permission-mode', 'bypassPermissions'];
-  if (model) args.push('--model', model);
-  if (plugin) args.push('--plugin-dir', path.join(__dirname, '..', '..', '.opencode'));
-  return execFileSync(process.env.EVAL_CLAUDE_BIN || 'claude', args, { cwd, timeout: 600000, encoding: 'utf8' });
+// The isolated, brittle part: shell out to the opencode CLI in run mode.
+// Flags may vary by CLI version; override the binary with EVAL_OPENCODE_BIN.
+// The plugin loads from the cwd's .opencode/ (no --plugin-dir equivalent).
+function opencodeInvoke({ prompt, cwd, model }) {
+  const args = ['run', prompt];
+  if (model) args.push('-m', model);
+  return execFileSync(process.env.EVAL_OPENCODE_BIN || 'opencode', args, { cwd, timeout: 600000, encoding: 'utf8' });
 }
 
 function main() {
-  if (!process.env.ANTHROPIC_API_KEY && !process.env.EVAL_CLAUDE_BIN) {
+  if (!process.env.ANTHROPIC_API_KEY && !process.env.EVAL_OPENCODE_BIN) {
     process.stdout.write('test:evals — skipped (set ANTHROPIC_API_KEY to run model evals; ' +
       'task specs + assertion engine are validated in `npm test`)\n');
     process.exit(0);
   }
   let tasks = loadTasks(path.join(__dirname, 'tasks.json'));
   if (process.env.EVAL_TASK) tasks = tasks.filter((t) => t.id === process.env.EVAL_TASK);
-  const { results, passed, failed } = runAll(tasks, { invoke: claudeInvoke, fixturesDir: path.join(__dirname, 'fixtures') });
+  const { results, passed, failed } = runAll(tasks, { invoke: opencodeInvoke, fixturesDir: path.join(__dirname, 'fixtures') });
   for (const r of results) {
     process.stdout.write(`${r.pass ? 'PASS' : 'FAIL'} ${r.id} — ${r.behavior}\n`);
     for (const f of r.failures) process.stdout.write(`    - ${f}\n`);

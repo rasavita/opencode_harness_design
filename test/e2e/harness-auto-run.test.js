@@ -9,13 +9,13 @@
 // (The full --auto pipeline on a multi-story PRD needs session chaining across
 // context windows — harness-plan-only proves the planning half headless.)
 //
-// LIVE: real `claude -p`, costs tokens, NOT in `npm test`. Run: `npm run test:auto`.
+// LIVE: real `opencode run`, costs tokens, NOT in `npm test`. Run: `npm run test:auto`.
 
 const path = require('path');
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { runClaude } = require('./helpers/opencode-runner');
+const { runOpencode } = require('./helpers/opencode-runner');
 const { runProjectSuite } = require('./helpers/project-suite');
 const { freshProject } = require('./helpers/fresh-project');
 const { alterAndVerify } = require('./helpers/alter-and-verify');
@@ -31,7 +31,7 @@ test('full-auto (lite/lean): trivial CLI -> autonomous build, zero gates, suite 
   freshProject(PROJECT_DIR, null);
   const opts = { cwd: PROJECT_DIR, model: 'sonnet', pluginDir: PLUGIN_DIR, sessionId: SESSION };
 
-  const scaffold = runClaude(
+  const scaffold = runOpencode(
     `/scaffold --yes ${APP}; CLI surface; no team integrations, no tracker, no framework packs`,
     { ...opts, budgetUsd: '3.00', timeoutMs: 300000 },
   );
@@ -43,7 +43,7 @@ test('full-auto (lite/lean): trivial CLI -> autonomous build, zero gates, suite 
   );
 
   // Full-auto over the compressed lane: zero gates, no GAN loop, trivial scope.
-  const build = runClaude(`/build --auto --mode lean --lite ${APP}`, { ...opts, continueSession: true, budgetUsd: '10.00', timeoutMs: 1080000 });
+  const build = runOpencode(`/build --auto --mode lean --lite ${APP}`, { ...opts, continueSession: true, budgetUsd: '10.00', timeoutMs: 1080000 });
   console.log('[auto] build exit:', build.exitCode, 'signal:', build.signal);
 
   t.after(() => console.log('[auto] artifacts: ' + PROJECT_DIR));
@@ -55,7 +55,7 @@ test('full-auto (lite/lean): trivial CLI -> autonomous build, zero gates, suite 
 
   // Then ALTER the generated functionality — exercises /code-map (deterministic
   // graph + wiki) on the just-generated code (the extend-existing-code path) before going green.
-  const alter = alterAndVerify(runClaude, opts, {
+  const alter = alterAndVerify(runOpencode, opts, {
     projectDir: PROJECT_DIR,
     changeDesc: 'extend the CLI: accept an optional third argument "op" of "add" or "sub"; "sub" prints a minus b, default stays add; update the tests to cover both',
   });

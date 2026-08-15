@@ -137,7 +137,7 @@ test('applyScaffold produces a real scaffold from a Minimal Node profile', () =>
     assert.ok(fs.existsSync(path.join(target, '.mcp.json')));
     assert.ok(fs.existsSync(path.join(target, '.gitignore')));
     assert.ok(fs.existsSync(path.join(target, 'features.json')));
-    assert.ok(fs.existsSync(path.join(target, 'claude-progress.txt')));
+    assert.ok(fs.existsSync(path.join(target, 'harness-progress.txt')));
 
     // Minimal (type D) skips calibration-profile.json.
     assert.ok(!fs.existsSync(path.join(target, 'calibration-profile.json')),

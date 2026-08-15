@@ -17,7 +17,7 @@ function fixture() {
   execFileSync('git', ['config', 'user.email', 'test@example.invalid'], { cwd: root });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: root });
   fs.writeFileSync(path.join(root, '.gitignore'), '.opencode/state/\n');
-  fs.writeFileSync(path.join(root, 'claude-progress.txt'), 'next_action: test\n');
+  fs.writeFileSync(path.join(root, 'harness-progress.txt'), 'next_action: test\n');
   fs.writeFileSync(path.join(root, 'features.json'), '[]\n');
   fs.mkdirSync(path.join(root, '.opencode', 'state'), { recursive: true });
   fs.writeFileSync(path.join(root, '.opencode', 'state', 'task-envelope.json'), JSON.stringify(stampEnvelope({
@@ -34,7 +34,7 @@ test('checkpoint chain resumes exactly and detects a partial iteration', () => {
   const root = fixture();
   createCheckpoint(root, { nextAction: 'run group A', currentGroup: 'A' });
   assert.strictEqual(resumeDecision(root).state, 'resume_exact');
-  fs.writeFileSync(path.join(root, 'claude-progress.txt'), 'partial write\n');
+  fs.writeFileSync(path.join(root, 'harness-progress.txt'), 'partial write\n');
   assert.strictEqual(resumeDecision(root).state, 'repair_partial_iteration');
   assert.deepStrictEqual(loadCheckpoints(root).errors, []);
 });

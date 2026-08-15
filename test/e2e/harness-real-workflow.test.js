@@ -6,7 +6,7 @@ const path = require('path');
 const { describe, test, before, after } = require('node:test');
 const { execFileSync } = require('child_process');
 
-const { runClaude, HARNESS_ROOT } = require('./helpers/opencode-runner');
+const { runOpencode, HARNESS_ROOT } = require('./helpers/opencode-runner');
 const { runProjectSuite } = require('./helpers/project-suite');
 
 const RESULTS_DIR = path.join(__dirname, 'results');
@@ -52,7 +52,7 @@ describe('Harness E2E — Real Workflow Certification', { timeout: 1800000 }, ()
     const pluginDir = path.join(HARNESS_ROOT, '..', '.opencode');
     const sessionId = require('crypto').randomUUID();
 
-    runClaude('/scaffold', {
+    runOpencode('/scaffold', {
       cwd: PROJECT_DIR,
       model: 'sonnet',
       budgetUsd: '1.00',
@@ -61,7 +61,7 @@ describe('Harness E2E — Real Workflow Certification', { timeout: 1800000 }, ()
       sessionId,
     });
 
-    const scaffold = runClaude(
+    const scaffold = runOpencode(
       'A Node.js CLI todo application using only Node built-ins; project shape: script/CLI; ' +
         'user surface: CLI; no team integrations, no tracker, no framework packs. Accept the inferred profile option A.',
       {
@@ -80,7 +80,7 @@ describe('Harness E2E — Real Workflow Certification', { timeout: 1800000 }, ()
     assertArtifact('AGENTS.md', 'scaffolded AGENTS.md');
     assertArtifact('project-manifest.json', 'project manifest');
 
-    const brd = runClaude('/brd', {
+    const brd = runOpencode('/brd', {
       cwd: PROJECT_DIR,
       model: 'sonnet',
       budgetUsd: '2.00',
@@ -93,7 +93,7 @@ describe('Harness E2E — Real Workflow Certification', { timeout: 1800000 }, ()
     assertArtifact('specs/brd/brd.md', 'BRD');
     assertArtifact('specs/reviews/phase-brd-eval.json', 'BRD phase evaluation');
 
-    const spec = runClaude('/spec', {
+    const spec = runOpencode('/spec', {
       cwd: PROJECT_DIR,
       model: 'sonnet',
       budgetUsd: '2.00',
@@ -107,7 +107,7 @@ describe('Harness E2E — Real Workflow Certification', { timeout: 1800000 }, ()
     assertArtifact('features.json', 'features registry');
     assertArtifact('specs/reviews/phase-spec-eval.json', 'spec phase evaluation');
 
-    const design = runClaude('/design', {
+    const design = runOpencode('/design', {
       cwd: PROJECT_DIR,
       model: 'sonnet',
       budgetUsd: '2.00',
@@ -121,7 +121,7 @@ describe('Harness E2E — Real Workflow Certification', { timeout: 1800000 }, ()
     assertArtifact('specs/design/api-contracts.md', 'API contracts');
     assertArtifact('specs/reviews/phase-design-eval.json', 'design phase evaluation');
 
-    const build = runClaude('/build --lite implement the approved Node.js CLI todo app with add, list, complete, and delete commands', {
+    const build = runOpencode('/build --lite implement the approved Node.js CLI todo app with add, list, complete, and delete commands', {
       cwd: PROJECT_DIR,
       model: 'sonnet',
       budgetUsd: '4.00',

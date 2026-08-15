@@ -4,7 +4,7 @@
 // The fast (<=20 min) full-lifecycle proof that the harness engine is wired end
 // to end — and that it can EXTEND code it already generated. Unlike the 90-min
 // certification suite, this is a single smoke with a browser oracle and a fix
-// loop. It runs LIVE `claude -p` and costs tokens, so it is NOT part of
+// loop. It runs LIVE `opencode run` and costs tokens, so it is NOT part of
 // `npm test`; run it deliberately with `npm run smoke`. The cheap static
 // contract lives in ../test/automated-e2e-contract.test.js.
 //
@@ -25,7 +25,7 @@ const { execFileSync } = require('child_process');
 const { randomUUID } = require('node:crypto');
 const { test } = require('node:test');
 
-const { runClaude } = require('./helpers/opencode-runner');
+const { runOpencode } = require('./helpers/opencode-runner');
 const { startApp, stopApp, assertInBrowser, DEFAULT_PORT } = require('./helpers/app-runtime');
 
 const PROJECT_DIR = path.join(__dirname, 'smoke-output');
@@ -63,7 +63,7 @@ function opencodeOpts() {
 // Repair grounded in the actual failure — never a bypass prompt. Routes through
 // /change so the harness's reviewer + test gates run on the fix.
 function requestRepair(fixGoal, diagnostics) {
-  return runClaude(
+  return runOpencode(
     `/change a browser end-to-end check failed for the existing counter web app. Goal: ${fixGoal}. ` +
       `Fix the generated code so the check passes; keep all currently working behavior intact.\n${diagnostics}`,
     { ...opencodeOpts(), timeoutMs: stepTimeout(240000) },
@@ -115,14 +115,14 @@ function prepareProjectDir() {
 }
 
 // Non-interactive scaffold: `--yes <description>` skips the interactive Q1 +
-// confirmation card (no human in `claude -p`), infers the profile, and
+// confirmation card (no human in `opencode run`), infers the profile, and
 // generates the project for real (see scaffold.md "Invocation modes"). Asserts
 // it did REAL work — the two core deliverables must exist, not just exit 0.
 function runScaffold() {
   const desc =
     'a minimal counter web app in Node.js with no external runtime dependencies; ' +
     'an HTTP server serving one HTML page; web UI surface; no team integrations';
-  const scaffold = runClaude(`/scaffold --yes ${desc}`, { ...opencodeOpts(), continueSession: false, budgetUsd: '4.00', timeoutMs: stepTimeout(360000) });
+  const scaffold = runOpencode(`/scaffold --yes ${desc}`, { ...opencodeOpts(), continueSession: false, budgetUsd: '4.00', timeoutMs: stepTimeout(360000) });
   logResult('scaffold', { exitCode: scaffold.exitCode });
   assert.strictEqual(
     scaffold.exitCode, 0,
@@ -140,7 +140,7 @@ function runBuild() {
     'that listens on process.env.PORT and serves one HTML page; the page shows a count (element id="count" ' +
     'starting at 0) and an Increment button (id="increment") that increases the count by 1. ' +
     'package.json must have "start": "node server.js" and a passing "test" script.';
-  const build = runClaude(`/build --lite implement ${buildGoal}`, { ...opencodeOpts(), budgetUsd: '5.00', timeoutMs: stepTimeout(480000) });
+  const build = runOpencode(`/build --lite implement ${buildGoal}`, { ...opencodeOpts(), budgetUsd: '5.00', timeoutMs: stepTimeout(480000) });
   logResult('build-lite', { exitCode: build.exitCode });
 }
 
@@ -171,7 +171,7 @@ test('full lifecycle: scaffold -> build -> verify -> modify -> regression (self-
   assert.ok(v1.ok, `v1 increment must pass within ${MAX_FIX_ATTEMPTS} attempts: ${JSON.stringify(v1)}`);
 
   // Modify already-generated code: add a decrement button via /change.
-  const change = runClaude(
+  const change = runOpencode(
     '/change add a Decrement button (id="decrement") to the existing counter web app that lowers #count by 1; ' +
       'keep the existing Increment behavior unchanged',
     { ...opencodeOpts(), budgetUsd: '4.00', timeoutMs: stepTimeout(300000) },

@@ -809,7 +809,7 @@ cp .opencode/templates/gitignore.template .gitignore
 echo '[]' > features.json
 ```
 
-Write `claude-progress.txt`:
+Write `harness-progress.txt`:
 ```
 === Session 0 ===
 date: {ISO 8601 now}

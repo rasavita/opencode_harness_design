@@ -13,7 +13,7 @@ const OFF = { HARNESS_AUTO_CONTINUE: '' };
 
 function writeProgress(projectDir, fields) {
   const body = Object.entries(fields).map(([k, v]) => `${k}: ${v}`).join('\n') + '\n';
-  fs.writeFileSync(path.join(projectDir, 'claude-progress.txt'), body);
+  fs.writeFileSync(path.join(projectDir, 'harness-progress.txt'), body);
 }
 
 function writeFeatures(projectDir, passes) {

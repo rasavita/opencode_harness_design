@@ -108,7 +108,7 @@ half-written file (the same discipline `build-chain.js`'s voluntary-yield alread
 
 - **`/auto` loop (SECTION 11, new stop criterion — priority 1, checked *before* the iteration cap):**
   At the top of SECTION 2 (Context Recovery), after reading state and **before** dispatching the
-  next group, compute the budget. If **exhausted**, stop the run cleanly: write `claude-progress.txt`
+  next group, compute the budget. If **exhausted**, stop the run cleanly: write `harness-progress.txt`
   with `next_action: "BUDGET — {dimension} cap reached ({spent}/{limit}); raise --budget or merge what's done"`,
   print a status report, run `docker compose down -v`, and exit. Work already committed is preserved;
   the run is resumable by raising the cap.

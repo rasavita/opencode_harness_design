@@ -17,9 +17,9 @@ test('real workflow E2E invokes harness commands instead of direct artifact prom
   const e2e = fs.readFileSync(REAL_WORKFLOW_E2E, 'utf8');
 
   for (const command of ['/scaffold', '/brd', '/spec', '/design']) {
-    assert.match(e2e, new RegExp(`runClaude\\('${command.replace('/', '\\/')}'`));
+    assert.match(e2e, new RegExp(`runOpencode\\('${command.replace('/', '\\/')}'`));
   }
-  assert.match(e2e, /runClaude\('\/build --lite/);
+  assert.match(e2e, /runOpencode\('\/build --lite/);
   assert.match(e2e, /specs\/reviews\/phase-brd-eval\.json/);
   assert.match(e2e, /specs\/reviews\/phase-spec-eval\.json/);
   assert.match(e2e, /specs\/reviews\/phase-design-eval\.json/);

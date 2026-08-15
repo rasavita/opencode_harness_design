@@ -31,7 +31,7 @@ function main() {
   const tarballs = [];
   for (const sku of skus) {
     const dirName = SKU_META[sku].dirName;
-    const tgz = path.join(releaseDir, `claude-harness-${sku}-${version}.tgz`);
+    const tgz = path.join(releaseDir, `opencode-harness-${sku}-${version}.tgz`);
     const r = spawnSync(
       'tar',
       ['-czf', tgz, '-C', outRoot, dirName],

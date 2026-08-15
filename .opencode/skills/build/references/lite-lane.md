@@ -198,7 +198,7 @@ Use the canonical schema (same shape as `/spec` output — required by `/auto` a
 ]
 ```
 
-Update `claude-progress.txt`'s `next_action` line to `Run /auto --group A`.
+Update `harness-progress.txt`'s `next_action` line to `Run /auto --group A`.
 
 ### Step 7 — Approval Gate
 
@@ -241,7 +241,7 @@ Before declaring the lite pass complete, verify:
 - [ ] `specs/design/component-map.md` exists, maps every story to owned files
 - [ ] `specs/design/api-contracts.md` exists (CLI invocation OR public library functions; not OpenAPI unless HTTP)
 - [ ] `features.json` exists at project root with one entry per story
-- [ ] `claude-progress.txt` `next_action` points at `/auto --group A`
+- [ ] `harness-progress.txt` `next_action` points at `/auto --group A`
 - [ ] No `architecture.md`, `data-models.schema.json`, `api-contracts.schema.json`, `deployment.md`, or mockups created
 
 If any item fails, fix it before handing off. If a missing artifact is one `/auto` actually requires (component-map, dependency-graph, features.json, epics.md), the autonomous loop will refuse to start.
