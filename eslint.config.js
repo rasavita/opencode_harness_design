@@ -52,4 +52,23 @@ module.exports = [
       eqeqeq: ['warn', 'smart'],
     },
   },
+  {
+    files: ['.opencode/plugins/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      'no-undef': 'error',
+      'no-unused-vars': ['warn', {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrors: 'none',
+      }],
+      eqeqeq: ['warn', 'smart'],
+    },
+  },
 ];

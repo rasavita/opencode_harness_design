@@ -76,7 +76,7 @@
     "regression-gate": "node .opencode/scripts/regression-gate.js",
     "impact-scope": "node .opencode/scripts/impact-scope.js",
     "local-regression-gate": "node .opencode/scripts/local-regression-gate.js",
-    "lint": "eslint .opencode/hooks .opencode/scripts .opencode/git-hooks dsl-packs test eslint.config.js tools",
+    "lint": "eslint .opencode/hooks .opencode/scripts .opencode/plugins .opencode/git-hooks dsl-packs test eslint.config.js tools",
     "test": "node --test test/*.test.js test/e2e/helpers/*.test.js",
     "build:chain": "node .opencode/scripts/build-chain.js",
     "test:e2e": "node test/e2e/run-pack.js cert",

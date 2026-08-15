@@ -1,28 +1,34 @@
 # opencode_harness_design
 
-A Claude Code plugin scaffold for autonomous long-running application development.
+An [opencode](https://opencode.ai) harness for autonomous long-running application development, ported from the Claude Code harness engine.
 
 ## What This Is
 
-A GAN-inspired harness combining Karpathy ratcheting + Anthropic/OpenAI harness engineering best practices:
+A GAN-inspired harness combining Karpathy ratcheting + harness engineering best practices:
 - Generator-Evaluator architecture (no self-evaluation bias)
 - Agent teams for parallel story execution
 - Session chaining for multi-context-window builds
 - Three-layer evaluation (API + Playwright + Vision with weighted scoring)
-- Superpowers integration (brainstorming, TDD, debugging, verification at key stages)
 - 2 execution modes: Full, Lean
 
 ## Installation
 
 1. Clone: `git clone <repo-url> ~/opencode_harness_design`
-2. Load as plugin: `claude --plugin-dir ~/opencode_harness_design/.opencode`
-3. Scaffold a project: `/opencode_harness_design:scaffold`
+2. Open the repo in opencode: `cd ~/opencode_harness_design && opencode`
+3. Scaffold a project: `/scaffold`
 
-## Commands, Agents & Superpowers Integration
+## How the opencode Integration Works
 
-The full Commands table, the 8-agent team (roles + model assignments), and the Superpowers pipeline-stage integration table live in `README.md` (sections *Command reference*, *Agent team*, *Superpowers integration*). They are reference material, not always-on rules, so they are kept out of this always-loaded file to preserve the prompt-cache prefix. Read `README.md` when you need the command/agent inventory.
+- **`opencode.json`** — native opencode config: permission model (Bash allowlist ported from the Claude `permissions.allow` list) and the `harness-nav` MCP server.
+- **`.opencode/plugins/harness.js`** — the plugin adapter. It reads the declarative hook manifest in `.opencode/settings.json#hooks` (logical event → tool matcher → hook command) and runs each hook script as a child process with the canonical JSON envelope on stdin. An exit code 2 from a `PreToolUse` hook becomes a thrown error in `tool.execute.before` — a true pre-execution veto. `PostToolUse`, `UserPromptSubmit`, `Stop`, and `SubagentStop` vetoes cannot undo work, so they are surfaced back into the session as corrective prompts.
+- **`.opencode/settings.json`** — harness-internal manifest (NOT read by opencode itself): env flags (`HARNESS_AGENT_TEAMS`, `HARNESS_AUTO_CONTINUE`), the hook wiring consumed by the plugin, and the vertical-pack registry (`enabledPlugins`).
+- **`.opencode/agents/*.md`** — subagent definitions (opencode frontmatter: `description`, `mode: subagent`, `model`, `permission`). Model pins are stamped by `node .opencode/scripts/model-tier.js <tier> --apply .opencode/agents` and the model ids are configurable via `HARNESS_MODEL_JUDGMENT` / `HARNESS_MODEL_GENERATION` / `HARNESS_MODEL_EXPLORATION` (opencode `provider/model` format).
+- **`.opencode/commands/*.md`** — slash commands. Entry points (`/build`, `/auto`, `/feature`, `/gate`, …) are thin wrappers that inline the corresponding skill via `@.opencode/skills/<name>/SKILL.md`.
+- **`.opencode/skills/*/SKILL.md`** — the skill library, with progressive-loading `references/` directories. Internal pipeline stages are marked in their descriptions and are invoked by the entry points, not typed by users.
 
-If a `superpowers:*` skill invocation fails because the plugin is not installed, do not skip the step silently — apply the equivalent inline discipline (TDD red-green-refactor and quality rules from `.opencode/skills/code-gen/SKILL.md`; for debugging, reproduce → isolate → root-cause before fixing) and note the degraded mode in the progress log.
+## Commands & Agents
+
+The full Commands table and the agent team (roles + model tiers) live in `README.md` (sections *Command reference*, *Agent team*). They are reference material, not always-on rules. Read `README.md` when you need the command/agent inventory.
 
 ## Coding Principles (Karpathy Guidelines)
 
@@ -42,11 +48,11 @@ UI mockups, architecture / ARB (Architecture Review Board) narrative documents, 
 
 | Artifact | Lane |
 |----------|------|
-| UI mockup / component / page | `frontend-design` skill |
+| UI mockup / component / page | direct authoring (no pipeline) |
 | Architecture / ARB / design narrative | `/design --doc-only` (single authored document; no planner/generator/evaluator, no `specs/design/` schema set) |
-| Research / deep dive / analysis | `deep-research` skill |
+| Research / deep dive / analysis | direct research (no pipeline) |
 
-These lanes skip contracts, ratcheting, and reviewer enforcement **by design** — abstaining from the pipeline is correct behavior here, not a shortcut, and it overrides the default impulse to brainstorm/escalate/TDD before acting. Only escalate to the SDLC pipeline if the artifact is being turned into shipped product code (e.g., a mockup becoming a real component). When in doubt about whether something is product code, ask. For a fully insulated workspace where the SDLC machinery is absent entirely, load the **harness-lite** plugin (`harness-lite/`) instead of this one. For small but *shippable* code, use `/build --lite` inside the full harness, not `harness-lite` — that loadout is only for artifacts that never ship.
+These lanes skip contracts, ratcheting, and reviewer enforcement **by design** — abstaining from the pipeline is correct behavior here, not a shortcut. Only escalate to the SDLC pipeline if the artifact is being turned into shipped product code (e.g., a mockup becoming a real component). When in doubt about whether something is product code, ask. For a fully insulated workspace where the SDLC machinery is absent entirely, load the **harness-lite** loadout (`harness-lite/`) instead of this one. For small but *shippable* code, use `/build --lite` inside the full harness.
 
 ### 1. Think Before Coding
 - State assumptions explicitly. If uncertain, ask — don't guess.
@@ -79,51 +85,36 @@ These lanes skip contracts, ratcheting, and reviewer enforcement **by design** �
 
 ## Large Codebase Best Practices
 
-The harness follows [Anthropic's guidance for large codebases](https://claude.com/blog/how-claude-code-works-in-large-codebases-best-practices-and-where-to-start):
-
-- **Hierarchical AGENTS.md** — Root AGENTS.md for project-wide rules; subdirectory AGENTS.md files for scoped test/lint commands (generated by `/scaffold` Step 5.B for multi-module projects)
-- **File exclusions** — `.gitignore` is the exclusion mechanism (Claude Code respects it by default via `respectGitignore: true`)
-- **Read-only exploration** — Use the `codebase-explorer` agent for discovery before editing; separates exploration from modification
-- **Session learnings** — Stop hook (`review-on-stop.js`) reviews accumulated rules and suggests AGENTS.md updates
-- **State archival** — Run `node .opencode/scripts/archive-state.js` to archive oversized state files to `.opencode/state/archive/`
-- **Codebase map** — `CODEBASE_MAP.md` documents top-level directory structure for navigation
+- **Hierarchical AGENTS.md** — Root AGENTS.md for project-wide rules; subdirectory AGENTS.md files for scoped test/lint commands (generated by `/scaffold` Step 5.B for multi-module projects). opencode reads `AGENTS.md` as its primary project instruction file.
+- **Read-only exploration** — Use the `codebase-explorer` agent for discovery before editing; separates exploration from modification.
+- **Session learnings** — Stop hook (`review-on-stop.js`) reviews accumulated rules and suggests AGENTS.md updates.
+- **State archival** — Run `node .opencode/scripts/archive-state.js` to archive oversized state files to `.opencode/state/archive/`.
+- **Codebase map** — `CODEBASE_MAP.md` documents top-level directory structure for navigation.
 - **Context-first navigation** — when `specs/brownfield/code-graph.json` is real, run `node .opencode/scripts/nav-query.js pack --diff --budget 1600 "<question>"` (or `/context`) before broad source reads; use `read_next` line ranges, not whole files. Refresh secondary indexes with `nav-query.js refresh`.
-- **LSP integration** — `/scaffold` auto-detects LSP servers from the stack (pyright, typescript-language-server, gopls, etc.), writes them to `project-manifest.json`, and checks availability in `init.sh`
-- **MCP servers** — `.mcp.json` template for connecting to internal tools, databases, and documentation
-- **Subdirectory commands** — Scope test/lint commands per module to avoid running full suites on minor changes
-- **Working-tree hygiene (this checkout)** — the repo lives under an iCloud-synced `Documents/` path; concurrent writes (parallel subagents) can spawn `<name> 2.<ext>` duplicate files that hang the `scaffold-copy` / `scaffold-apply` / `skills-consistency` tests. If `npm test` hangs, kill orphaned `node --test` processes and delete the ` 2.`-suffixed dupes, then re-run. Moving the clone outside the synced path prevents it.
+- **LSP integration** — `/scaffold` auto-detects LSP servers from the stack (pyright, typescript-language-server, gopls, etc.), writes them to `project-manifest.json`, and checks availability in `init.sh`.
+- **MCP servers** — configured in `opencode.json#mcp` (dogfood: `harness-nav` via `nav-mcp-server.js`; settle before long runs).
+- **Subdirectory commands** — Scope test/lint commands per module to avoid running full suites on minor changes.
 
-## Prompt Caching
+## Prompt Stability
 
-Claude Code is built around prompt caching: the API caches the request prefix (static system prompt + tools → `AGENTS.md` → session context) and reuses it across turns, which is what makes long agentic sessions cheap and fast. **Caching is automatic and always-on inside Claude Code — there is nothing to enable**, and the harness makes no direct Anthropic API calls, so there are no `cache_control` breakpoints to manage. The only job is to avoid invalidating the cached prefix: a change anywhere in the prefix invalidates everything after it.
+Long agentic sessions depend on provider prompt caching: the request prefix (system prompt + tools → `AGENTS.md` → session context) is cached and reused across turns. A change anywhere in the prefix invalidates everything after it. Three rules keep the prefix stable during a run:
 
-Three rules keep the prefix stable during a run:
-
-1. **Don't churn tools mid-session.** Adding/removing a tool, plugin, or MCP server during a run rebuilds the whole cache. Settle `enabledPlugins` and `.mcp.json` *before* long `/auto` runs. (Claude Code defers MCP tool schemas via tool search rather than removing them — leave that mechanism in place.)
-2. **Don't edit `AGENTS.md` mid-session.** It's cached per-project; an edit busts the prefix for every later turn. The `session-learnings` Stop hook only *suggests* updates — apply them between sessions, not during a build.
-3. **Don't swap the orchestrator's model mid-session.** Model changes happen via subagents with their own context windows (planner=Opus, generator=Sonnet, etc. — see the Agents table), never by `/model`-switching the main loop. Dynamic values (dates, timestamps) belong in messages / `<system-reminder>` tags, never in cached content.
+1. **Don't churn tools mid-session.** Adding/removing a plugin or MCP server during a run rebuilds the whole cache. Settle `opencode.json#mcp` *before* long `/auto` runs.
+2. **Don't edit `AGENTS.md` mid-session.** The `session-learnings` Stop hook only *suggests* updates — apply them between sessions, not during a build.
+3. **Don't swap the orchestrator's model mid-session.** Model changes happen via subagents with their own frontmatter pins (see the Agents table), never by switching the main session's model mid-run. Dynamic values (dates, timestamps) belong in messages, never in cached content.
 
 **Enforced:** `pre-write-gate` + `pre-bash-gate` block writes to `AGENTS.md`, `.mcp.json`, and `.opencode/settings*.json` (see `.opencode/hooks/lib/prefix-cache.js`). Escape for intentional inter-session work only: `HARNESS_PREFIX_EDIT=1`.
 
-Monitor cache hit rate like uptime. Telemetry is **off by default** (opt-in) — enable it per the README's "Enable telemetry" section (`HARNESS_ENABLE_TELEMETRY=1` + the OTEL/Pushgateway env vars in `.opencode/settings.json`). Once enabled, `telemetry/cache-alerts.rules.yml` (wired into `telemetry/prometheus.yml`) and `telemetry/grafana/dashboards/cache-health.json` (auto-provisioned) add a hit-rate alert and dashboard on top of it. See `telemetry/CACHE_MONITORING.md`.
+Telemetry is **off by default** (opt-in) — enable it per the README's "Enable telemetry" section (`HARNESS_ENABLE_TELEMETRY=1` + the OTEL/Pushgateway env vars). Once enabled, `telemetry/cache-alerts.rules.yml` (wired into `telemetry/prometheus.yml`) and `telemetry/grafana/dashboards/cache-health.json` (auto-provisioned) add a hit-rate alert and dashboard on top of it. See `telemetry/CACHE_MONITORING.md`.
 
 ## Key Files
 
 - `.opencode/program.md` — Karpathy human-agent bridge (edit to steer /auto)
-- `.opencode/settings.json` — Hook config, permissions, enabled plugins
-- `.mcp.json` — Project MCP servers (dogfood: `harness-nav` via `nav-mcp-server.js`; settle before long runs)
+- `opencode.json` — opencode config: permissions + MCP servers
+- `.opencode/settings.json` — harness-internal hook manifest, env flags, vertical-pack registry
+- `.opencode/plugins/harness.js` — the opencode plugin adapter (hook dispatch + veto translation)
 - `.opencode/workflows/` — Slot for dynamic workflows you author (each `.js` you add becomes a `/<name>` command). Ships empty; `/scaffold` copies the slot to target projects. See `.opencode/workflows/README.md`
 - `design.md` — Full architecture reference (copied to target projects)
 - `HARNESS.md` + `harness-manifest.json` — Registry of the control system (guides × sensors across maintainability/architecture/behaviour/traceability). Read before adding or changing any gate/sensor/reviewer so the new control gets registered, not orphaned; keep the manifest honest (`node .opencode/scripts/validate-harness-manifest.js`, enforced by `npm test`)
 - `README.md` — Installation and usage guide
 - `docs/prompting-standards.md` — How to author agent/skill prompts for the current models (read before editing any `.opencode/agents/*` or `.opencode/skills/*` prompt)
-
-<!-- OPENWIKI:START -->
-
-## OpenWiki
-
-This repository uses OpenWiki for recurring code documentation. Start with `open_wiki/wiki/quickstart.md`, then follow its links to architecture, workflows, domain concepts, operations, integrations, testing guidance, and source maps.
-
-The scheduled OpenWiki GitHub Actions workflow refreshes the repository wiki. Do not hand-edit generated OpenWiki pages unless explicitly asked; prefer updating source code/docs and letting OpenWiki regenerate.
-
-<!-- OPENWIKI:END -->

@@ -1,11 +1,10 @@
 ---
-name: advisor
-model: claude-opus-5
 description: Frontier mid-run advisor. Structural re-rank / unblock / design pivot at fixed checkpoints. Read-only; never implements.
-tools:
-  - Read
-  - Grep
-  - Glob
+mode: subagent
+model: anthropic/claude-opus-5
+permission:
+  edit: deny
+  bash: deny
 ---
 
 # Advisor Agent

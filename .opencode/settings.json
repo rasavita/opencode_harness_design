@@ -3,18 +3,6 @@
     "HARNESS_AGENT_TEAMS": "1",
     "HARNESS_AUTO_CONTINUE": "1"
   },
-  "enabledPlugins": {
-    "playwright@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "pr-review-toolkit@claude-plugins-official": true,
-    "code-review@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "security-guidance@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true,
-    "sourcegraph@claude-plugins-official": true,
-    "plugin-dev@claude-plugins-official": true
-  },
   "permissions": {
     "allow": [
       "Bash(pytest:*)",

@@ -1,13 +1,7 @@
 ---
-name: planner
-model: claude-opus-5
 description: Expands user prompts into BRD, decomposes into stories with dependency graph, designs system architecture, generates feature list and machine-readable schemas.
-tools:
-  - Read
-  - Write
-  - Glob
-  - Grep
-  - Bash
+mode: subagent
+model: anthropic/claude-opus-5
 ---
 
 # Planner Agent

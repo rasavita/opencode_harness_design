@@ -12,7 +12,7 @@ When the user runs this command, follow these steps exactly:
 `/scaffold` takes optional arguments: `/scaffold [--yes | -y | --non-interactive] [--core | --brownfield | --full] [--telemetry] [--drift-workflow] [<description>]`.
 
 - **Interactive (default — no `--yes`):** the full Infer + Confirm flow below. The normal human path.
-- **Non-interactive (`--yes` / `-y` / `--non-interactive`):** for unattended / CI / e2e use where no human is present to answer (e.g. `claude -p`). Never call `AskUserQuestion` in this mode. `--yes` with no `<description>` is an error: print one line asking for a description and stop — do not invent a project. Otherwise do exactly this and nothing else:
+- **Non-interactive (`--yes` / `-y` / `--non-interactive`):** for unattended / CI / e2e use where no human is present to answer (e.g. `opencode run`). Never call `AskUserQuestion` in this mode. `--yes` with no `<description>` is an error: print one line asking for a description and stop — do not invent a project. Otherwise do exactly this and nothing else:
   1. Take `<description>` as the Q1 answer and run the **Step 1.B** inference to build the profile. Inference is the *only* judgement you make here — do **not** hand-write project files.
   2. `Write` the inferred profile as JSON to `./.scaffold-profile.json` using the schema documented at the top of `.opencode/scripts/scaffold-apply.js` (`name`, `description`, `stack.backend`/`frontend`/`database`, `projectType` A–D, `verificationMode` A–C, `modelTier`, `scaffoldProfile` core/brownfield/full, `telemetry`, `tracker` A–D, `frameworkPacks`, `lsp`).
   3. Run the deterministic generator — it performs every copy / mkdir / template-write of Steps 2–9, so nothing can be skipped or hallucinated:
@@ -69,7 +69,7 @@ Apply these rules. Be explicit and conservative — when the description is ambi
 
 **Drift workflow:** Default OFF. If the user passes `--drift-workflow`, set `quality.drift.workflow: true`. This copies `.opencode/templates/github-workflows/harness-drift.yml` into `.github/workflows/harness-drift.yml` so GitHub Actions can run the slow-cadence drift, flake, harness-coverage, approved-fixtures, contract-drift, and optional SLO checks. Keep it separate from `--telemetry`: telemetry exports data; the drift workflow schedules quality checks.
 
-**Plugins:** The deterministic generator trims target `enabledPlugins` to Playwright + Superpowers for `core` and `brownfield`. Use `full` only when the project should receive the whole optional plugin surface.
+**Plugins:** For `core` and `brownfield`, the deterministic generator strips the harness-internal `enabledPlugins` vertical-pack registry from the target's settings. Use `full` only when the project should receive the whole optional surface.
 
 **Tracker:** Default to A Local-only unless Q1 explicitly names a tracker:
 - Mentions "Linear" → C Publish + sync
@@ -151,19 +151,10 @@ If the user picks D, install the `core` scaffold by default, recommend `/build -
    - A) Docker Compose (default)
    - B) Local dev servers
    - C) Stub / mock server
-5. "Install complementary official Claude Code plugins?"
-   (`playwright` is installed unconditionally — the evaluator's Layer 2 browser checks and the design-critic vision loop depend on its MCP browser tools. This question covers only the optional extras.)
-   - `superpowers` — Structured developer workflows used by the harness pipeline
-   - `code-review` — Automated PR review with confidence scoring
-   - `commit-commands` — `/commit`, `/commit-push-pr` git workflows
-   - `security-guidance` — Real-time security pattern checking on edits
-   - `pr-review-toolkit` — Specialized PR review agents (comments, tests, errors, types)
-   - `frontend-design` — Aesthetic direction skill (does NOT replace `design-critic`)
-   - `context7` — Up-to-date library/docs lookup MCP
-   - `code-simplifier` — `/simplify` skill used during `/refactor`
-   - A) Yes, install all eight (recommended)
-   - B) Let me pick which ones
-   - C) No, skip official plugins
+5. "Enable browser automation via the Playwright MCP server?"
+   (the evaluator's Layer 2 browser checks and the design-critic vision loop drive a browser through Playwright MCP tools; without them, `/evaluate` degrades to API-only checks)
+   - A) Yes, add the Playwright MCP server to `opencode.json` (recommended)
+   - B) No, skip browser automation
 6. "Enable optional external tracker orchestration?"
    - A) No, keep this project local-only
    - B) Publish generated story groups to Linear/Jira only
@@ -171,10 +162,10 @@ If the user picks D, install the `core` scaffold by default, recommend `/build -
    - D) Publish + external orchestrator dispatch
 7. "Configure agent-framework skill packs?" (multi-select; default: None) — opt-in packs recorded in `project-manifest.json`.
    - A) Python AI Agents (LangGraph / LangChain / DeepAgents) — bundled directly in this harness, copied automatically, no manual install needed
-   - B) LangChain / LangGraph / DeepAgents (external community pack) — `cwijayasundara/agent_cli_langchain` (9 skills, installed manually from a normal terminal because Claude Code auto-mode blocks external `npx skills add` installs)
+   - B) LangChain / LangGraph / DeepAgents (external community pack) — `cwijayasundara/agent_cli_langchain` (9 skills, installed manually from a normal terminal because agent auto-mode blocks external `npx skills add` installs)
    - C) Google ADK — `google/agents-cli` (7 skills, same manual-install caveat as B)
    - D) None
-8. "Enable a domain-vertical plugin?" (single-select; default: None) — reads `.opencode/config/scaffold-packs.json`'s `verticalPacks` array for the list of known verticals; recorded in `project-manifest.json`, installed manually via `claude plugin marketplace add`/`claude plugin install` because Claude Code auto-mode blocks these installs the same way it blocks `npx skills add`.
+8. "Enable a domain-vertical plugin?" (single-select; default: None) — reads `.opencode/config/scaffold-packs.json`'s `verticalPacks` array for the list of known verticals; recorded in `project-manifest.json`, installed manually (see the Domain Vertical Plugins section) because agent auto-mode blocks these installs the same way it blocks `npx skills add`.
    - A) Private Equity — `private-equity@claude-for-financial-services`
    - B) None
 9. "Enforce bounded-context boundaries between domain modules?" (single-select; default: No) — a *vertical* import rule, distinct from the default-on horizontal layer/import-direction gate (`architecture.layers` in Step 2): two domain modules (e.g. `src/billing`, `src/user`) may not reach into each other's internals except via a public surface or an explicit exception. Enforced by `.opencode/hooks/lib/contexts.js` (gap G8) only when configured — most projects have no bounded contexts and should skip this.
@@ -397,7 +388,7 @@ Preset mappings:
 
 ## Step 3: Copy Scaffold Files
 
-First, locate the plugin source directory. `${HARNESS_PLUGIN_ROOT}` is the authoritative answer — Claude Code sets it to this plugin's own root for every session that loaded the plugin (marketplace install or `--plugin-dir` alike), so it never points at a stale clone or a renamed checkout. Only fall back to searching when it is unset.
+First, locate the plugin source directory. `${HARNESS_PLUGIN_ROOT}` is the authoritative answer when set — the harness plugin adapter exports it to hook processes, and users can export it in their shell to point at the harness checkout. Inside an opencode command session it is usually unset — fall back to searching.
 
 ```bash
 # Authoritative: the running plugin's own root.
@@ -495,7 +486,7 @@ writes placeholder `specs/brownfield/code-graph.json`, `symbol-map.md`, and
 the lean initial code-map/wiki render immediately. The `graph-refresh` hook keeps
 the graph, symbol map, and deterministic DeepWiki current after edits.
 
-`settings.auto.json` is the **unattended full-auto profile** — a no-prompt permission set (`Bash(*)`, `Write(*)`, …) plus `HARNESS_AUTO_CONTINUE=1`. Claude Code does **not** auto-load it; a headless `--auto` run passes it explicitly with `--settings .opencode/settings.auto.json`. It merges over the curated `settings.json`, so the deterministic gate hooks and ratchet still enforce safety — interactive sessions keep `settings.json`'s curated allowlist untouched. Do not enable broad permissions in `settings.json` itself.
+`settings.auto.json` is the **unattended full-auto profile** — a no-prompt permission set (`Bash(*)`, `Write(*)`, …) plus `HARNESS_AUTO_CONTINUE=1`. It is never auto-loaded; a headless `--auto` run opts into it explicitly (the plugin adapter and hooks read it only when `HARNESS_SETTINGS=.opencode/settings.auto.json` is exported). It merges over the curated `settings.json`, so the deterministic gate hooks and ratchet still enforce safety — interactive sessions keep `settings.json`'s curated allowlist untouched. Do not enable broad permissions in `settings.json` itself.
 
 **Apply the cost-posture preset.** Stamp each agent's `model:` pin from the manifest's `execution.model_tier` (product default `cost` — Sonnet generation, Haiku explorer, Opus judgment). This is the one place a model is named; the prompt bodies stay model-agnostic.
 
@@ -525,59 +516,31 @@ cp "$HARNESS_ROOT/docs/telemetry.md" "$HARNESS_ROOT/docs/testing.md" "$HARNESS_R
 
 **Important:** You MUST actually run these copy commands via Bash. Do NOT skip this step or try to generate the files from memory. The source files contain hooks, agent definitions, and skill instructions that must be copied exactly.
 
-### Add Official Plugins to settings.json (based on the plugins decision)
+### Configure opencode.json (permissions + MCP, based on the browser-automation decision)
 
-The `settings.json` you just copied is the **harness's own** config — its `enabledPlugins` lists the plugins the *harness pipeline itself* depends on (`superpowers` for brainstorming/TDD/debugging/verification, `playwright`, `frontend-design`, and complementary reviewers). **Do not inherit that set into the target verbatim** — a user who declined optional plugins must not receive them anyway. **Rebuild** the target's `enabledPlugins` authoritatively from the user's answer:
+The `settings.json` you just copied is the **harness's own** internal manifest (env flags, hook wiring for the plugin adapter, and the vertical-pack registry). It is not opencode configuration. Delete any `enabledPlugins` key inherited from the harness seed unless the target already had project-scoped vertical entries — preserve those.
 
-- always include `playwright@claude-plugins-official` (unless explicitly declined — see below),
-- plus exactly the complementary plugins the user selected (all / picked / none),
-- plus any project-scoped entries already present in the **target's** pre-scaffold settings (e.g. `opencode_harness_design@local-harness`).
+Generate the target's `opencode.json` at the project root by copying the harness's own `opencode.json` (permission allowlist + the `harness-nav` MCP server, with the MCP command path pointing at `.opencode/scripts/nav-mcp-server.js` in the target).
 
-Replace the copied `enabledPlugins` object with this rebuilt set.
-
-**Always merge `playwright@claude-plugins-official` first, regardless of the answer.** It is not one of the optional eight: the `evaluator` agent's Layer 2 (browser verification) and the `design-critic` GAN loop (Layer 3) call its `mcp__plugin_playwright_playwright__browser_*` tools, and without the plugin those layers cannot run — `/evaluate` degrades to API-only checks. Only omit it if the user explicitly declines after being told this, and record the degradation in the Step 10 report.
+**If the user enabled browser automation (Q5 = Yes):** add the Playwright MCP server so the `evaluator` agent's Layer 2 (browser verification) and the `design-critic` GAN loop (Layer 3) can drive a browser. Without it those layers cannot run — `/evaluate` degrades to API-only checks. Record a Q5 = No answer as a degradation in the Step 10 report.
 
 ```json
-"enabledPlugins": {
-  "playwright@claude-plugins-official": true
+"mcp": {
+  "playwright": {
+    "type": "local",
+    "command": ["npx", "-y", "@playwright/mcp@latest"],
+    "enabled": true
+  }
 }
 ```
 
-**If Yes (all eight) or selected plugins:**
-Set the target's `enabledPlugins` to `playwright` plus the selected official plugins:
-```json
-"enabledPlugins": {
-  "superpowers@claude-plugins-official": true,
-  "code-review@claude-plugins-official": true,
-  "commit-commands@claude-plugins-official": true,
-  "security-guidance@claude-plugins-official": true,
-  "pr-review-toolkit@claude-plugins-official": true,
-  "frontend-design@claude-plugins-official": true,
-  "context7@claude-plugins-official": true,
-  "code-simplifier@claude-plugins-official": true
-}
-```
+**If No:** omit the `playwright` MCP entry — skip browser automation.
 
-When rebuilding the object, preserve any project-scoped entries already present in the **target's** pre-scaffold settings (such as `opencode_harness_design@local-harness`); otherwise a project-scoped plugin install can be disabled by the scaffold copy. Discard the complementary plugins inherited from the harness seed unless the user actually selected them.
+Claude Code official plugins (superpowers, code-review, commit-commands, security-guidance, pr-review-toolkit, frontend-design, context7, code-simplifier) have no opencode equivalents and are **not** installed. Where the source harness leaned on them, the port substitutes:
 
-If the user chose "Let me pick," only include the plugins they selected.
-
-**If No:** Add only the `playwright@claude-plugins-official` entry (see above) — skip the optional eight.
-
-These plugins are complementary to the harness and do not conflict:
-- `playwright` — **required, not optional**: provides the MCP browser tools (`mcp__plugin_playwright_playwright__browser_*`) that the `evaluator` agent uses for Layer 2 verification and the `design-critic` uses for screenshots. Without it, `/evaluate` runs API checks only.
-- `superpowers` — structured workflows used by the harness pipeline for brainstorming, planning, TDD, debugging, and verification
-- `code-review` — PR review (our harness does sprint evaluation, not PR review)
-- `commit-commands` — git workflows (our harness manages commits in `/auto`, but manual commits need this)
-- `security-guidance` — real-time, in-session security review (per-edit pattern match + background diff/commit reviews). **Advisory only — it never blocks** (per its docs); findings are fed to Claude as suggestions. It complements but does not replace enforcement: the deterministic `pre-write-gate` hook blocks secrets before they reach disk, and the **`security-reviewer` agent is the enforced gate** (its `security-verdict.json` fails `/evaluate` and the `/auto` loop on any critical/high finding). Sharpen the plugin with a project threat model in `.opencode/security-guidance.md` and custom deterministic patterns in `.opencode/security-patterns.yaml`. The plugin itself **cannot block** (advisory by design), but the harness `pre-write-gate` hook reads that same patterns file and **hard-blocks** any rule you flag `block: true` — so the plugin warns on every pattern and the hook enforces the subset you choose.
-- `pr-review-toolkit` — specialized PR agents for after the harness finishes building
-- `frontend-design` — aesthetic-direction skill. Invoked by `generator` during `/design` and by frontend teammates during `/implement` to avoid raw-Tailwind-default UI. The `design-critic` GAN loop still owns scoring and iteration control — `frontend-design` does not replace it.
-- `context7` — up-to-date library/docs lookup MCP. Useful when teammates need current API references for third-party libraries.
-- `code-simplifier` — in-session `/simplify` skill used during `/refactor` for reuse, quality, and efficiency cleanup.
-
-**Do NOT install** these official plugins (they conflict with harness functionality):
-- `feature-dev` — competes with our `/brd` -> `/spec` -> `/design` -> `/implement` pipeline
-- `hookify` — dynamically generated hooks could interfere with our purpose-built hooks
+- `superpowers` workflows → inline discipline (TDD red-green-refactor and quality rules from `.opencode/skills/code-gen/SKILL.md`; for debugging, reproduce → isolate → root-cause before fixing)
+- `security-guidance` advisory review → the deterministic `pre-write-gate` hook still blocks secrets before they reach disk, and the **`security-reviewer` agent is the enforced gate** (its `security-verdict.json` fails `/evaluate` and the `/auto` loop on any critical/high finding). Sharpen it with a project threat model in `.opencode/security-guidance.md` and custom deterministic patterns in `.opencode/security-patterns.yaml` — the `pre-write-gate` hook reads that patterns file and **hard-blocks** any rule you flag `block: true`.
+- `frontend-design` / `code-simplifier` / review toolkits → the harness's own `design-critic`, `/refactor`, and `code-reviewer` surfaces.
 
 ### Generate .mcp.json (MCP Server Configuration)
 
@@ -591,7 +554,7 @@ All servers are disabled by default. The user enables servers they need and conf
 
 ### Generate Security Threat-Model Files
 
-Copy the security starter files to `.opencode/` (read by both the `security-guidance` plugin and the `security-reviewer` gate):
+Copy the security starter files to `.opencode/` (read by the `pre-write-gate` hook and the `security-reviewer` gate):
 
 ```bash
 cp $PLUGIN_SOURCE/templates/security-guidance.template.md .opencode/security-guidance.md
@@ -652,12 +615,12 @@ This pack (`python-ai-agents`) is authored and bundled directly in this harness.
 
 **B) External — LangChain / LangGraph / DeepAgents (community pack) — 9 skills**
 
-Do not run `npx skills add` from `/scaffold`. Claude Code auto-mode commonly blocks external `npx` installs even when command permissions are allowlisted, so attempting it during scaffold creates a noisy denial and a misleading partial-success report. The reliable path is: (1) scaffold writes the harness files and records selected packs; (2) the user runs the listed `npx --yes skills add ...` command in a normal terminal; (3) the user returns to Claude Code and runs `/install-framework-packs --list` to verify.
+Do not run `npx skills add` from `/scaffold`. Agent auto-mode commonly blocks external `npx` installs even when command permissions are allowlisted, so attempting it during scaffold creates a noisy denial and a misleading partial-success report. The reliable path is: (1) scaffold writes the harness files and records selected packs; (2) the user runs the listed `npx --yes skills add ...` command in a normal terminal; (3) the user returns to opencode and runs `/install-framework-packs --list` to verify.
 
 **Important:** manual commands must be run inside the target project directory. Do NOT use `-g`/`--global`. **CLI syntax:** the package source goes FIRST as a positional argument — flags before it fail with `ERROR Missing required argument: source`.
 
 ```bash
-npx --yes skills add cwijayasundara/agent_cli_langchain -a claude-code -s '*' -y
+npx --yes skills add cwijayasundara/agent_cli_langchain -a opencode -s '*' -y
 ```
 
 Expected: 9 skills under `.opencode/skills/langchain-agents-*`. Source: <https://github.com/cwijayasundara/agent_cli_langchain>. Two skills (`deepagents-code`, `deploy`) carry a "Med Risk" Snyk flag from the `skills` CLI's install-time scan — surface this in the install report; the flag's cause hasn't been independently root-caused (likely a repo/dependency-level finding, not something found in the skill content itself — see below).
@@ -667,7 +630,7 @@ Content review (2026-07-07): the actual `SKILL.md` bodies for `langgraph-code`, 
 **C) Google ADK — 7 skills**
 
 ```bash
-npx --yes skills add google/agents-cli -a claude-code -s '*' -y
+npx --yes skills add google/agents-cli -a opencode -s '*' -y
 ```
 
 Expected: 7 skills under `.opencode/skills/google-agents-cli-*`.
@@ -680,7 +643,7 @@ ls .opencode/skills/ | grep -E '^(langchain-agents|google-agents-cli)-' | wc -l
 
 #### Domain Vertical Plugins
 
-Read `.opencode/config/scaffold-packs.json`'s `verticalPacks` array for the list of known verticals to offer (currently: `private-equity`). A selected vertical is a Claude Code marketplace plugin, installed via `claude plugin install` — a different command family from the tech-stack packs above, kept separate in the report below on purpose.
+Read `.opencode/config/scaffold-packs.json`'s `verticalPacks` array for the list of known verticals to offer (currently: `private-equity`). A selected vertical originates from the Claude Code plugin marketplace — opencode has no equivalent marketplace, so the vertical's skills are installed manually (via the Claude CLI if available, or by copying the pack's skills into `.opencode/skills/`) and then registered in `.opencode/settings.json#enabledPlugins` (the harness-internal vertical registry). Kept separate from the tech-stack packs above in the report below on purpose.
 
 Once selected, the vertical's `enabled_plugin_prefix` becoming truthy in `.opencode/settings.json#enabledPlugins` (via the manual install below) is what makes `/brd` Step 2.7 (`vertical-glossary-pack.js`) start seeding `CONTEXT.md` from that vertical's skill vocabulary automatically — no further scaffold-side action needed once installed.
 
@@ -690,12 +653,12 @@ If one or more external tech-stack packs or domain verticals were selected, run 
 
 ```text
 [!] Some selections require a manual terminal install.
-    Claude Code auto-mode blocks these installs during /scaffold.
+    Agent auto-mode blocks these installs during /scaffold.
 
   Tech-stack packs (npx):
   cd <project-root>
-  npx --yes skills add cwijayasundara/agent_cli_langchain -a claude-code -s '*' -y   # if external LangChain pack selected
-  npx --yes skills add google/agents-cli -a claude-code -s '*' -y                     # if Google ADK selected
+  npx --yes skills add cwijayasundara/agent_cli_langchain -a opencode -s '*' -y   # if external LangChain pack selected
+  npx --yes skills add google/agents-cli -a opencode -s '*' -y                     # if Google ADK selected
 
   Domain vertical plugins (claude plugin):
   <output of `node .opencode/scripts/scaffold-vertical-status.js`, verbatim, for each selected vertical not yet installed — e.g.:
@@ -823,7 +786,7 @@ mkdir -p .opencode/runs
 
 ### Telemetry (default: OFF)
 
-Telemetry is opt-in. The deterministic generator bakes OTEL + Pushgateway env vars into `settings.json` and `settings.auto.json` only when `--telemetry` or `"telemetry": true` is used. Without that flag, the `record-run` hook still writes local harness memory, but Claude Code does not export OTEL metrics and the hook does not push to a Pushgateway.
+Telemetry is opt-in. The deterministic generator bakes OTEL + Pushgateway env vars into `settings.json` and `settings.auto.json` only when `--telemetry` or `"telemetry": true` is used. Without that flag, the `record-run` hook still writes local harness memory, but no OTEL metrics are exported and the hook does not push to a Pushgateway.
 
 When telemetry is enabled, the user still starts the stack — the one step scaffold cannot automate:
 
@@ -994,10 +957,10 @@ Use `INSTALLED` when the prefix directory contains the expected skill count. Use
 
 Also append a "Framework-specific entry points" hint to Next steps, since these packs ship their own scaffolders and workflow skills that complement the harness pipeline. Example additions:
 
-- If LangChain pack selected and installed: "For LangChain/LangGraph/DeepAgents work, ask Claude to 'scaffold a langgraph agent' or 'build an agent using ADK middleware' — the framework's `*-scaffold` and `*-workflow` skills will trigger."
-- If LangChain pack selected but pending: "After the manual LangChain pack install, ask Claude to 'scaffold a langgraph agent' or 'build an agent using ADK middleware'."
-- If Google ADK pack selected and installed: "For Google ADK work, ask Claude to 'start a new ADK project' or 'deploy my ADK agent' — the `google-agents-cli-*` skills will trigger."
-- If Google ADK pack selected but pending: "After the manual Google ADK pack install, ask Claude to 'start a new ADK project' or 'deploy my ADK agent'."
+- If LangChain pack selected and installed: "For LangChain/LangGraph/DeepAgents work, ask the agent to 'scaffold a langgraph agent' or 'build an agent using ADK middleware' — the framework's `*-scaffold` and `*-workflow` skills will trigger."
+- If LangChain pack selected but pending: "After the manual LangChain pack install, ask the agent to 'scaffold a langgraph agent' or 'build an agent using ADK middleware'."
+- If Google ADK pack selected and installed: "For Google ADK work, ask the agent to 'start a new ADK project' or 'deploy my ADK agent' — the `google-agents-cli-*` skills will trigger."
+- If Google ADK pack selected but pending: "After the manual Google ADK pack install, ask the agent to 'start a new ADK project' or 'deploy my ADK agent'."
 
 If the user picked None for framework packs, omit both additions.
 
@@ -1026,16 +989,16 @@ Print exactly this template for each pending pack (concatenate if there are mult
 ═══════════════════════════════════════════════════════════════════════════════
 
   Pack: <pack-display-name> (<repo>)
-  Cause: Claude Code auto-mode blocks external npx installs during /scaffold.
+  Cause: agent auto-mode blocks external npx installs during /scaffold.
 
   Finish the install in 2 steps:
 
-  1) Open a normal terminal (NOT Claude Code) and run:
+  1) Open a normal terminal (NOT the agent session) and run:
 
        cd <project-root>
-       npx --yes skills add <repo> -a claude-code -s '*' -y
+       npx --yes skills add <repo> -a opencode -s '*' -y
 
-  2) Come back to Claude Code and run:
+  2) Come back to opencode and run:
 
        /install-framework-packs --list
 
@@ -1057,16 +1020,16 @@ Banner rules:
 ═══════════════════════════════════════════════════════════════════════════════
 
   Vertical: <vertical-display-name> (<install_id>)
-  Cause: Claude Code auto-mode blocks external plugin installs during /scaffold.
+  Cause: agent auto-mode blocks external plugin installs during /scaffold.
 
   Finish the install in 2 steps:
 
-  1) Open a normal terminal (NOT Claude Code) and run:
+  1) Open a normal terminal (NOT the agent session) and run:
 
        claude plugin marketplace add <marketplace>
        claude plugin install <install_id>
 
-  2) Come back to Claude Code and run:
+  2) Come back to opencode and run:
 
        node .opencode/scripts/scaffold-vertical-status.js
 

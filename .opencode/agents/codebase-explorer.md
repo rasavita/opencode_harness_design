@@ -1,13 +1,9 @@
 ---
-name: codebase-explorer
-model: claude-sonnet-5
 description: Read-only codebase exploration agent. Maps subsystems, traces dependencies, and reports findings without modifying any files. Use for brownfield discovery, architecture audits, and pre-change impact analysis.
-tools:
-  - Read
-  - Glob
-  - Grep
-  - Bash
-  - LSP
+mode: subagent
+model: anthropic/claude-sonnet-5
+permission:
+  edit: deny
 ---
 
 # Codebase Explorer — Read-Only Discovery Agent

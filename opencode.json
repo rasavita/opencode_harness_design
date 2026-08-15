@@ -1,0 +1,60 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "edit": "allow",
+    "read": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "list": "allow",
+    "task": "allow",
+    "skill": "allow",
+    "todowrite": "allow",
+    "todoread": "allow",
+    "webfetch": "ask",
+    "bash": {
+      "*": "ask",
+      "pytest *": "allow",
+      "ruff *": "allow",
+      "mypy *": "allow",
+      "npm test*": "allow",
+      "npm ci*": "allow",
+      "npm run lint*": "allow",
+      "npm run typecheck*": "allow",
+      "npm run test*": "allow",
+      "npm run build*": "allow",
+      "npx playwright *": "allow",
+      "npx tsc *": "allow",
+      "node .opencode/skills/tracker-publish/scripts/publish-to-linear.js *": "allow",
+      "node .opencode/scripts/*": "allow",
+      "node .opencode/hooks/*": "allow",
+      "uv sync*": "allow",
+      "uv run pytest *": "allow",
+      "docker compose *": "allow",
+      "curl localhost*": "allow",
+      "git status*": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git branch*": "allow",
+      "git init*": "allow",
+      "git checkout *": "allow",
+      "git commit *": "allow",
+      "git push *": "allow",
+      "git merge *": "allow",
+      "gh issue *": "allow",
+      "gh pr *": "allow",
+      "mkdir *": "allow",
+      "cp *": "allow",
+      "chmod *": "allow",
+      "grep *": "allow",
+      "find *": "allow",
+      "wc *": "allow"
+    }
+  },
+  "mcp": {
+    "harness-nav": {
+      "type": "local",
+      "command": ["node", ".opencode/scripts/nav-mcp-server.js"],
+      "enabled": true
+    }
+  }
+}

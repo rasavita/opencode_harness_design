@@ -31,7 +31,7 @@ Before running `/evaluate`, verify:
 - `sprint-contracts/{group}.json` exists and is valid JSON.
 - `project-manifest.json` exists with `evaluation.api_base_url`, `evaluation.ui_base_url`, and `evaluation.health_check` fields.
 - Docker stack is expected to be running. If it is not, the health check in Step 4 will catch this and produce a FAIL.
-- The Playwright MCP browser tools (`mcp__plugin_playwright_playwright__browser_*`) are available. If the contract has `playwright_checks` or `design_checks` and the tools are missing, do NOT silently skip those layers or improvise with curl: write `VERDICT: FAIL` with `failure_layer: infrastructure` and the fix `Enable "playwright@claude-plugins-official": true in .opencode/settings.json enabledPlugins, restart Claude Code, then re-run /evaluate.`
+- The Playwright MCP browser tools (`playwright_browser_*`) are available. If the contract has `playwright_checks` or `design_checks` and the tools are missing, do NOT silently skip those layers or improvise with curl: write `VERDICT: FAIL` with `failure_layer: infrastructure` and the fix `Add the playwright MCP server to opencode.json#mcp, restart opencode, then re-run /evaluate.`
 
 ---
 

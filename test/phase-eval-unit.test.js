@@ -76,7 +76,7 @@ test('evaluator.md exists and is non-empty', () => {
 });
 
 test('evaluator.md is pinned to Opus 5 (exact id)', () => {
-  assert.match(agentContent, /^---\n[\s\S]*?model:\s*claude-opus-5[\s\S]*?\n---/);
+  assert.match(agentContent, /^---\n[\s\S]*?model:\s*anthropic\/claude-opus-5[\s\S]*?\n---/);
 });
 
 test('evaluator.md documents the artifact mode', () => {

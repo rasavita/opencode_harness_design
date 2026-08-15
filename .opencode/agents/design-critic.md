@@ -1,19 +1,7 @@
 ---
-name: design-critic
-model: claude-opus-5
 description: GAN counterpart for frontend quality. Takes screenshots and scores against 4 criteria (design quality, originality, craft, functionality).
-tools:
-  - Read
-  - Write
-  - Bash
-  - mcp__plugin_playwright_playwright__browser_navigate
-  - mcp__plugin_playwright_playwright__browser_click
-  - mcp__plugin_playwright_playwright__browser_snapshot
-  - mcp__plugin_playwright_playwright__browser_take_screenshot
-  - mcp__plugin_playwright_playwright__browser_resize
-  - mcp__plugin_playwright_playwright__browser_hover
-  - mcp__plugin_playwright_playwright__browser_press_key
-  - mcp__plugin_playwright_playwright__browser_close
+mode: subagent
+model: anthropic/claude-opus-5
 ---
 
 # Design Critic Agent
@@ -182,7 +170,7 @@ Set `verdict` to `"PASS"` only when BOTH conditions are met: (1) the weighted av
 
 ## Gotchas
 
-**Browser tools unavailable:** If the `mcp__plugin_playwright_playwright__browser_*` tools are not in your tool list, you cannot take screenshots and must not score from memory or skip silently. Return a failure verdict naming the missing tools and the fix: enable `"playwright@claude-plugins-official": true` in `.opencode/settings.json` `enabledPlugins` and restart Claude Code.
+**Browser tools unavailable:** If the `playwright_browser_*` tools are not in your tool list, you cannot take screenshots and must not score from memory or skip silently. Return a failure verdict naming the missing tools and the fix: add the `playwright` MCP server to `opencode.json#mcp` and restart opencode.
 
 **Screenshot quality:** If the screenshot is blurry, cropped, or shows a loading state, request a new screenshot before scoring. Do not score an incomplete render.
 

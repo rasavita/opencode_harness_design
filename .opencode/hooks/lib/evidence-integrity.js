@@ -25,10 +25,13 @@ const EVALUATE = 'browser_evaluate';
 const NON_INTERACTIONS = new Set([EVALUATE, 'browser_close']);
 const AXE_PURPOSE = 'axe-core';
 
-// Accepts both the bare tool name and the full MCP name
-// (mcp__plugin_playwright_playwright__browser_click).
+// Accepts the bare tool name and prefixed MCP names
+// (playwright_browser_click, mcp__plugin_playwright_playwright__browser_click).
 function toolName(raw) {
-  const parts = String(raw || '').split('__');
+  const s = String(raw || '');
+  const idx = s.indexOf('browser_');
+  if (idx !== -1) return s.slice(idx);
+  const parts = s.split('__');
   return parts[parts.length - 1];
 }
 

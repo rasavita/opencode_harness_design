@@ -27,7 +27,7 @@ const CALLERS = {
 };
 
 test('the evaluator keeps its frontier pin for runtime mode', () => {
-  assert.match(read('.opencode/agents/evaluator.md'), /^model: claude-opus-5$/m,
+  assert.match(read('.opencode/agents/evaluator.md'), /^model: anthropic\/claude-opus-5$/m,
     'runtime evaluation drives a live app — that is where the tier earns its cost');
 });
 

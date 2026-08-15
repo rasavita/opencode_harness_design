@@ -29,10 +29,14 @@
 const fs = require('fs');
 const path = require('path');
 
-// Exact model IDs (not bare aliases) — version-pinned and unambiguous.
-const OPUS = 'claude-opus-5';       // judgment: evaluator + reviewers + planner + advisor
-const SONNET5 = 'claude-sonnet-5';  // generation (cost/balanced) + exploration (balanced+)
-const HAIKU = 'claude-haiku-4-5';   // cheap exploration on enterprise/cost
+// Exact model IDs in opencode `provider/model` format (not bare aliases) —
+// version-pinned and unambiguous. Each bucket is overridable via environment
+// so the harness is not hardcoded to one vendor: set HARNESS_MODEL_JUDGMENT,
+// HARNESS_MODEL_GENERATION, and HARNESS_MODEL_EXPLORATION to any
+// `provider/model` id your opencode install can resolve.
+const OPUS = process.env.HARNESS_MODEL_JUDGMENT || 'anthropic/claude-opus-5';          // judgment: evaluator + reviewers + planner + advisor
+const SONNET5 = process.env.HARNESS_MODEL_GENERATION || 'anthropic/claude-sonnet-5';   // generation (cost/balanced) + exploration (balanced+)
+const HAIKU = process.env.HARNESS_MODEL_EXPLORATION || 'anthropic/claude-haiku-4-5';   // cheap exploration on enterprise/cost
 
 const JUDGMENT = {
   planner: OPUS,

@@ -22,8 +22,9 @@ test('modularity-pack CLI reuses the lib and is require-safe', () => {
 
 test('the modularity-reviewer agent exists with frontmatter and a verdict', () => {
   const agent = read('.opencode/agents/modularity-reviewer.md');
-  assert.match(agent, /^name:\s*modularity-reviewer/m);
-  assert.match(agent, /^model:\s*claude-/m);
+  assert.match(agent, /^description:/m);
+  assert.match(agent, /^mode:\s*subagent/m);
+  assert.match(agent, /^model:\s*\S+\/\S+/m);
   assert.match(agent, /modularity-pack/, 'must be grounded in the pack');
   assert.match(agent, /modularity-verdict\.json/, 'must write a verdict');
 });

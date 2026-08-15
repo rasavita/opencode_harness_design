@@ -22,10 +22,10 @@ function findProjectDir(startDir) {
   }
 }
 
-// The project being worked on. OPENCODE_PROJECT_DIR (set by Claude Code for hook
-// processes) wins: in plugin mode the hook script lives in the harness repo,
-// not the project, so walking up from the script location would resolve the
-// wrong directory.
+// The project being worked on. OPENCODE_PROJECT_DIR (set by the opencode
+// plugin adapter for hook processes) wins: in plugin mode the hook script
+// lives in the harness repo, not the project, so walking up from the script
+// location would resolve the wrong directory.
 function resolveProjectDir(scriptDir) {
   return (
     process.env.OPENCODE_PROJECT_DIR ||

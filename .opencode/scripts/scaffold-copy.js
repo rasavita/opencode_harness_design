@@ -55,11 +55,6 @@ const BROWNFIELD_SCRIPTS = withExt(profileUnits('brownfield', 'script'), '.js');
 // Skills no profile below `full` installs — the vertical/framework packs.
 const OPTIONAL_SKILLS = profileUnits('full', 'skill').filter((s) => !BROWNFIELD_SKILLS.includes(s));
 
-const LEAN_PLUGIN_ALLOWLIST = {
-  'playwright@claude-plugins-official': true,
-  'superpowers@claude-plugins-official': true,
-};
-
 function fail(msg) {
   throw new Error(msg);
 }
@@ -98,13 +93,15 @@ function resolveScaffoldProfile(profile, opts = {}) {
   return resolved;
 }
 
+// Vertical packs register under settings.json#enabledPlugins (a harness-internal
+// registry, not opencode config); profiles below `full` ship with none installed.
 function pruneSettings(target, profileName) {
   if (profileName === 'full') return;
   for (const file of ['settings.json', 'settings.auto.json']) {
     const p = path.join(target, '.opencode', file);
     if (!fs.existsSync(p)) continue;
     const settings = JSON.parse(fs.readFileSync(p, 'utf8'));
-    settings.enabledPlugins = { ...LEAN_PLUGIN_ALLOWLIST };
+    delete settings.enabledPlugins;
     fs.writeFileSync(p, `${JSON.stringify(settings, null, 2)}\n`);
   }
 }
