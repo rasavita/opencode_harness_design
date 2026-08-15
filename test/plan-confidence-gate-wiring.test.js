@@ -9,11 +9,11 @@ const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { test } = require('node:test');
-const { parseCliArgs } = require('../.claude/scripts/plan-confidence');
+const { parseCliArgs } = require('../.opencode/scripts/plan-confidence');
 const { readSkillCorpus } = require('./helpers/skill-corpus');
 
 const ROOT = path.resolve(__dirname, '..');
-const SCRIPT = path.join(ROOT, '.claude', 'scripts', 'plan-confidence.js');
+const SCRIPT = path.join(ROOT, '.opencode', 'scripts', 'plan-confidence.js');
 
 function read(rel) {
   return fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -105,7 +105,7 @@ test('--verify is parsed as its own mode, distinct from --gate', () => {
 // proceeded to /design fifteen hours later.
 test('/build Phase 3 enforces --gate and checks staleness before quoting the verdict', () => {
   const phases = fs.readFileSync(
-    path.join(__dirname, '..', '.claude', 'skills', 'build', 'references',
+    path.join(__dirname, '..', '.opencode', 'skills', 'build', 'references',
       'section-04-pipeline-phases.md'), 'utf8',
   );
   assert.match(phases, /plan-confidence\.js \. --gate/, 'the gated lane must run the gate');

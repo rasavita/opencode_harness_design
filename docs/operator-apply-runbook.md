@@ -102,7 +102,7 @@ Two halves: the **CI workflow** that produces the `gitleaks` and `sast` check ru
 `require_code_owner_review` is inert without a CODEOWNERS file. Generate it from config:
 
 ```bash
-node .claude/scripts/generate-codeowners.js
+node .opencode/scripts/generate-codeowners.js
 # -> writes .github/CODEOWNERS, or says default_owners is empty (then it writes nothing —
 #    an owner-less CODEOWNERS is worse than none). Commit the file.
 ```
@@ -117,22 +117,22 @@ Always `plan` first (read-only), then `--apply`, then `--verify`.
 
 ```bash
 # PLAN — GET the live ruleset, diff vs desired, print create/update/compliant. Exit 0.
-node .claude/scripts/provision-protection.js
+node .opencode/scripts/provision-protection.js
 
 # APPLY — idempotent create-or-update. Org scope = one call; needs org-admin.
-node .claude/scripts/provision-protection.js --apply
+node .opencode/scripts/provision-protection.js --apply
 
 # VERIFY — GET live, report drift, write specs/reviews/branch-protection-verify.json.
 #          Exit 0 compliant / 1 drift / 2 read error.
-node .claude/scripts/provision-protection.js --verify
+node .opencode/scripts/provision-protection.js --verify
 ```
 
 **Fleet / single-repo variants** (repo-scoped rulesets omit the org `repository_name` target
 automatically):
 
 ```bash
-node .claude/scripts/provision-protection.js --apply --repo your-org/service-a
-node .claude/scripts/provision-protection.js --apply --fleet fleet.json
+node .opencode/scripts/provision-protection.js --apply --repo your-org/service-a
+node .opencode/scripts/provision-protection.js --apply --fleet fleet.json
 ```
 
 After apply you'll see `created`/`updated … Merge-blocking is now live.` A non-compliant PR is
@@ -161,11 +161,11 @@ Put them into `project-manifest.json#github.environments[].reviewers` as
 ### 3b. Provision
 
 ```bash
-node .claude/scripts/provision-environments.js --repo your-org/service-a            # plan
-node .claude/scripts/provision-environments.js --apply --repo your-org/service-a    # apply
-node .claude/scripts/provision-environments.js --verify --repo your-org/service-a   # verify
+node .opencode/scripts/provision-environments.js --repo your-org/service-a            # plan
+node .opencode/scripts/provision-environments.js --apply --repo your-org/service-a    # apply
+node .opencode/scripts/provision-environments.js --verify --repo your-org/service-a   # verify
 # or fleet-wide:
-node .claude/scripts/provision-environments.js --apply --fleet fleet.json
+node .opencode/scripts/provision-environments.js --apply --fleet fleet.json
 ```
 
 > **Exit `3` = provisioned but NOT gating.** If you apply with an empty `reviewers` array, the
@@ -184,16 +184,16 @@ Once §1–§3 are live, each repo's attestation reflects real compliance.
 
 ```bash
 # Per-repo: assemble a sha256-checksummed evidence bundle at the current commit.
-node .claude/scripts/generate-attestation.js
-# -> .claude/attestations/<sha>.json (+ index.json). Commit it as durable evidence.
+node .opencode/scripts/generate-attestation.js
+# -> .opencode/attestations/<sha>.json (+ index.json). Commit it as durable evidence.
 # Verify integrity later:
-node .claude/scripts/generate-attestation.js --verify .claude/attestations/<sha>.json
+node .opencode/scripts/generate-attestation.js --verify .opencode/attestations/<sha>.json
 
 # Portfolio: aggregate all repos' latest attestations into one rollup.
 #   Offline (attestations already collected into a dir):
-node .claude/scripts/portfolio-rollup.js ./collected-attestations
+node .opencode/scripts/portfolio-rollup.js ./collected-attestations
 #   Fetch mode (gather via fleet.json + gh api, then roll up):
-node .claude/scripts/portfolio-rollup.js ./collected-attestations --fetch --fleet fleet.json
+node .opencode/scripts/portfolio-rollup.js ./collected-attestations --fetch --fleet fleet.json
 ```
 
 The rollup is fail-safe: a repo with **no** attestation is a recorded `not-attested` gap, a
@@ -240,8 +240,8 @@ the gates are still in place; verify exits non-zero on drift so a job can gate o
 - **Bulk fleet retrofit.** To apply §2b + §3 across an entire fleet in one command and get a
   single per-repo compliance report, use the fleet-retrofit runner instead of looping by hand:
   ```bash
-  node .claude/scripts/fleet-retrofit.js --fleet fleet.json            # audit (read-only)
-  node .claude/scripts/fleet-retrofit.js --fleet fleet.json --apply    # apply both gates + re-verify
+  node .opencode/scripts/fleet-retrofit.js --fleet fleet.json            # audit (read-only)
+  node .opencode/scripts/fleet-retrofit.js --fleet fleet.json --apply    # apply both gates + re-verify
   ```
   It invokes the §2/§3 provisioners per repo, isolates per-repo failures (one repo's error never
   aborts the rest), and writes `specs/reviews/fleet-retrofit.json` (each repo gated / drifted /

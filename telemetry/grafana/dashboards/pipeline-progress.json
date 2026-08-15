@@ -1,6 +1,6 @@
 {
   "uid": "claude-harness-pipeline-progress",
-  "title": "Claude Harness — SDLC Pipeline Progress",
+  "title": "OpenCode Harness — SDLC Pipeline Progress",
   "tags": ["claude-code", "harness", "pipeline", "sdlc"],
   "refresh": "30s",
   "panels": [

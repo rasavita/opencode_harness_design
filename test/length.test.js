@@ -7,7 +7,7 @@
 // length that changed depending on what was appended AFTER the function — a 16-line
 // function reported as 31 because unrelated code followed it.
 {
-  const { oversizedFunctions } = require('../.claude/hooks/lib/length.js');
+  const { oversizedFunctions } = require('../.opencode/hooks/lib/length.js');
   const { test: t } = require('node:test');
   const a = require('assert');
 
@@ -76,7 +76,7 @@
 }
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { oversizedFunctions, newlyOversized, newlyOverFileLimit, FILE_HARD_LIMIT } = require('../.claude/hooks/lib/length');
+const { oversizedFunctions, newlyOversized, newlyOverFileLimit, FILE_HARD_LIMIT } = require('../.opencode/hooks/lib/length');
 const L = FILE_HARD_LIMIT;
 
 const names = (content, ext) => oversizedFunctions(content, ext).map((f) => f.name);

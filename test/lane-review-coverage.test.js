@@ -8,7 +8,7 @@
 // after the per-turn review gate was removed from review-on-stop.js, which is
 // now purely advisory. /vibe named no reviewer of its own, so the lightest lane
 // (the one most likely to touch production code casually) ended up the only one
-// with no agentic review at all. Nothing failed; the promise in CLAUDE.md simply
+// with no agentic review at all. Nothing failed; the promise in AGENTS.md simply
 // stopped being kept.
 //
 // The rule these assertions encode: a lane's review is wired IN THE LANE. A lane
@@ -52,7 +52,7 @@ test('no lane claims the Stop hook enforces review — it does not', () => {
 });
 
 test('review-on-stop stays advisory, and says so where a reader will look', () => {
-  const hook = read('.claude/hooks/review-on-stop.js');
+  const hook = read('.opencode/hooks/review-on-stop.js');
   assert.match(hook, /purely advisory/,
     'if this hook ever blocks again, the lanes must be updated deliberately, not by accident');
 });

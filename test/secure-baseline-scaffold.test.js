@@ -13,11 +13,11 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const { renderSecurityWorkflow, wiringViolations, parseWorkflowJobs } =
-  require('../.claude/hooks/lib/security-baseline.js');
-const { applyScaffold } = require('../.claude/scripts/scaffold-apply');
+  require('../.opencode/hooks/lib/security-baseline.js');
+const { applyScaffold } = require('../.opencode/scripts/scaffold-apply');
 
 const TEMPLATE = fs.readFileSync(
-  path.join(ROOT, '.claude', 'templates', 'github-workflows', 'security.yml'), 'utf8',
+  path.join(ROOT, '.opencode', 'templates', 'github-workflows', 'security.yml'), 'utf8',
 );
 
 for (const engine of ['semgrep', 'veracode']) {
@@ -67,7 +67,7 @@ function scaffoldInto(scaffoldProfile) {
   const target = path.join(workDir, 'project');
   const profilePath = path.join(workDir, 'profile.json');
   fs.writeFileSync(profilePath, JSON.stringify(BASE_PROFILE));
-  applyScaffold({ profile: profilePath, pluginSource: path.join(ROOT, '.claude'), target, scaffoldProfile });
+  applyScaffold({ profile: profilePath, pluginSource: path.join(ROOT, '.opencode'), target, scaffoldProfile });
   return { workDir, target };
 }
 

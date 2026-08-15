@@ -53,12 +53,12 @@ realized benefit. Only Ryan's withhold-and-rerun disambiguates, and nothing reco
 
 **The mechanism.**
 
-- `.claude/hooks/lib/withhold-verdicts.js` — an append-only verdict ledger
-  (`.claude/state/sensor-withhold.jsonl`), one row per experiment: `{ sensor, degraded,
+- `.opencode/hooks/lib/withhold-verdicts.js` — an append-only verdict ledger
+  (`.opencode/state/sensor-withhold.jsonl`), one row per experiment: `{ sensor, degraded,
   job, evidence, ts }`. `degraded=true` → withholding degraded a real job → it earns its
   place; `degraded=false` → the job closed unchanged → safe to cut. Unlike the bite
   ledger it is **not** best-effort — an operator-invoked record must fail loud.
-- `.claude/scripts/sensor-withhold.js` (`npm run sensor-withhold`) — `record --sensor
+- `.opencode/scripts/sensor-withhold.js` (`npm run sensor-withhold`) — `record --sensor
   <id> --degraded <true|false> [--job "..."] [--evidence "..."]`, or no args to list.
 - `sensor-value-report.js` now reads the latest verdict per control and adds two decisive
   buckets: **REMOVABLE** (withhold showed no degradation — safe to cut) and

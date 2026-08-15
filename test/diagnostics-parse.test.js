@@ -13,8 +13,8 @@ const {
   parseAuto,
   shardDiagnostics,
   packageOf,
-} = require('../.claude/hooks/lib/diagnostics-parse');
-const { run: runShard } = require('../.claude/scripts/diagnostics-shard');
+} = require('../.opencode/hooks/lib/diagnostics-parse');
+const { run: runShard } = require('../.opencode/scripts/diagnostics-shard');
 
 test('packageOf uses src/<mod> and packages/<name>', () => {
   assert.equal(packageOf('src/orders/service.ts'), 'src/orders');

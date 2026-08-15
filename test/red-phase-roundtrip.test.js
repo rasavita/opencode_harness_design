@@ -1,6 +1,6 @@
 'use strict';
 
-// G41-G43 round-trip. CLAUDE.md principle #5: integration tests must round-trip
+// G41-G43 round-trip. AGENTS.md principle #5: integration tests must round-trip
 // the REAL artifact through its REAL validator, never hand-built fixtures. A
 // fixture encoding the wrong record shape would keep every unit test green while
 // the lock sat inert — which is precisely how a gate ships reading a flat
@@ -18,9 +18,9 @@ const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
 
 const REPO = path.resolve(__dirname, '..');
-const RECORDER = path.join(REPO, '.claude', 'hooks', 'red-phase-record.js');
-const PRE_WRITE = path.join(REPO, '.claude', 'hooks', 'pre-write-gate.js');
-const PRE_BASH = path.join(REPO, '.claude', 'hooks', 'pre-bash-gate.js');
+const RECORDER = path.join(REPO, '.opencode', 'hooks', 'red-phase-record.js');
+const PRE_WRITE = path.join(REPO, '.opencode', 'hooks', 'pre-write-gate.js');
+const PRE_BASH = path.join(REPO, '.opencode', 'hooks', 'pre-bash-gate.js');
 
 function fixtureRepo() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'rp-roundtrip-'));
@@ -41,7 +41,7 @@ function runHook(hookPath, root, payload) {
   return spawnSync('node', [hookPath], {
     input: JSON.stringify(payload),
     encoding: 'utf8',
-    env: { ...process.env, CLAUDE_PROJECT_DIR: root, HARNESS_TEST_LOCK: '', HARNESS_TDD_GATE: 'off' },
+    env: { ...process.env, OPENCODE_PROJECT_DIR: root, HARNESS_TEST_LOCK: '', HARNESS_TDD_GATE: 'off' },
     cwd: root,
   });
 }
@@ -58,7 +58,7 @@ const RED_OUTPUT = 'FAILED tests/test_calc.py::test_add - assert 0 == 3\n===== 1
 const GREEN_OUTPUT = '===== 1 passed in 0.01s =====';
 
 function readLedgerRaw(root) {
-  const file = path.join(root, '.claude', 'state', 'red-phase.jsonl');
+  const file = path.join(root, '.opencode', 'state', 'red-phase.jsonl');
   if (!fs.existsSync(file)) return [];
   return fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));
 }
@@ -138,8 +138,8 @@ test('test-integrity passes a clean red->green cycle and BLOCKS a weakened one',
   fs.writeFileSync(path.join(clean, 'src', 'calc.py'), 'def add(a, b):\n    return a + b\n');
   observeRun(clean, 'pytest tests/test_calc.py', GREEN_OUTPUT);
 
-  const { integrityFindings } = require('../.claude/hooks/lib/test-integrity');
-  const { readLedger } = require('../.claude/hooks/lib/red-phase-ledger');
+  const { integrityFindings } = require('../.opencode/hooks/lib/test-integrity');
+  const { readLedger } = require('../.opencode/hooks/lib/red-phase-ledger');
   assert.deepStrictEqual(integrityFindings(readLedger(clean).events), []);
 
   // Now the tamper: the TEST changes between red and green, production does not.
@@ -156,21 +156,21 @@ test('test-integrity passes a clean red->green cycle and BLOCKS a weakened one',
 
 // The ledger IS the control. An agent that can rewrite or blank it can unlock
 // every test, so it belongs to the same protected-machinery class as its direct
-// peer .claude/state/task-lifecycle.jsonl — which was already listed while this
+// peer .opencode/state/task-lifecycle.jsonl — which was already listed while this
 // file was not.
 test('the red-phase ledger is protected machinery, like task-lifecycle.jsonl', () => {
-  const { machineryViolation } = require('../.claude/hooks/lib/trust-boundary');
+  const { machineryViolation } = require('../.opencode/hooks/lib/trust-boundary');
   const root = REPO;
   const protectedPaths = [
-    path.join(root, '.claude', 'state', 'red-phase.jsonl'),
-    path.join(root, '.claude', 'state', 'task-lifecycle.jsonl'), // the precedent
+    path.join(root, '.opencode', 'state', 'red-phase.jsonl'),
+    path.join(root, '.opencode', 'state', 'task-lifecycle.jsonl'), // the precedent
   ];
   for (const p of protectedPaths) {
     assert.ok(machineryViolation(root, p), `${p} must be protected machinery`);
   }
   // Ordinary state is still writable — this must not over-reach into a blanket
-  // .claude/state/ lock, which would break every gate that ratchets a baseline.
-  assert.strictEqual(machineryViolation(root, path.join(root, '.claude', 'state', 'current-lane')), null);
+  // .opencode/state/ lock, which would break every gate that ratchets a baseline.
+  assert.strictEqual(machineryViolation(root, path.join(root, '.opencode', 'state', 'current-lane')), null);
 });
 
 // Found by independent review, not by the suite: checkTarget resolves symlinks,

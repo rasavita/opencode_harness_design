@@ -4,7 +4,7 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const path = require('path');
 
-const lib = require(path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'security-baseline.js'));
+const lib = require(path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'security-baseline.js'));
 
 // Secret-shaped strings are built at runtime so this source file carries no real
 // secret (the pre-write gate would otherwise block it).
@@ -196,7 +196,7 @@ test('wiringViolations flags an unset/invalid sast_engine', () => {
 const fs = require('fs');
 // The REAL deploy.yml skeleton, env-stamped as materializeDeployWorkflow does.
 const DEPLOY_TEMPLATE = fs.readFileSync(
-  path.resolve(__dirname, '..', '.claude', 'templates', 'github-workflows', 'deploy.yml'), 'utf8');
+  path.resolve(__dirname, '..', '.opencode', 'templates', 'github-workflows', 'deploy.yml'), 'utf8');
 function renderDeploy(envName) {
   return DEPLOY_TEMPLATE.replace(/^(\s*environment:\s*).*$/m, `$1${envName}`);
 }

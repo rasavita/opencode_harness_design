@@ -6,7 +6,7 @@
 **Preferred format:** open [`docs/agentic-engineering-whitepaper.html`](./agentic-engineering-whitepaper.html) in a browser (navigable, offline).  
 **Audience:** Engineering leaders, staff/principal engineers, and teams rolling out Claude Code, Codex, Grok CLI, or similar agentic coding tools in production environments  
 **Companion materials:** [`docs/harness-guide.html`](./harness-guide.html) · [`docs/zl-continuum-rubric.md`](./zl-continuum-rubric.md) · [`docs/proposals/bun-adversarial-mechanical-loops.md`](./proposals/bun-adversarial-mechanical-loops.md) · [Harness Engineering (Latent Space)](https://www.latent.space/p/harness-eng)  
-**Harness companion version:** Claude Harness Engine **v5 / 2.5.0** (product line v5; Bun-inspired dual review + mechanical loops shipped as minors 2.2–2.4; the `fusion` cheap-worker preset shipped as 2.5)
+**Harness companion version:** OpenCode Harness Engine **v5 / 2.5.0** (product line v5; Bun-inspired dual review + mechanical loops shipped as minors 2.2–2.4; the `fusion` cheap-worker preset shipped as 2.5)
 
 ---
 
@@ -225,7 +225,7 @@ A harness is not “more prompts.” It is the **control plane** around agents:
 - **Human gates** on planning where ceremony is load-bearing  
 - **State + session chaining** so long work survives context windows  
 
-Latent Space’s harness engineering conversations and commercial scaffolds (including this repo’s Claude Harness Engine) share the same idea: **when generation is cheap, verification and routing become the product.**
+Latent Space’s harness engineering conversations and commercial scaffolds (including this repo’s OpenCode Harness Engine) share the same idea: **when generation is cheap, verification and routing become the product.**
 
 ### 5.2 Why harnesses still get abused
 
@@ -251,7 +251,7 @@ Jarred Sumner’s write-up of [rewriting Bun in Rust with Claude Code](https://b
 | **Canary before fan-out** | 3 files fail cheaply; 1,400 files fail expensively | G32 + implement/feature canary story |
 | **1 implementer · ≥2 adversarial reviewers** | Writer bias; “compiles clean” is not correct | Tiered dual `code-reviewer` (`review-tier.js`, union merge) |
 | **Tool errors as a work queue** | Shard `cargo check` / tsc walls; no suite thrash mid-shard | `diagnostics-shard.js` + `fix-from-diagnostics` / `/fix-diagnostics` |
-| **Fix the process, not only the tree** | Stash races, stub-to-green, suite thrash → rule edits | `.claude/state/process-rules.md` + workflow exemplar |
+| **Fix the process, not only the tree** | Stash races, stub-to-green, suite thrash → rule edits | `.opencode/state/process-rules.md` + workflow exemplar |
 | **Language-independent oracle** | Port cannot redefine green | Sprint contracts, AT-first, G31 no test deletion |
 | **Semantic divergence** | Same shape ≠ same semantics (`debug_assert!`, Drop vs defer) | `semantic-divergence.md` lens on mechanical ports |
 
@@ -265,10 +265,10 @@ Approval flags and tool permissions are **two different planes**, and headless a
 
 | File | Role | Loaded when |
 |---|---|---|
-| `.claude/settings.json` | Curated interactive allowlist — prompts for risky ops | Always (default) |
-| `.claude/settings.auto.json` | Unattended full-auto profile — no permission prompts (`Bash(*)`, `Write(*)`, … + `CLAUDE_AUTO_CONTINUE=1`, agent teams) | Only when passed explicitly |
+| `.opencode/settings.json` | Curated interactive allowlist — prompts for risky ops | Always (default) |
+| `.opencode/settings.auto.json` | Unattended full-auto profile — no permission prompts (`Bash(*)`, `Write(*)`, … + `HARNESS_AUTO_CONTINUE=1`, agent teams) | Only when passed explicitly |
 
-Claude Code does not auto-load the auto profile; you opt in per run — `claude -p "/build docs/prd.md --auto" --settings .claude/settings.auto.json`. It **merges over** `settings.json`, so the deterministic gate hooks (`pre-write-gate`, `pre-bash-gate`), git hooks, the `/auto` ratchet, security review, and pre-PR verify all still fire, and no PR opens over a red build.
+Claude Code does not auto-load the auto profile; you opt in per run — `claude -p "/build docs/prd.md --auto" --settings .opencode/settings.auto.json`. It **merges over** `settings.json`, so the deterministic gate hooks (`pre-write-gate`, `pre-bash-gate`), git hooks, the `/auto` ratchet, security review, and pre-PR verify all still fire, and no PR opens over a red build.
 
 **Isolation boundary required:** `Bash(*)` still permits *reading* host secrets (`~/.ssh`, cloud creds) and network egress — the gate hooks only constrain writes. This is the productized form of Bun's cgroup-isolation caveat above: run the auto profile only inside a container / CI runner / VM with no host secrets mounted and limited egress. Never promote it to the default `settings.json`.
 
@@ -401,7 +401,7 @@ Those measure **generation**, not **value under control**.
 | Start from a written micro-contract or story | Prevents free-form invention |
 | Prefer repo-native tools (tests, linters, typecheck) over chat claims | Claims are free; green is evidence |
 | Separate explore agents (read-only) from write agents | Stops drive-by rewrites |
-| Keep CLAUDE.md / AGENTS.md stable mid-run | Prompt-cache + consistent policy |
+| Keep AGENTS.md / AGENTS.md stable mid-run | Prompt-cache + consistent policy |
 | Use worktrees / branches per agent stream | Parallelism without thrash |
 | Demand a walkthrough artifact for M/Z | Makes human review 5 minutes, not 50 |
 | When stuck twice on same error, stop and root-cause | Avoids flailing token loops |

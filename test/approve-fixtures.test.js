@@ -8,8 +8,8 @@ const { test } = require('node:test');
 const { execFileSync } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
-const GATE = path.join(ROOT, '.claude', 'scripts', 'approved-fixtures-gate.js');
-const APPROVE = path.join(ROOT, '.claude', 'scripts', 'approve-fixtures.js');
+const GATE = path.join(ROOT, '.opencode', 'scripts', 'approved-fixtures-gate.js');
+const APPROVE = path.join(ROOT, '.opencode', 'scripts', 'approve-fixtures.js');
 
 function tmp() { return fs.mkdtempSync(path.join(os.tmpdir(), 'af2-')); }
 function gateCode(dir) {

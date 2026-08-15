@@ -34,7 +34,7 @@ npm run record-outcome -- \
   --attention-minutes 45 \
   --accepted true \
   --production-survived true \
-  --evidence-reference .claude/evidence/task-completion-receipt.json \
+  --evidence-reference .opencode/evidence/task-completion-receipt.json \
   --evidence-hash <sha256>
 ```
 
@@ -47,7 +47,7 @@ Use the same study metadata on `implementation_started` and
 npm run productivity-study -- --study STUDY-2026-Q3
 ```
 
-The report is written to `.claude/evidence/productivity-study.json`. It reports
+The report is written to `.opencode/evidence/productivity-study.json`. It reports
 median human-attention and cycle-time speedups, rework events, exclusions, and
 a deterministic bootstrap confidence bound.
 

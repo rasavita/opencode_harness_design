@@ -8,8 +8,8 @@ const { test } = require('node:test');
 const { execFileSync } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
-const SCRIPT = path.join(ROOT, '.claude', 'scripts', 'flake-detector.js');
-const { parseTap, aggregateFlakes, parsePlaywrightJson } = require('../.claude/scripts/flake-detector.js');
+const SCRIPT = path.join(ROOT, '.opencode', 'scripts', 'flake-detector.js');
+const { parseTap, aggregateFlakes, parsePlaywrightJson } = require('../.opencode/scripts/flake-detector.js');
 
 test('parseTap reads ok/not ok lines, strips directives, ignores plan/comments', () => {
   const tap = 'TAP version 13\n1..2\nok 1 - a\nnot ok 2 - b # AssertionError\n# a comment\n';
@@ -134,7 +134,7 @@ test('CLI --e2e mode: unparseable output across all runs -> exit 2, no completed
 });
 
 test('G12: flake-detection is scripted + registered active (drift cadence)', () => {
-  assert.strictEqual(JSON.parse(rd('package.json')).scripts.flakes, 'node .claude/scripts/flake-detector.js');
+  assert.strictEqual(JSON.parse(rd('package.json')).scripts.flakes, 'node .opencode/scripts/flake-detector.js');
   const m = JSON.parse(rd('harness-manifest.json'));
   const s = m.sensors.find((x) => x.id === 'flake-detection');
   assert.ok(s, 'flake-detection sensor must exist');

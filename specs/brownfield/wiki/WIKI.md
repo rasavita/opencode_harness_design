@@ -11,7 +11,7 @@
 |---|---|---|
 | `js:test/helpers/hook-fixture.js` | 25 | 5 |
 | `js:test/helpers/skill-corpus.js` | 24 | 2 |
-| `js:test/e2e/helpers/claude-runner.js` | 17 | 4 |
+| `js:test/e2e/helpers/opencode-runner.js` | 17 | 4 |
 | `js:test/e2e/helpers/project-suite.js` | 9 | 3 |
 | `js:test/helpers/pre-commit-fixtures.js` | 9 | 3 |
 | `js:symphony_clone/src/orchestrator/scheduler.js` | 7 | 6 |
@@ -33,7 +33,7 @@
 - `js:symphony_clone/scripts/diagnose-linear.js`
 - `js:symphony_clone/src/config.test.js`
 - `js:symphony_clone/src/index.test.js`
-- `js:symphony_clone/src/orchestrator/claude-runner.test.js`
+- `js:symphony_clone/src/orchestrator/opencode-runner.test.js`
 - `js:symphony_clone/src/orchestrator/eligibility.test.js`
 - `js:symphony_clone/src/orchestrator/outcomes.test.js`
 - `js:symphony_clone/src/orchestrator/planning-prompt.test.js`
@@ -106,7 +106,7 @@ _(Hash-cached concept pages from `nav-concepts.js`.)_
 
 ## Agent navigation
 
-- Context pack: `node .claude/scripts/nav-query.js pack --budget 1600 "<question>"`
-- Refresh secondary indexes: `node .claude/scripts/nav-query.js refresh`
+- Context pack: `node .opencode/scripts/nav-query.js pack --budget 1600 "<question>"`
+- Refresh secondary indexes: `node .opencode/scripts/nav-query.js refresh`
 
 _+ 30 smaller cluster(s) not paged (raise --max-pages)._

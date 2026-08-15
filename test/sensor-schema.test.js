@@ -1,7 +1,7 @@
 'use strict';
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { parseDefault, applyDefaults, SCHEMA_VERSION, normalize } = require('../.claude/hooks/lib/sensor-schema');
+const { parseDefault, applyDefaults, SCHEMA_VERSION, normalize } = require('../.opencode/hooks/lib/sensor-schema');
 
 test('parseDefault fills defaults for a bare finding list', () => {
   const r = parseDefault(JSON.stringify({ findings: [{ message: 'x', severity: 'error' }] }));

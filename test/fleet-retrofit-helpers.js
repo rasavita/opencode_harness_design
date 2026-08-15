@@ -12,7 +12,7 @@ const os = require('os');
 const path = require('path');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
-const SCRIPTS = path.join(REPO_ROOT, '.claude', 'scripts');
+const SCRIPTS = path.join(REPO_ROOT, '.opencode', 'scripts');
 const { buildDesiredRuleset } = require(path.join(SCRIPTS, 'provision-protection'));
 const NOW = '2026-07-19T00:00:00.000Z';
 

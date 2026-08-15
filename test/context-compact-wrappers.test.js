@@ -27,7 +27,7 @@ test('run-compact executes a command, stores raw output, and returns a compact p
     ].join('\n'));
 
     const result = spawnSync(process.execPath, [
-      path.join(ROOT, '.claude', 'scripts', 'run-compact.js'),
+      path.join(ROOT, '.opencode', 'scripts', 'run-compact.js'),
       '--root', dir,
       '--kind', 'test',
       '--',
@@ -40,8 +40,8 @@ test('run-compact executes a command, stores raw output, and returns a compact p
     assert.strictEqual(pack.exit, 1);
     assert.match(pack.summary, /FAIL|failed|failure/i);
     assert.ok(pack.context_hash, JSON.stringify(pack));
-    assert.ok(fs.existsSync(path.join(dir, '.claude', 'state', 'context-cache', `${pack.context_hash}.raw`)));
-    const meta = JSON.parse(fs.readFileSync(path.join(dir, '.claude', 'state', 'context-cache', `${pack.context_hash}.json`), 'utf8'));
+    assert.ok(fs.existsSync(path.join(dir, '.opencode', 'state', 'context-cache', `${pack.context_hash}.raw`)));
+    const meta = JSON.parse(fs.readFileSync(path.join(dir, '.opencode', 'state', 'context-cache', `${pack.context_hash}.json`), 'utf8'));
     assert.strictEqual(meta.estimated_pack_tokens, pack.estimated_pack_tokens);
     assert.strictEqual(meta.estimated_saved_tokens, pack.estimated_saved_tokens);
     assert.ok(pack.failures.some((f) => f.path === 'test/auth.test.js' && f.line === 52), JSON.stringify(pack.failures));
@@ -58,7 +58,7 @@ test('search-compact groups matching lines by file and stores full search output
     fs.writeFileSync(path.join(dir, 'src', 'auth.js'), 'function validateSession() {}\nconst token = "expired";\n');
     fs.writeFileSync(path.join(dir, 'src', 'billing.js'), 'function billCustomer() {}\n');
     const output = execFileSync(process.execPath, [
-      path.join(ROOT, '.claude', 'scripts', 'search-compact.js'),
+      path.join(ROOT, '.opencode', 'scripts', 'search-compact.js'),
       '--root', dir,
       '--pattern', 'function|token',
       '--glob', 'src/*.js',
@@ -69,8 +69,8 @@ test('search-compact groups matching lines by file and stores full search output
     assert.ok(pack.context_hash, JSON.stringify(pack));
     assert.ok(pack.files.some((f) => f.path === 'src/auth.js' && f.matches.length === 2), JSON.stringify(pack.files));
     assert.ok(pack.files.some((f) => f.path === 'src/billing.js' && f.matches.length === 1), JSON.stringify(pack.files));
-    assert.ok(fs.existsSync(path.join(dir, '.claude', 'state', 'context-cache', `${pack.context_hash}.raw`)));
-    const meta = JSON.parse(fs.readFileSync(path.join(dir, '.claude', 'state', 'context-cache', `${pack.context_hash}.json`), 'utf8'));
+    assert.ok(fs.existsSync(path.join(dir, '.opencode', 'state', 'context-cache', `${pack.context_hash}.raw`)));
+    const meta = JSON.parse(fs.readFileSync(path.join(dir, '.opencode', 'state', 'context-cache', `${pack.context_hash}.json`), 'utf8'));
     assert.strictEqual(meta.estimated_pack_tokens, pack.estimated_pack_tokens);
     assert.strictEqual(meta.estimated_saved_tokens, pack.estimated_saved_tokens);
   } finally {

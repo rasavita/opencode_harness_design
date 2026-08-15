@@ -71,7 +71,7 @@ test('does not lint, typecheck, or layer-check fixture files', async () => {
 
 test('treats "npx canceled due to missing packages" as unprovisioned, not a failure', () => {
   const { unavailable } = require(path.join(
-    __dirname, '..', '.claude', 'hooks', 'lib', 'toolchain.js'
+    __dirname, '..', '.opencode', 'hooks', 'lib', 'toolchain.js'
   ));
   assert.strictEqual(
     unavailable('npm error npx canceled due to missing packages and no YES option: ["eslint@10.4.1"]'),
@@ -81,7 +81,7 @@ test('treats "npx canceled due to missing packages" as unprovisioned, not a fail
 
 test('resolveAdvisory reads the manifest flag and env override, defaulting to blocking', () => {
   const { resolveAdvisory } = require(path.join(
-    __dirname, '..', '.claude', 'hooks', 'verify-on-save.js'
+    __dirname, '..', '.opencode', 'hooks', 'verify-on-save.js'
   ));
   assert.strictEqual(resolveAdvisory({ quality: { verify_on_save: 'advisory' } }, {}), true);
   assert.strictEqual(resolveAdvisory({ quality: { verify_on_save: 'blocking' } }, {}), false);

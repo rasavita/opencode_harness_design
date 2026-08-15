@@ -3,7 +3,7 @@
 // "Does this unit ship to a scaffolded project, and in which profiles?"
 //
 // Wiring tests used to answer that by regexing scaffold-copy.js for a quoted filename.
-// The copy lists are now derived from .claude/config/packs.json, so the literals are
+// The copy lists are now derived from .opencode/config/packs.json, so the literals are
 // gone and those regexes silently matched nothing — a test that can only pass is worse
 // than no test. This reads the partition, which is what the copy step actually uses.
 
@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
-const PACKS = path.join(ROOT, '.claude', 'config', 'packs.json');
+const PACKS = path.join(ROOT, '.opencode', 'config', 'packs.json');
 
 function loadPacks() {
   return JSON.parse(fs.readFileSync(PACKS, 'utf8'));

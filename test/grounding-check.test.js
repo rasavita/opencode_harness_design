@@ -7,7 +7,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'skills', 'brd', 'scripts', 'grounding-check.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'skills', 'brd', 'scripts', 'grounding-check.js');
 const { checkGrounding } = require(SCRIPT);
 
 // --- pure-function tests (the core logic) -------------------------------------
@@ -227,7 +227,7 @@ test('/brd skill documents the --frd flow and runs the grounding gate', () => {
 });
 
 test('rubric brd phase has the FRD hard-gate and grounded traceability criterion', () => {
-  const rubric = JSON.parse(fsw.readFileSync(pathw.join(ROOTW, '.claude', 'templates', 'phase-eval-rubrics.json'), 'utf8'));
+  const rubric = JSON.parse(fsw.readFileSync(pathw.join(ROOTW, '.opencode', 'templates', 'phase-eval-rubrics.json'), 'utf8'));
   const brd = rubric.phases.brd;
   assert.match(brd.hard_gate, /brd-grounding\.json/);
   assert.match(brd.hard_gate, /net_new/);
@@ -238,7 +238,7 @@ test('rubric brd phase has the FRD hard-gate and grounded traceability criterion
 });
 
 test('evaluator artifact mode hard-gates the BRD on the grounding verdict in FRD mode', () => {
-  const ev = fsw.readFileSync(pathw.join(ROOTW, '.claude', 'agents', 'evaluator.md'), 'utf8');
+  const ev = fsw.readFileSync(pathw.join(ROOTW, '.opencode', 'agents', 'evaluator.md'), 'utf8');
   assert.match(ev, /brd-grounding\.json/);
   assert.match(ev, /FRD mode/);
   assert.match(ev, /interview-from-scratch/i);

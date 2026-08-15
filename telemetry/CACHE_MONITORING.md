@@ -1,12 +1,12 @@
 # Prompt-Cache Monitoring
 
 Claude Code is built around prompt caching: the API caches the request prefix (static
-system prompt + tools → `CLAUDE.md` → session context) and reuses it across turns. A
+system prompt + tools → `AGENTS.md` → session context) and reuses it across turns. A
 high cache-read ratio is what makes long agentic sessions cheap and fast. Caching is
 **automatic and always-on inside Claude Code** — there is nothing to "enable", and this
 harness makes no direct API calls, so there are no `cache_control` breakpoints to set.
 The job is to make sure the harness doesn't *break* the cached prefix, and to alert when
-it does. (See the "Prompt Caching" section of the root `CLAUDE.md` for the design rules.)
+it does. (See the "Prompt Caching" section of the root `AGENTS.md` for the design rules.)
 
 ## Files
 
@@ -34,7 +34,7 @@ Both pieces are already wired into the existing stack — no manual import neede
 3. **Alertmanager** — route `component: prompt-cache` alerts wherever you want them.
 
 The token-usage metric comes from Claude Code's native OTEL export (the OTLP endpoint
-configured by `OTEL_EXPORTER_OTLP_ENDPOINT` in `.claude/settings.json`) flowing through
+configured by `OTEL_EXPORTER_OTLP_ENDPOINT` in `.opencode/settings.json`) flowing through
 `otel-collector-config.yml` into Prometheus — **not** from `HARNESS_PUSHGATEWAY_URL`
 (9091), which carries the harness's own hook metrics.
 
@@ -63,12 +63,12 @@ suspects, in order of likelihood:
 1. **Tool / plugin / MCP churn mid-session** — a plugin or MCP server was enabled or
    disabled, or a tool definition changed, during a run. Settle `enabledPlugins` /
    `.mcp.json` before long `/auto` runs.
-2. **`CLAUDE.md` edited mid-session** — cached per-project; editing it busts the prefix
+2. **`AGENTS.md` edited mid-session** — cached per-project; editing it busts the prefix
    for every later turn. Apply `session-learnings` suggestions between sessions.
 3. **Model swap on the main loop** — `/model`-switching the orchestrator mid-session
    rebuilds the cache. Switch models via subagents instead.
 4. **Dynamic value in cached content** — a timestamp/date/random value that leaked into
-   the system prompt or `CLAUDE.md` instead of being passed in a message.
+   the system prompt or `AGENTS.md` instead of being passed in a message.
 
 Thresholds (70% warning / 40% critical) are starting points — calibrate to your own
 steady-state baseline.

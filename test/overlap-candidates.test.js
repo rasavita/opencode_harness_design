@@ -111,7 +111,7 @@ test('loadControls counts real guides+sensors and excludes planned entries', () 
 });
 
 // Round-trip the REAL manifest through the REAL loader — the discipline from
-// CLAUDE.md #5: a hand-built fixture can pass while the tool is inert against the
+// AGENTS.md #5: a hand-built fixture can pass while the tool is inert against the
 // actual artifact shape. This proves the pre-pass runs end-to-end on today's manifest.
 test('round-trips the real harness-manifest.json without dropping any control', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'harness-manifest.json'), 'utf8'));

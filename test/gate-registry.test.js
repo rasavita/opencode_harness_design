@@ -3,8 +3,8 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { GATE_CATALOG, selectGates } = require('../.claude/hooks/lib/gate-registry');
-const { GATE_TIERS } = require('../.claude/hooks/lib/sensor-tier');
+const { GATE_CATALOG, selectGates } = require('../.opencode/hooks/lib/gate-registry');
+const { GATE_TIERS } = require('../.opencode/hooks/lib/sensor-tier');
 
 // The v6 partition rule, enforced at runtime rather than only by tools/check-partition.js:
 // gates-early and gates-quality are kernel; every other gate module belongs to a pack and
@@ -22,7 +22,7 @@ test('loading the registry does not eagerly require any pack gate module', () =>
 
 test('every pack-owned gate is wired through a lazy runner, not a direct reference', () => {
   const src = require('fs').readFileSync(
-    require('path').join(__dirname, '..', '.claude', 'hooks', 'lib', 'gate-registry.js'), 'utf8'
+    require('path').join(__dirname, '..', '.opencode', 'hooks', 'lib', 'gate-registry.js'), 'utf8'
   );
   // A top-level require of a pack module defeats the laziness above.
   for (const packModule of ['gates-legacy', 'gates-strict', 'gates-live-externals']) {

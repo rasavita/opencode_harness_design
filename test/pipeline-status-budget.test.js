@@ -6,15 +6,15 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const script = path.join(__dirname, '..', '.claude', 'scripts', 'pipeline-status.js');
+const script = path.join(__dirname, '..', '.opencode', 'scripts', 'pipeline-status.js');
 const { buildSnapshot, renderStatus } = require(script);
 
 const NOW = '2026-06-21T12:00:00.000Z';
 
 function makeProject(files = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pipeline-budget-'));
-  fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
-  fs.mkdirSync(path.join(dir, '.claude', 'runs'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'runs'), { recursive: true });
   for (const [rel, content] of Object.entries(files)) {
     const target = path.join(dir, rel);
     fs.mkdirSync(path.dirname(target), { recursive: true });
@@ -33,8 +33,8 @@ test('buildSnapshot meters the budget from the start marker + receipts and rende
   const startMs = Date.parse(NOW) - 31 * 60000; // 31 minutes into the run
   const dir = makeProject({
     'project-manifest.json': JSON.stringify({ execution: { model_tier: 'cost' } }),
-    '.claude/state/budget-start': String(startMs),
-    '.claude/runs/2026-06-21.jsonl':
+    '.opencode/state/budget-start': String(startMs),
+    '.opencode/runs/2026-06-21.jsonl':
       Array.from({ length: 80 }, (_, i) => JSON.stringify({ kind: 'subagent', agent: 'generator', ts: startMs + i })).join('\n') + '\n',
   });
   const snap = buildSnapshot(dir, { now: NOW });
@@ -50,7 +50,7 @@ test('buildSnapshot meters the budget from the start marker + receipts and rende
 test('a budget of "off" in the manifest disables metering even with a start marker', () => {
   const dir = makeProject({
     'project-manifest.json': JSON.stringify({ execution: { model_tier: 'cost', budget: 'off' } }),
-    '.claude/state/budget-start': String(Date.parse(NOW) - 60000),
+    '.opencode/state/budget-start': String(Date.parse(NOW) - 60000),
   });
   const snap = buildSnapshot(dir, { now: NOW });
   assert.strictEqual(snap.budget, null);
@@ -60,8 +60,8 @@ test('a healthy mid-run budget renders an ok band', () => {
   const startMs = Date.parse(NOW) - 10 * 60000; // 10m into a 90m balanced cap
   const dir = makeProject({
     'project-manifest.json': JSON.stringify({ execution: { model_tier: 'balanced' } }),
-    '.claude/state/budget-start': String(startMs),
-    '.claude/runs/2026-06-21.jsonl':
+    '.opencode/state/budget-start': String(startMs),
+    '.opencode/runs/2026-06-21.jsonl':
       Array.from({ length: 12 }, (_, i) => JSON.stringify({ kind: 'subagent', agent: 'generator', ts: startMs + i })).join('\n') + '\n',
   });
   const snap = buildSnapshot(dir, { now: NOW });
@@ -73,8 +73,8 @@ test('cost line shows model mix when budget-start is set', () => {
   const startMs = Date.parse(NOW) - 5 * 60000;
   const dir = makeProject({
     'project-manifest.json': JSON.stringify({ execution: { model_tier: 'cost' } }),
-    '.claude/state/budget-start': String(startMs),
-    '.claude/runs/2026-06-21.jsonl': [
+    '.opencode/state/budget-start': String(startMs),
+    '.opencode/runs/2026-06-21.jsonl': [
       { kind: 'subagent', agent: 'generator', model: 'claude-sonnet-5', ts: startMs + 1 },
       { kind: 'subagent', agent: 'evaluator', model: 'claude-opus-4-8', ts: startMs + 2 },
     ].map((r) => JSON.stringify(r)).join('\n') + '\n',

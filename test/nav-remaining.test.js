@@ -6,18 +6,18 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const { buildMaps } = require('../.claude/scripts/nav-brownfield-maps');
-const { buildGraphIndex, lookupSymbol } = require('../.claude/scripts/nav-graph-index');
-const { runBench } = require('../.claude/scripts/nav-bench');
-const { buildContextPack } = require('../.claude/scripts/context-pack');
-const { adviseTokenUsage } = require('../.claude/hooks/token-advisor');
+const { buildMaps } = require('../.opencode/scripts/nav-brownfield-maps');
+const { buildGraphIndex, lookupSymbol } = require('../.opencode/scripts/nav-graph-index');
+const { runBench } = require('../.opencode/scripts/nav-bench');
+const { buildContextPack } = require('../.opencode/scripts/context-pack');
+const { adviseTokenUsage } = require('../.opencode/hooks/token-advisor');
 
 const ROOT = path.join(__dirname, '..');
 
 function tempProject() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nav-rem-'));
   fs.mkdirSync(path.join(dir, 'specs', 'brownfield', 'wiki', 'pages'), { recursive: true });
-  fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
   fs.mkdirSync(path.join(dir, 'src', 'auth'), { recursive: true });
   return dir;
 }
@@ -146,13 +146,13 @@ test('token advisor stays quiet for path-scoped rg', () => {
 
 test('Iron Law appears in change/feature/implement/generator skills', () => {
   const files = [
-    '.claude/skills/change/SKILL.md',
-    '.claude/skills/feature/SKILL.md',
-    '.claude/skills/implement/SKILL.md',
-    '.claude/skills/vibe/SKILL.md',
-    '.claude/skills/refactor/SKILL.md',
-    '.claude/agents/generator.md',
-    'CLAUDE.md',
+    '.opencode/skills/change/SKILL.md',
+    '.opencode/skills/feature/SKILL.md',
+    '.opencode/skills/implement/SKILL.md',
+    '.opencode/skills/vibe/SKILL.md',
+    '.opencode/skills/refactor/SKILL.md',
+    '.opencode/agents/generator.md',
+    'AGENTS.md',
   ];
   for (const rel of files) {
     const text = fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -161,7 +161,7 @@ test('Iron Law appears in change/feature/implement/generator skills', () => {
 });
 
 test('brownfield skill documents lean maps script', () => {
-  const text = fs.readFileSync(path.join(ROOT, '.claude/skills/brownfield/SKILL.md'), 'utf8');
+  const text = fs.readFileSync(path.join(ROOT, '.opencode/skills/brownfield/SKILL.md'), 'utf8');
   assert.match(text, /nav-brownfield-maps\.js/);
   assert.match(text, /lean mode/i);
 });

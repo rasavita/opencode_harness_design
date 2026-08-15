@@ -14,15 +14,15 @@ const ENV = { HARNESS_TDD_GATE: 'off' };
 // --- trust boundary (harness machinery) ---
 
 const MACHINERY_TARGETS = [
-  '.claude/hooks/pre-write-gate.js',
-  '.claude/hooks/lib/tdd.js',
-  '.claude/git-hooks/pre-commit',
-  '.claude/settings.json',
-  '.claude/security-patterns.json',
-  '.claude/state/coverage-baseline.txt',
-  '.claude/state/coverage-baseline-js.txt',
-  '.claude/state/coverage-preflight-cache.json',
-  '.claude/state/hook-errors.log',
+  '.opencode/hooks/pre-write-gate.js',
+  '.opencode/hooks/lib/tdd.js',
+  '.opencode/git-hooks/pre-commit',
+  '.opencode/settings.json',
+  '.opencode/security-patterns.json',
+  '.opencode/state/coverage-baseline.txt',
+  '.opencode/state/coverage-baseline-js.txt',
+  '.opencode/state/coverage-preflight-cache.json',
+  '.opencode/state/hook-errors.log',
 ];
 
 test('blocks writes to harness machinery in a target project', async () => {
@@ -37,9 +37,9 @@ test('blocks writes to harness machinery in a target project', async () => {
   }
 });
 
-test('machinery protection does not block ordinary .claude content', async () => {
+test('machinery protection does not block ordinary .opencode content', async () => {
   const projectDir = makeHookProject([HOOK]);
-  for (const rel of ['.claude/state/learned-rules.md', '.claude/program.md', '.claude/skills/foo/SKILL.md']) {
+  for (const rel of ['.opencode/state/learned-rules.md', '.opencode/program.md', '.opencode/skills/foo/SKILL.md']) {
     const result = await runHook(projectDir, HOOK, {
       tool_name: 'Write',
       tool_input: { file_path: path.join(projectDir, rel), content: 'notes\n' },
@@ -50,10 +50,10 @@ test('machinery protection does not block ordinary .claude content', async () =>
 
 test('machinery edits are allowed inside the harness repo itself', async () => {
   const projectDir = makeHookProject([HOOK]);
-  fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify({ name: 'claude-harness-eng-v5' }));
+  fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify({ name: 'opencode-harness-design' }));
   const result = await runHook(projectDir, HOOK, {
     tool_name: 'Write',
-    tool_input: { file_path: path.join(projectDir, '.claude', 'hooks', 'new-hook.js'), content: 'ok\n' },
+    tool_input: { file_path: path.join(projectDir, '.opencode', 'hooks', 'new-hook.js'), content: 'ok\n' },
   }, ENV);
   assert.strictEqual(result.status, 0, result.stdout);
 });
@@ -61,11 +61,11 @@ test('machinery edits are allowed inside the harness repo itself', async () => {
 test('HARNESS_PROTECT=off bypasses the machinery gate deliberately', async () => {
   const projectDir = makeHookProject([HOOK]);
   // Use a machinery path that is NOT also a prompt-cache prefix file
-  // (.claude/settings.json is dual-guarded; HARNESS_PROTECT alone is not enough).
+  // (.opencode/settings.json is dual-guarded; HARNESS_PROTECT alone is not enough).
   const result = await runHook(projectDir, HOOK, {
     tool_name: 'Write',
     tool_input: {
-      file_path: path.join(projectDir, '.claude', 'security-patterns.json'),
+      file_path: path.join(projectDir, '.opencode', 'security-patterns.json'),
       content: '[]\n',
     },
   }, { ...ENV, HARNESS_PROTECT: 'off' });
@@ -80,7 +80,7 @@ function mungedProject(projectDir) {
 
 test("allows writes to this project's Claude memory directory", async () => {
   const projectDir = makeHookProject([HOOK]);
-  const memoryFile = path.join(os.homedir(), '.claude', 'projects', mungedProject(projectDir), 'memory', 'note.md');
+  const memoryFile = path.join(os.homedir(), '.opencode', 'projects', mungedProject(projectDir), 'memory', 'note.md');
   const result = await runHook(projectDir, HOOK, {
     tool_name: 'Write',
     tool_input: { file_path: memoryFile, content: '# memory\n' },
@@ -90,7 +90,7 @@ test("allows writes to this project's Claude memory directory", async () => {
 
 test("still blocks writes to a DIFFERENT project's Claude memory directory", async () => {
   const projectDir = makeHookProject([HOOK]);
-  const otherFile = path.join(os.homedir(), '.claude', 'projects', '-Users-someone-else-project', 'memory', 'note.md');
+  const otherFile = path.join(os.homedir(), '.opencode', 'projects', '-Users-someone-else-project', 'memory', 'note.md');
   const result = await runHook(projectDir, HOOK, {
     tool_name: 'Write',
     tool_input: { file_path: otherFile, content: '# memory\n' },

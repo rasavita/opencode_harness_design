@@ -6,7 +6,7 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'record-at-red.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'record-at-red.js');
 const { run, resolveOutPath, appendReceipt, runTestCmd } = require(SCRIPT);
 
 function makeProject() {

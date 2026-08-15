@@ -1,7 +1,7 @@
 'use strict';
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { detectLiveExternalReach } = require('../.claude/hooks/lib/regression-gate');
+const { detectLiveExternalReach } = require('../.opencode/hooks/lib/regression-gate');
 
 test('detectLiveExternalReach true on MissingFixtureError in child output', () => {
   assert.strictEqual(detectLiveExternalReach('E   replay_transport.MissingFixtureError: no recorded fixture for stripe/charge'), true);

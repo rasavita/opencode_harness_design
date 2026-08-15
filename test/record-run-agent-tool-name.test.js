@@ -30,7 +30,7 @@ test('record-run treats a PostToolUse(Agent) event the same as PostToolUse(Task)
   gateway.server.close();
 
   assert.match(gateway.body, /harness_agent_runs_total\{/);
-  const ledgerPath = path.join(projectDir, '.claude', 'state', 'telemetry-ledger.jsonl');
+  const ledgerPath = path.join(projectDir, '.opencode', 'state', 'telemetry-ledger.jsonl');
   const ledger = fs.readFileSync(ledgerPath, 'utf8').trim().split('\n').map((line) => JSON.parse(line));
   assert.equal(ledger.length, 1);
   assert.equal(ledger[0].kind, 'subagent', 'must be tallied as a subagent dispatch, not a generic tool call');
@@ -56,7 +56,7 @@ test('record-run falls back to tool_input.agent_type if subagent_type is ever ab
 
   gateway.server.close();
 
-  const ledgerPath = path.join(projectDir, '.claude', 'state', 'telemetry-ledger.jsonl');
+  const ledgerPath = path.join(projectDir, '.opencode', 'state', 'telemetry-ledger.jsonl');
   const ledger = fs.readFileSync(ledgerPath, 'utf8').trim().split('\n').map((line) => JSON.parse(line));
   assert.equal(ledger[0].agent, 'evaluator');
 });
@@ -76,7 +76,7 @@ test('record-run resolves the agent name from a real SubagentStop event (agent_t
 
   gateway.server.close();
 
-  const ledgerPath = path.join(projectDir, '.claude', 'state', 'telemetry-ledger.jsonl');
+  const ledgerPath = path.join(projectDir, '.opencode', 'state', 'telemetry-ledger.jsonl');
   const ledger = fs.readFileSync(ledgerPath, 'utf8').trim().split('\n').map((line) => JSON.parse(line));
   assert.equal(ledger.length, 1);
   assert.equal(ledger[0].kind, 'subagent_stop');

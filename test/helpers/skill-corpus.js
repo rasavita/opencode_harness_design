@@ -18,7 +18,7 @@ const COMPANION_SKILLS = {
 };
 
 function readSkillCorpus(skillName, root = REPO_ROOT) {
-  const skillDir = path.join(root, '.claude', 'skills', skillName);
+  const skillDir = path.join(root, '.opencode', 'skills', skillName);
   const skillMd = path.join(skillDir, 'SKILL.md');
   if (!fs.existsSync(skillMd)) {
     throw new Error(`skill corpus missing: ${skillMd}`);
@@ -38,7 +38,7 @@ function readSkillCorpus(skillName, root = REPO_ROOT) {
 }
 
 function skillEntryLineCount(skillName, root = REPO_ROOT) {
-  const skillMd = path.join(root, '.claude', 'skills', skillName, 'SKILL.md');
+  const skillMd = path.join(root, '.opencode', 'skills', skillName, 'SKILL.md');
   return fs.readFileSync(skillMd, 'utf8').split('\n').length;
 }
 

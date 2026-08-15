@@ -10,7 +10,7 @@ const { test } = require('node:test');
 
 const ROOT = path.join(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
-const { resolveTopology, topologyPreset, TOPOLOGIES } = require('../.claude/scripts/topologies.js');
+const { resolveTopology, topologyPreset, TOPOLOGIES } = require('../.opencode/scripts/topologies.js');
 
 test('resolveTopology: lite -> cli-or-library', () => {
   assert.strictEqual(resolveTopology({ stack: { frontend: { framework: 'react' } } }, true), 'cli-or-library');
@@ -43,7 +43,7 @@ test('TOPOLOGIES has exactly the three supported topologies', () => {
   assert.deepStrictEqual(Object.keys(TOPOLOGIES).sort(), ['api-service', 'cli-or-library', 'web-app']);
 });
 
-const { buildManifest } = require('../.claude/scripts/scaffold-render.js');
+const { buildManifest } = require('../.opencode/scripts/scaffold-render.js');
 
 test('buildManifest: web-app profile gets the server preset + topology label', () => {
   const m = buildManifest({ projectType: 'A', name: 'shop',
@@ -92,5 +92,5 @@ test('G10: topology-templates guide is registered active and wired', () => {
 });
 
 test('G10: scaffold.md surfaces the detected topology', () => {
-  assert.ok(/topology/i.test(read('.claude/commands/scaffold.md')), 'scaffold.md must mention topology');
+  assert.ok(/topology/i.test(read('.opencode/commands/scaffold.md')), 'scaffold.md must mention topology');
 });

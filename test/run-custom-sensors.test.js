@@ -2,7 +2,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs'), os = require('os'), path = require('path');
-const { loadCustomSensors, runOne, runAll } = require('../.claude/scripts/run-custom-sensors');
+const { loadCustomSensors, runOne, runAll } = require('../.opencode/scripts/run-custom-sensors');
 
 function proj(customSensors) {
   const d = fs.mkdtempSync(path.join(os.tmpdir(), 'cs-'));

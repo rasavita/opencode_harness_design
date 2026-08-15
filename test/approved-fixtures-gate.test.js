@@ -8,8 +8,8 @@ const { test } = require('node:test');
 const { execFileSync } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
-const SCRIPT = path.join(ROOT, '.claude', 'scripts', 'approved-fixtures-gate.js');
-const lib = require('../.claude/hooks/lib/fixtures.js');
+const SCRIPT = path.join(ROOT, '.opencode', 'scripts', 'approved-fixtures-gate.js');
+const lib = require('../.opencode/hooks/lib/fixtures.js');
 
 test('classify buckets ok/modified/unapproved/removed', () => {
   const found = ['a.snap', 'b.snap', 'c.snap'];
@@ -95,8 +95,8 @@ test('removed approved snapshot -> WARN, exit 0', () => {
 const rd = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 test('G12: approved-fixtures is wired + registered active', () => {
-  assert.ok(/approved-fixtures-gate\.js|approved-fixtures/.test(rd('.claude/skills/gate/SKILL.md')), '/gate must run the gate');
-  assert.strictEqual(JSON.parse(rd('package.json')).scripts['approved-fixtures'], 'node .claude/scripts/approved-fixtures-gate.js');
+  assert.ok(/approved-fixtures-gate\.js|approved-fixtures/.test(rd('.opencode/skills/gate/SKILL.md')), '/gate must run the gate');
+  assert.strictEqual(JSON.parse(rd('package.json')).scripts['approved-fixtures'], 'node .opencode/scripts/approved-fixtures-gate.js');
   const m = JSON.parse(rd('harness-manifest.json'));
   const s = m.sensors.find((x) => x.id === 'approved-fixtures-gate');
   assert.ok(s, 'approved-fixtures-gate sensor must exist');

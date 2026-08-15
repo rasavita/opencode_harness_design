@@ -10,7 +10,7 @@ function hasTsx() {
   return spawnSync('npx', ['tsx', '--version'], { encoding: 'utf8' }).status === 0;
 }
 
-const TEMPLATES = path.join(__dirname, '..', '.claude', 'templates', 'boundary-doubles');
+const TEMPLATES = path.join(__dirname, '..', '.opencode', 'templates', 'boundary-doubles');
 
 function runTs(files, lines) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bdts-'));

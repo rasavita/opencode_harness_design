@@ -10,11 +10,11 @@ const assert = require('assert');
 const { test } = require('node:test');
 const { randomUUID } = require('crypto');
 
-const { runClaude } = require('./helpers/claude-runner');
+const { runClaude } = require('./helpers/opencode-runner');
 const { freshProject } = require('./helpers/fresh-project');
 
 const PROJECT_DIR = path.join(__dirname, 'gated-build-output');
-const PLUGIN_DIR = path.join(__dirname, '..', '..', '.claude');
+const PLUGIN_DIR = path.join(__dirname, '..', '..', '.opencode');
 const PRD = path.join(__dirname, 'fixtures', 'counter-prd.md');
 // Fresh id per run — hardcoded session ids fail with "already in use" on re-run.
 const SESSION = randomUUID();
@@ -35,8 +35,8 @@ test('gated build: /build prd.md stops at the first human approval gate', { time
   );
   console.log('[gated] scaffold exit:', scaffold.exitCode);
   assert.ok(
-    exists('project-manifest.json') || exists('CLAUDE.md'),
-    'scaffold must install harness (project-manifest.json or CLAUDE.md) before /build',
+    exists('project-manifest.json') || exists('AGENTS.md'),
+    'scaffold must install harness (project-manifest.json or AGENTS.md) before /build',
   );
 
   const build = runClaude('/build prd.md', {
@@ -53,7 +53,7 @@ test('gated build: /build prd.md stops at the first human approval gate', { time
   // Scaffold may seed claude-progress.txt / features.json; gated /build must not
   // run the autonomous tail (no evaluator PASS report / sprint contracts filled).
   assert.ok(
-    !exists('specs/reviews/eval-report.md') && !exists('.claude/state/auto-build'),
+    !exists('specs/reviews/eval-report.md') && !exists('.opencode/state/auto-build'),
     'default /build must not enter autonomous build before approval',
   );
 });

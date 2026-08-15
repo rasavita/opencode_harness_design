@@ -5,7 +5,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { buildSingleStoryMap } = require(
-  path.join(__dirname, '..', '.claude/skills/tracker-publish/scripts/single-story-map.js')
+  path.join(__dirname, '..', '.opencode/skills/tracker-publish/scripts/single-story-map.js')
 );
 
 test('builds one group keyed by storyId in the publisher-consumed shape', () => {
@@ -20,7 +20,7 @@ test('builds one group keyed by storyId in the publisher-consumed shape', () => 
   assert.equal(m.provider, 'linear');
   assert.deepEqual(Object.keys(m.groups), ['F-001']);
   const g = m.groups['F-001'];
-  assert.equal(g.body_file, '.claude/state/tracker-runs/group-F-001.md');
+  assert.equal(g.body_file, '.opencode/state/tracker-runs/group-F-001.md');
   assert.deepEqual(g.stories, ['F-001']);
   assert.equal(g.tracker_key, null); // so looksAlreadyPublished() returns false → it publishes
   assert.ok(g.labels.includes('agent-ready'));

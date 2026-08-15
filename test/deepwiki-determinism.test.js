@@ -15,8 +15,8 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const { hubsFromGraph, buildHomepage } = require('../.claude/scripts/human-codebase.js');
-const { buildConceptPages } = require('../.claude/scripts/nav-concepts.js');
+const { hubsFromGraph, buildHomepage } = require('../.opencode/scripts/human-codebase.js');
+const { buildConceptPages } = require('../.opencode/scripts/nav-concepts.js');
 
 const ISO_RE = /\d{4}-\d\d-\d\dT\d\d:\d\d/;
 

@@ -6,7 +6,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'record-modularity-review.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'record-modularity-review.js');
 const { buildMarker, run } = require(SCRIPT);
 
 function graphWith(hubs) {
@@ -56,7 +56,7 @@ test('run writes the marker file from the live code-graph', () => {
   assert.strictEqual(code, 0);
   assert.match(out, /marker written/);
 
-  const markerPath = path.join(root, '.claude', 'state', 'modularity-review-marker.json');
+  const markerPath = path.join(root, '.opencode', 'state', 'modularity-review-marker.json');
   const marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
   assert.deepStrictEqual(marker, {
     timestamp: '2026-07-09T02:00:00.000Z',
@@ -77,7 +77,7 @@ test('run overwrites a prior marker with the current snapshot (not appended)', (
   } finally {
     process.stdout.write = origWrite;
   }
-  const markerPath = path.join(root, '.claude', 'state', 'modularity-review-marker.json');
+  const markerPath = path.join(root, '.opencode', 'state', 'modularity-review-marker.json');
   const marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
   assert.deepStrictEqual(marker, { timestamp: 't2', unstableHubIds: ['src/b.js'] });
 });
@@ -115,7 +115,7 @@ test('run --scope-path (D3.5 scoped review): an out-of-scope hub that was never 
     process.stdout.write = origWrite;
   }
   assert.strictEqual(code, 0);
-  const markerPath = path.join(root, '.claude', 'state', 'modularity-review-marker.json');
+  const markerPath = path.join(root, '.opencode', 'state', 'modularity-review-marker.json');
   const marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
   // in_scope.py was just reviewed -> no longer stale. out_of_scope.py was
   // never reviewed (no prior marker either) -> must stay OUT of the marker
@@ -140,7 +140,7 @@ test('run --scope-path: a previously-reviewed out-of-scope hub is carried forwar
   fs.writeFileSync(graphPath, JSON.stringify(graph));
   // Seed a prior marker as if a full /brownfield --full review already
   // covered already_reviewed.py.
-  const markerPath = path.join(root, '.claude', 'state', 'modularity-review-marker.json');
+  const markerPath = path.join(root, '.opencode', 'state', 'modularity-review-marker.json');
   fs.mkdirSync(path.dirname(markerPath), { recursive: true });
   fs.writeFileSync(markerPath, JSON.stringify({ timestamp: 't0', unstableHubIds: ['py:already_reviewed.py'] }));
 
@@ -159,7 +159,7 @@ test('run --scope-path: a previously-reviewed out-of-scope hub is carried forwar
 test('run with no --scope-path (full /brownfield --full review) is unaffected: full overwrite, as before', () => {
   const root = tmpRoot();
   writeGraph(root, [{ id: 'src/a.js', fan_in: 6, fan_out: 1, instability: 0.85 }]);
-  const markerPath = path.join(root, '.claude', 'state', 'modularity-review-marker.json');
+  const markerPath = path.join(root, '.opencode', 'state', 'modularity-review-marker.json');
   fs.mkdirSync(path.dirname(markerPath), { recursive: true });
   fs.writeFileSync(markerPath, JSON.stringify({ timestamp: 't0', unstableHubIds: ['src/stale-old.js'] }));
   const silence = () => true;
@@ -187,5 +187,5 @@ test('run degrades loudly and exits 1 when no code-graph exists', () => {
   }
   assert.strictEqual(code, 1);
   assert.match(err, /no code-graph/);
-  assert.ok(!fs.existsSync(path.join(root, '.claude', 'state', 'modularity-review-marker.json')));
+  assert.ok(!fs.existsSync(path.join(root, '.opencode', 'state', 'modularity-review-marker.json')));
 });

@@ -1,7 +1,7 @@
 'use strict';
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { scanSecrets } = require('../.claude/hooks/lib/secrets');
+const { scanSecrets } = require('../.opencode/hooks/lib/secrets');
 
 // Assemble a credentialed connection string at runtime so this test file itself
 // does not carry a verbatim one (which its own subject would flag).

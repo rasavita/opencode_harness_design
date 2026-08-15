@@ -1,9 +1,9 @@
 apiVersion: 1
 
 providers:
-  - name: Claude Harness
+  - name: OpenCode Harness
     orgId: 1
-    folder: Claude Harness
+    folder: OpenCode Harness
     type: file
     disableDeletion: false
     editable: true

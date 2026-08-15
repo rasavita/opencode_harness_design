@@ -13,12 +13,12 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const { adviseTokenUsage } = require('../.claude/hooks/token-advisor');
-const { verboseKind } = require('../.claude/hooks/lib/verbose-command');
+const { adviseTokenUsage } = require('../.opencode/hooks/token-advisor');
+const { verboseKind } = require('../.opencode/hooks/lib/verbose-command');
 
 function tempProject(mode = 'enforced') {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tg-falsepos-'));
-  fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
   fs.mkdirSync(path.join(dir, 'specs', 'brownfield'), { recursive: true });
   fs.writeFileSync(path.join(dir, 'project-manifest.json'), JSON.stringify({
     token_governor: { enabled: true, mode, max_source_read_lines: 300, compress_tool_output: true },
@@ -36,7 +36,7 @@ function writeGraph(dir, filePath) {
 // --- verboseKind unit cases (the core false positives) ---------------------
 
 const NOT_VERBOSE = [
-  'test -d harness-lite/.claude',
+  'test -d harness-lite/.opencode',
   'test -f package.json',
   '[ -d src ] && echo yes',
   'git add test/control-budget.test.js',
@@ -63,7 +63,7 @@ const VERBOSE = [
   ['playwright test', 'test'],
   ['npm run build', 'build-log'],
   ['tsc --noEmit', 'build-log'],
-  ['npx eslint .claude', 'lint'],
+  ['npx eslint .opencode', 'lint'],
   ['ruff check .', 'lint'],
   ['cd /repo && npm test', 'test'],
 ];

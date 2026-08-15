@@ -7,7 +7,7 @@ const path = require('path');
 const { describe, test, before } = require('node:test');
 const { execFileSync } = require('child_process');
 
-const { runClaude, HARNESS_ROOT } = require('./helpers/claude-runner');
+const { runClaude, HARNESS_ROOT } = require('./helpers/opencode-runner');
 const { runProjectSuite } = require('./helpers/project-suite');
 const { isPrometheusUp, assertMetricExists, pollMetric } = require('./helpers/prometheus-checker');
 const { isGrafanaUp, getDashboard, listDashboards } = require('./helpers/grafana-checker');
@@ -38,7 +38,7 @@ function findFiles(dir, pattern) {
   if (!fs.existsSync(dir)) return results;
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
-    if (entry.isDirectory() && !['node_modules', '.claude'].includes(entry.name)) {
+    if (entry.isDirectory() && !['node_modules', '.opencode'].includes(entry.name)) {
       results.push(...findFiles(full, pattern));
     } else if (entry.isFile() && pattern.test(entry.name)) {
       results.push(full);
@@ -61,7 +61,7 @@ describe('Harness E2E — Brownfield + Telemetry', { timeout: 1200000 }, () => {
       execFileSync('git', ['init'], { cwd: PROJECT_DIR, stdio: 'ignore' });
     }
     const jsFiles = findFiles(PROJECT_DIR, /\.js$/)
-      .filter((f) => !f.includes('node_modules') && !f.includes('.claude') && !f.includes('specs'));
+      .filter((f) => !f.includes('node_modules') && !f.includes('.opencode') && !f.includes('specs'));
     console.log('[e2e] Project directory:', PROJECT_DIR);
     console.log('[e2e] Source files found:', jsFiles.length);
   });
@@ -126,7 +126,7 @@ describe('Harness E2E — Brownfield + Telemetry', { timeout: 1200000 }, () => {
       return;
     }
     const indexer = path.join(
-      __dirname, '..', '..', '.claude', 'skills', 'code-map', 'scripts',
+      __dirname, '..', '..', '.opencode', 'skills', 'code-map', 'scripts',
       'code_index', 'code_index.py'
     );
     const graphPath = path.join(PROJECT_DIR, 'specs', 'brownfield', 'code-graph.json');
@@ -169,7 +169,7 @@ describe('Harness E2E — Brownfield + Telemetry', { timeout: 1200000 }, () => {
 
   test('Stage 6c - Brownfield change: add search command', { timeout: 300000 }, () => {
     const filesBefore = findFiles(PROJECT_DIR, /\.js$/)
-      .filter((f) => !f.includes('node_modules') && !f.includes('.claude') && !f.includes('specs'));
+      .filter((f) => !f.includes('node_modules') && !f.includes('.opencode') && !f.includes('specs'));
 
     const prompt =
       'This is an existing Node.js CLI todo app. Read the source files to understand the codebase. ' +
@@ -187,7 +187,7 @@ describe('Harness E2E — Brownfield + Telemetry', { timeout: 1200000 }, () => {
     });
 
     const filesAfter = findFiles(PROJECT_DIR, /\.js$/)
-      .filter((f) => !f.includes('node_modules') && !f.includes('.claude') && !f.includes('specs'));
+      .filter((f) => !f.includes('node_modules') && !f.includes('.opencode') && !f.includes('specs'));
 
     // Discipline, not string-grep: a TEST exercises the new search command,
     // and the full suite passes — "do NOT break existing commands" verified
@@ -197,7 +197,7 @@ describe('Harness E2E — Brownfield + Telemetry', { timeout: 1200000 }, () => {
       .filter((f) => /\.(test|spec)\.js$/.test(f) || /(^|\/)tests?\//.test(f))
       .some((f) => { try { return fs.readFileSync(f, 'utf8').toLowerCase().includes('search'); } catch (_) { return false; } });
     const suite = runProjectSuite(PROJECT_DIR);
-    const preflightEngaged = fileExists('.claude/state/coverage-preflight-cache.json');
+    const preflightEngaged = fileExists('.opencode/state/coverage-preflight-cache.json');
 
     logResult('stage-6c-brownfield-change', {
       exitCode: result.exitCode,
@@ -218,8 +218,8 @@ describe('Harness E2E — Brownfield + Telemetry', { timeout: 1200000 }, () => {
 
   test('Stage 7 - Telemetry: Prometheus metrics', { timeout: 90000 }, async () => {
     // Push a brownfield-lane ledger record before querying.
-    const telemetryMem = require(path.join(HARNESS_ROOT, '..', '.claude', 'scripts', 'telemetry-memory'));
-    const stateDir = path.join(PROJECT_DIR, '.claude', 'state');
+    const telemetryMem = require(path.join(HARNESS_ROOT, '..', '.opencode', 'scripts', 'telemetry-memory'));
+    const stateDir = path.join(PROJECT_DIR, '.opencode', 'state');
     fs.mkdirSync(stateDir, { recursive: true });
     telemetryMem.appendLedger(stateDir, {
       kind: 'phase_eval', ts: Date.now(), user: 'e2e-brownfield', session_id: 'e2e-brownfield',

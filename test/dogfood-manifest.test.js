@@ -48,8 +48,8 @@ test('verification.mode is local (no docker product stack required)', () => {
   assert.strictEqual(m.verification.mode, 'local');
 });
 
-test('committed agent-readiness baseline exists under .claude/state/', () => {
-  const baseline = path.join(ROOT, '.claude', 'state', 'agent-readiness-baseline.json');
+test('committed agent-readiness baseline exists under .opencode/state/', () => {
+  const baseline = path.join(ROOT, '.opencode', 'state', 'agent-readiness-baseline.json');
   assert.ok(fs.existsSync(baseline), 'agent-readiness-baseline.json must be committed');
   const b = JSON.parse(fs.readFileSync(baseline, 'utf8'));
   assert.ok(b.summary, 'baseline needs summary');

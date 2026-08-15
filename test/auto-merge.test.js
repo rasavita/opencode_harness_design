@@ -10,8 +10,8 @@ const path = require('path');
 const {
   isAutoMergeEnabled, resolveMethod, enableAutoMerge,
   isRealPrUrl, repoSlugFromGitUrl, repoSlugFromPrUrl,
-} = require('../.claude/scripts/auto-merge.js');
-const { readProvenance } = require('../.claude/hooks/lib/merge-provenance.js');
+} = require('../.opencode/scripts/auto-merge.js');
+const { readProvenance } = require('../.opencode/hooks/lib/merge-provenance.js');
 
 test('isAutoMergeEnabled: flag, env, neither, both', () => {
   assert.strictEqual(isAutoMergeEnabled(['--auto-merge'], {}), true);

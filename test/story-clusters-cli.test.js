@@ -7,7 +7,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'story-clusters.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'story-clusters.js');
 const { planClusters, normalizeEdges } = require(SCRIPT);
 
 function workspace(stories) {

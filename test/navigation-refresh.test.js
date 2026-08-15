@@ -6,15 +6,15 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const { refreshNavigation, estimateTextTokens } = require('../.claude/scripts/navigation-refresh');
+const { refreshNavigation, estimateTextTokens } = require('../.opencode/scripts/navigation-refresh');
 
 const ROOT = path.join(__dirname, '..');
-const CODE_MAP_SOURCE = path.join(ROOT, '.claude', 'skills', 'code-map');
+const CODE_MAP_SOURCE = path.join(ROOT, '.opencode', 'skills', 'code-map');
 
 function tempProject() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'navigation-refresh-'));
-  fs.mkdirSync(path.join(dir, '.claude', 'skills'), { recursive: true });
-  fs.cpSync(CODE_MAP_SOURCE, path.join(dir, '.claude', 'skills', 'code-map'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'skills'), { recursive: true });
+  fs.cpSync(CODE_MAP_SOURCE, path.join(dir, '.opencode', 'skills', 'code-map'), { recursive: true });
   return dir;
 }
 

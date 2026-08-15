@@ -7,7 +7,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'vocabulary-check.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'vocabulary-check.js');
 const {
   checkVocabulary, parseGlossaryTerms, normalizeTerm,
   candidatesFromDomainConcepts, candidatesFromDataModels, candidatesFromApiContracts,

@@ -6,9 +6,9 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const { applyScaffold } = require('../.claude/scripts/scaffold-apply');
+const { applyScaffold } = require('../.opencode/scripts/scaffold-apply');
 
-const PLUGIN_SOURCE = path.resolve(__dirname, '..', '.claude');
+const PLUGIN_SOURCE = path.resolve(__dirname, '..', '.opencode');
 const PROFILE = {
   name: 'sample-cli',
   description: 'A tiny Node CLI utility.',

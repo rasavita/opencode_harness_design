@@ -10,10 +10,10 @@ const {
   isStaleByName,
   planDeletes,
   RETENTION_DIRS,
-} = require('../.claude/scripts/runs-retention');
+} = require('../.opencode/scripts/runs-retention');
 
 const NOW = new Date('2026-07-10T12:00:00.000Z');
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'runs-retention.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'runs-retention.js');
 
 function tmpRoot() { return fs.mkdtempSync(path.join(os.tmpdir(), 'retention-')); }
 
@@ -73,10 +73,10 @@ test('planDeletes with preferName uses filename dates', () => {
 
 test('RETENTION_DIRS covers every churn directory the harness writes', () => {
   const rels = RETENTION_DIRS.map((d) => d.rel.join('/'));
-  assert.ok(rels.includes('.claude/runs'), 'runs must stay covered');
-  assert.ok(rels.includes('.claude/state/archive'), 'archive must stay covered');
-  assert.ok(rels.includes('.claude/state/context-cache'), 'context-cache is unpruned churn');
-  assert.ok(rels.includes('.claude/state/tool-output'), 'tool-output is unpruned churn');
+  assert.ok(rels.includes('.opencode/runs'), 'runs must stay covered');
+  assert.ok(rels.includes('.opencode/state/archive'), 'archive must stay covered');
+  assert.ok(rels.includes('.opencode/state/context-cache'), 'context-cache is unpruned churn');
+  assert.ok(rels.includes('.opencode/state/tool-output'), 'tool-output is unpruned churn');
 });
 
 test('content-hash cache names carry no date, so they prune by mtime, not name', () => {
@@ -97,10 +97,10 @@ test('content-hash cache names carry no date, so they prune by mtime, not name',
 
 test('round-trip: the real script prunes stale cache files and keeps fresh ones', () => {
   const root = tmpRoot();
-  const staleRaw = seed(root, '.claude/state/context-cache', 'bc2be0c7ad3617e8.raw', 30);
-  const freshRaw = seed(root, '.claude/state/context-cache', 'aa11bb22cc33dd44.raw', 1);
-  const staleLog = seed(root, '.claude/state/tool-output', '2026-01-02T11-38-28-216Z-test.log', 30);
-  const freshLog = seed(root, '.claude/state/tool-output', 'recent-run.log', 1);
+  const staleRaw = seed(root, '.opencode/state/context-cache', 'bc2be0c7ad3617e8.raw', 30);
+  const freshRaw = seed(root, '.opencode/state/context-cache', 'aa11bb22cc33dd44.raw', 1);
+  const staleLog = seed(root, '.opencode/state/tool-output', '2026-01-02T11-38-28-216Z-test.log', 30);
+  const freshLog = seed(root, '.opencode/state/tool-output', 'recent-run.log', 1);
 
   const out = runRetention(root);
 
@@ -114,7 +114,7 @@ test('round-trip: the real script prunes stale cache files and keeps fresh ones'
 
 test('round-trip: --dry-run reports cache deletions without performing them', () => {
   const root = tmpRoot();
-  const staleRaw = seed(root, '.claude/state/context-cache', 'deadbeefcafe0001.raw', 30);
+  const staleRaw = seed(root, '.opencode/state/context-cache', 'deadbeefcafe0001.raw', 30);
 
   const out = runRetention(root, ['--dry-run']);
 
@@ -124,7 +124,7 @@ test('round-trip: --dry-run reports cache deletions without performing them', ()
 
 test('--cache-days overrides the cache retention window', () => {
   const root = tmpRoot();
-  const threeDaysOld = seed(root, '.claude/state/context-cache', 'ffffffffffffffff.raw', 3);
+  const threeDaysOld = seed(root, '.opencode/state/context-cache', 'ffffffffffffffff.raw', 3);
 
   runRetention(root, ['--cache-days', '30']);
   assert.ok(fs.existsSync(threeDaysOld), '3d-old file survives a 30d window');

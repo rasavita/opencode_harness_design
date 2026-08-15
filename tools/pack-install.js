@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-// Materialize an install from .claude/config/packs.json.
+// Materialize an install from .opencode/config/packs.json.
 //
 // The partition declares which units are kernel and which belong to each pack, and
 // tools/check-partition.js proves the kernel never hard-references a pack. This turns
@@ -12,7 +12,7 @@
 // required by relative path (`./gates-planning`, `../scripts/x`) and pack code
 // legitimately reaches BACK into the kernel (gates-planning needs pre-commit-util).
 // Relocating them in-repo would break every one of those requires and buy nothing —
-// what ships is a single .claude tree either way. Composition keeps development flat
+// what ships is a single .opencode tree either way. Composition keeps development flat
 // and makes the install lean, which is the property that was actually wanted.
 //
 //   node tools/pack-install.js --out <dir> [--packs a,b] [--list]
@@ -22,39 +22,39 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const PARTITION = path.join(ROOT, '.claude', 'config', 'packs.json');
+const PARTITION = path.join(ROOT, '.opencode', 'config', 'packs.json');
 
 // Where each unit kind lives, and how its name maps to a path. Directories (skills)
 // copy whole; everything else is a single file.
 const KIND_PATHS = {
-  skill: (n) => `.claude/skills/${n}`,
-  agent: (n) => `.claude/agents/${n}.md`,
-  hook: (n) => `.claude/hooks/${n}.js`,
-  lib: (n) => `.claude/hooks/lib/${n}.js`,
-  script: (n) => `.claude/scripts/${n}.js`,
-  githook: (n) => `.claude/git-hooks/${n}`,
+  skill: (n) => `.opencode/skills/${n}`,
+  agent: (n) => `.opencode/agents/${n}.md`,
+  hook: (n) => `.opencode/hooks/${n}.js`,
+  lib: (n) => `.opencode/hooks/lib/${n}.js`,
+  script: (n) => `.opencode/scripts/${n}.js`,
+  githook: (n) => `.opencode/git-hooks/${n}`,
 };
 
 // Files every install needs regardless of pack selection: the plugin manifest, the
 // settings that wire the hooks, and the data the kernel scripts read.
 const ALWAYS = [
-  '.claude/.claude-plugin',
-  '.claude/settings.json',
-  '.claude/config',
-  '.claude/templates/state-seeds',
+  '.opencode/.opencode-plugin',
+  '.opencode/settings.json',
+  '.opencode/config',
+  '.opencode/templates/state-seeds',
   // Support modules for the git hooks. The partition's `githook` kind names the hook
   // entry points only, so this tree is not reachable from it — a kernel-only install
   // built without it loaded the hooks fine and then failed inside gate-registry.
-  '.claude/git-hooks/lib',
+  '.opencode/git-hooks/lib',
 ];
 
 // Directories whose contents should be accounted for by the partition. Anything here
 // that is neither declared nor covered by ALWAYS is a hole: it would be missing from
 // a composed install, and check-partition cannot see it either.
 const ACCOUNTED_DIRS = [
-  ['.claude/hooks/lib', 'lib'],
-  ['.claude/scripts', 'script'],
-  ['.claude/agents', 'agent'],
+  ['.opencode/hooks/lib', 'lib'],
+  ['.opencode/scripts', 'script'],
+  ['.opencode/agents', 'agent'],
 ];
 
 function loadPartition(file = PARTITION) {

@@ -28,7 +28,7 @@ test('/auto documents --no-retro and the --once non-interaction', () => {
 });
 
 test('/retro stays silent (no review prompt) when Step 3 drafts zero new recommendations', () => {
-  const skill = read('.claude/skills/retro/SKILL.md');
+  const skill = read('.opencode/skills/retro/SKILL.md');
   assert.match(skill, /zero new recommendations[\s\S]*stay silent|stay silent[\s\S]*zero new recommendations/i);
 });
 
@@ -41,7 +41,7 @@ test('the /retro guide is registered in harness-manifest.json and resolves', () 
 });
 
 test('harness-manifest.json itself remains internally valid (honesty invariant)', () => {
-  const { validate } = require('../.claude/scripts/validate-harness-manifest.js');
+  const { validate } = require('../.opencode/scripts/validate-harness-manifest.js');
   const manifest = JSON.parse(read('harness-manifest.json'));
   const { errors } = validate(manifest);
   assert.deepStrictEqual(errors, []);

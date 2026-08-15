@@ -8,7 +8,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const script = path.join(__dirname, '..', '..', '.claude', 'scripts', 'pipeline-status.js');
+const script = path.join(__dirname, '..', '..', '.opencode', 'scripts', 'pipeline-status.js');
 
 const NOW = '2026-06-21T12:00:00.000Z';
 
@@ -67,22 +67,22 @@ const RUNS_THREE_STEPS = [
 ].join('\n') + '\n';
 
 const MID_BUILD_FILES = {
-  '.claude/state/current-lane': 'auto\n',
-  '.claude/state/current-mode': 'lean\n',
-  '.claude/state/current-iteration': '2\n',
-  '.claude/state/current-group': 'B\n',
-  '.claude/state/current-story': 'E1-S3\n',
+  '.opencode/state/current-lane': 'auto\n',
+  '.opencode/state/current-mode': 'lean\n',
+  '.opencode/state/current-iteration': '2\n',
+  '.opencode/state/current-group': 'B\n',
+  '.opencode/state/current-story': 'E1-S3\n',
   'claude-progress.txt': PROGRESS_TWO_SESSIONS,
   'features.json': FEATURES_FOUR,
   'specs/stories/dependency-graph.md': GRAPH_TWO_GROUPS,
-  '.claude/state/iteration-log.md': ITERATION_LOG_PASS,
-  '.claude/runs/2026-06-21.jsonl': RUNS_THREE_STEPS,
+  '.opencode/state/iteration-log.md': ITERATION_LOG_PASS,
+  '.opencode/runs/2026-06-21.jsonl': RUNS_THREE_STEPS,
 };
 
 function makeProject(files = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pipeline-status-'));
-  fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
-  fs.mkdirSync(path.join(dir, '.claude', 'runs'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'runs'), { recursive: true });
   for (const [rel, content] of Object.entries(files)) {
     const target = path.join(dir, rel);
     fs.mkdirSync(path.dirname(target), { recursive: true });

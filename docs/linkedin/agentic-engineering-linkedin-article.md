@@ -13,13 +13,13 @@ How to ship commercial software with coding agents—without agent psychosis, fi
 
 **First comment (after publish):**  
 Full white paper (HTML + MD):  
-https://github.com/cwijayasundara/claude_harness_eng_v5/blob/main/docs/agentic-engineering-whitepaper.html  
+https://github.com/cwijayasundara/opencode_harness_design/blob/main/docs/agentic-engineering-whitepaper.html  
 
 One-page Z/L rubric:  
-https://github.com/cwijayasundara/claude_harness_eng_v5/blob/main/docs/zl-continuum-rubric.md  
+https://github.com/cwijayasundara/opencode_harness_design/blob/main/docs/zl-continuum-rubric.md  
 
 Slide deck PDF source:  
-https://github.com/cwijayasundara/claude_harness_eng_v5/blob/main/docs/linkedin/agentic-engineering-linkedin-deck.html  
+https://github.com/cwijayasundara/opencode_harness_design/blob/main/docs/linkedin/agentic-engineering-linkedin-deck.html  
 
 ---
 

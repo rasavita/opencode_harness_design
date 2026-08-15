@@ -12,7 +12,7 @@ const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
 const ROOT = path.join(__dirname, '..');
-const SCRIPT = path.join(ROOT, '.claude', 'scripts', 'impact-scope.js');
+const SCRIPT = path.join(ROOT, '.opencode', 'scripts', 'impact-scope.js');
 const { resolveSpecsAndContracts, computeImpactScope, run } = require(SCRIPT);
 
 function tmpDir() {

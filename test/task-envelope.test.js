@@ -4,8 +4,8 @@ const assert = require('assert');
 const { test } = require('node:test');
 const {
   contentHash, forbiddenAction, pathMatches, stampEnvelope, validateEnvelope,
-} = require('../.claude/hooks/lib/task-envelope');
-const { buildEnvelope } = require('../.claude/scripts/task-envelope');
+} = require('../.opencode/hooks/lib/task-envelope');
+const { buildEnvelope } = require('../.opencode/scripts/task-envelope');
 
 const RISK = {
   task_id: 'TASK-1',

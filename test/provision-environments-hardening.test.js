@@ -9,11 +9,11 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const { normalizeLiveEnvironment } = require('../.claude/scripts/env-diff');
-const { run } = require('../.claude/scripts/provision-environments');
-const { materializeDeployWorkflow } = require('../.claude/scripts/scaffold-security-baseline');
+const { normalizeLiveEnvironment } = require('../.opencode/scripts/env-diff');
+const { run } = require('../.opencode/scripts/provision-environments');
+const { materializeDeployWorkflow } = require('../.opencode/scripts/scaffold-security-baseline');
 
-const SRC = path.join(__dirname, '..', '.claude');
+const SRC = path.join(__dirname, '..', '.opencode');
 
 function mkProject(environments) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'provenv-h-'));

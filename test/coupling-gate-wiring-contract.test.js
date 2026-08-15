@@ -12,27 +12,27 @@ const ROOT = path.resolve(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 test('coupling-gate CLI reuses the lib and is require-safe', () => {
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude/scripts/coupling-gate.js')));
-  const cli = read('.claude/scripts/coupling-gate.js');
+  assert.ok(fs.existsSync(path.join(ROOT, '.opencode/scripts/coupling-gate.js')));
+  const cli = read('.opencode/scripts/coupling-gate.js');
   assert.match(cli, /require\('\.\.\/hooks\/lib\/coupling-gate'\)/, 'CLI must use the tested lib');
 });
 
 test('coupling-gate lib reuses drift.js and cycle-gate.js instead of reimplementing', () => {
-  const lib = read('.claude/hooks/lib/coupling-gate.js');
+  const lib = read('.opencode/hooks/lib/coupling-gate.js');
   assert.match(lib, /require\('\.\/drift'\)/, 'must reuse unstableHubIds from drift.js');
   assert.match(lib, /require\('\.\/cycle-gate'\)/, 'must reuse gateDecision from cycle-gate.js');
 });
 
 test('package.json exposes the coupling-gate script; /auto Gate 4 and /gate run it', () => {
   const pkg = JSON.parse(read('package.json'));
-  assert.strictEqual(pkg.scripts['coupling-gate'], 'node .claude/scripts/coupling-gate.js');
+  assert.strictEqual(pkg.scripts['coupling-gate'], 'node .opencode/scripts/coupling-gate.js');
   assert.match(readSkillCorpus('auto'), /coupling-gate\.js/, 'Gate 4 must run the coupling ratchet');
   // /gate no longer names checks inline — it runs the pack-contributed registry.
   // Registry membership is the stronger assertion: prose could mention the script
   // without it ever running.
-  const { loadRegistry } = require('../.claude/scripts/run-gate-checks.js');
+  const { loadRegistry } = require('../.opencode/scripts/run-gate-checks.js');
   const entry = loadRegistry(process.cwd()).find((c) => c.script === 'coupling-gate.js');
-  assert.ok(entry, '/gate must run the coupling ratchet (via .claude/config/gate-checks.json)');
+  assert.ok(entry, '/gate must run the coupling ratchet (via .opencode/config/gate-checks.json)');
   assert.strictEqual(entry.blocking, true, 'the coupling ratchet must block, not warn');
 });
 
@@ -43,7 +43,7 @@ test('manifest marks the coupling ratchet active and enforced on the architectur
   assert.strictEqual(s.axis, 'architecture');
   assert.strictEqual(s.status, 'active');
   assert.strictEqual(s.scope, 'repo');
-  assert.strictEqual(s.wired_at, '.claude/scripts/coupling-gate.js');
+  assert.strictEqual(s.wired_at, '.opencode/scripts/coupling-gate.js');
   assert.strictEqual(s.gap_ref, 'G18');
 });
 

@@ -6,8 +6,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const { buildReport, scoreRow, renderText } = require('../.claude/scripts/sensor-comprehension-debt');
-const { recordMerge } = require('../.claude/hooks/lib/merge-provenance');
+const { buildReport, scoreRow, renderText } = require('../.opencode/scripts/sensor-comprehension-debt');
+const { recordMerge } = require('../.opencode/hooks/lib/merge-provenance');
 
 function tmp() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'comp-debt-'));

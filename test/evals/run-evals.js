@@ -57,7 +57,7 @@ function runAll(tasks, opts) {
 function claudeInvoke({ prompt, cwd, plugin, model }) {
   const args = ['-p', prompt, '--output-format', 'text', '--permission-mode', 'bypassPermissions'];
   if (model) args.push('--model', model);
-  if (plugin) args.push('--plugin-dir', path.join(__dirname, '..', '..', '.claude'));
+  if (plugin) args.push('--plugin-dir', path.join(__dirname, '..', '..', '.opencode'));
   return execFileSync(process.env.EVAL_CLAUDE_BIN || 'claude', args, { cwd, timeout: 600000, encoding: 'utf8' });
 }
 

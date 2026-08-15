@@ -8,7 +8,7 @@ const { test } = require('node:test');
 const { execFileSync } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
-const SCRIPT = path.join(ROOT, '.claude', 'scripts', 'harness-coverage.js');
+const SCRIPT = path.join(ROOT, '.opencode', 'scripts', 'harness-coverage.js');
 
 function run(files, scopedManifest, coverage, arch, extraArgs) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hc-'));
@@ -112,6 +112,6 @@ test('tolerant coverage path matching: absolute coverage key matches relative co
 const rd = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 test('G11: harness-coverage is surfaced + scripted', () => {
-  assert.strictEqual(JSON.parse(rd('package.json')).scripts['harness-coverage'], 'node .claude/scripts/harness-coverage.js');
+  assert.strictEqual(JSON.parse(rd('package.json')).scripts['harness-coverage'], 'node .opencode/scripts/harness-coverage.js');
   assert.ok(/harness-coverage/.test(rd('HARNESS.md')), 'HARNESS.md must document harness coverage');
 });

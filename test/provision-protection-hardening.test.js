@@ -11,7 +11,7 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'provision-protection.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'provision-protection.js');
 const { buildDesiredRuleset, computeDrift, run } = require(SCRIPT);
 
 const GH = {

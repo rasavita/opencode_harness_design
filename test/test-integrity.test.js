@@ -23,7 +23,7 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { integrityFindings } = require('../.claude/hooks/lib/test-integrity');
+const { integrityFindings } = require('../.opencode/hooks/lib/test-integrity');
 
 const FILE = 'tests/test_a.py';
 

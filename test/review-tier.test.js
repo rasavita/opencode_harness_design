@@ -5,7 +5,7 @@ const assert = require('node:assert');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { resolveReviewTier, DEFAULTS } = require('../.claude/scripts/review-tier');
+const { resolveReviewTier, DEFAULTS } = require('../.opencode/scripts/review-tier');
 
 function withManifest(review, quality, fn) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'review-tier-'));

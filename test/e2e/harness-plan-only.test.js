@@ -15,12 +15,12 @@ const assert = require('assert');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const { runClaude } = require('./helpers/claude-runner');
+const { runClaude } = require('./helpers/opencode-runner');
 const { summarizeSpecs, formatSummary } = require('./helpers/specs-summary');
 
 const PROJECT_DIR = path.join(__dirname, 'plan-output');
 const SAMPLE_PRD = path.join(__dirname, 'fixtures', 'sample-prd.md');
-const HARNESS_PLUGIN_DIR = path.join(__dirname, '..', '..', '.claude');
+const HARNESS_PLUGIN_DIR = path.join(__dirname, '..', '..', '.opencode');
 const { randomUUID } = require('crypto');
 // Fresh id per run — hardcoded session ids fail with "already in use" on re-run.
 const SESSION_ID = randomUUID();
@@ -47,7 +47,7 @@ test('plan-only: PRD -> specs/ for inspection (no code, no PR)', { timeout: 1200
   console.log('[plan] scaffold exit:', scaffold.exitCode);
   assert.ok(
     fs.existsSync(path.join(PROJECT_DIR, 'project-manifest.json'))
-      || fs.existsSync(path.join(PROJECT_DIR, 'CLAUDE.md')),
+      || fs.existsSync(path.join(PROJECT_DIR, 'AGENTS.md')),
     'scaffold must install harness before /build',
   );
 

@@ -10,9 +10,9 @@ const path = require('path');
 const { test } = require('node:test');
 
 const ROOT = path.join(__dirname, '..');
-const PLUGIN_MANIFEST = path.join(ROOT, '.claude', '.claude-plugin', 'plugin.json');
-const SKILLS_DIR = path.join(ROOT, '.claude', 'skills');
-const SETTINGS = path.join(ROOT, '.claude', 'settings.json');
+const PLUGIN_MANIFEST = path.join(ROOT, '.opencode', '.opencode-plugin', 'plugin.json');
+const SKILLS_DIR = path.join(ROOT, '.opencode', 'skills');
+const SETTINGS = path.join(ROOT, '.opencode', 'settings.json');
 
 function readJson(p) {
   return JSON.parse(fs.readFileSync(p, 'utf8'));
@@ -70,7 +70,7 @@ test('every SKILL.md has frontmatter with name matching its directory and a desc
 test('every settings.json command hook resolves to a tracked file', () => {
   const broken = [];
   for (const command of hookCommands(readJson(SETTINGS))) {
-    const m = /\$CLAUDE_PROJECT_DIR\/([^\s"]+)/.exec(command);
+    const m = /\$OPENCODE_PROJECT_DIR\/([^\s"]+)/.exec(command);
     if (!m) continue;
     if (!fs.existsSync(path.join(ROOT, m[1]))) broken.push(command);
   }
@@ -81,5 +81,5 @@ test('no settings.json command hook hardcodes an absolute path', () => {
   const offenders = hookCommands(readJson(SETTINGS)).filter((c) =>
     /(^|\s|")\/(Users|home)\//.test(c)
   );
-  assert.deepStrictEqual(offenders, [], `hooks must use $CLAUDE_PROJECT_DIR:\n${offenders.join('\n')}`);
+  assert.deepStrictEqual(offenders, [], `hooks must use $OPENCODE_PROJECT_DIR:\n${offenders.join('\n')}`);
 });

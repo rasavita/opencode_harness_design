@@ -100,7 +100,7 @@ test/
     run.sh                         # Compatibility wrapper for run-pack.js cert
     harness-pipeline.test.js       # Certification layer
     helpers/
-      claude-runner.js             # Spawn claude -p with model/budget
+      opencode-runner.js             # Spawn claude -p with model/budget
       llm-validator.js             # LLM artifact quality checks (Haiku)
       prometheus-checker.js        # Prometheus HTTP API queries
       grafana-checker.js           # Grafana REST API dashboard checks

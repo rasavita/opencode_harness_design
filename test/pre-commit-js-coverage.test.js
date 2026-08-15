@@ -19,7 +19,7 @@ function stage(projectDir, rel, content) {
 }
 
 function baselineFile(projectDir) {
-  return path.join(projectDir, '.claude', 'state', 'coverage-baseline-js.txt');
+  return path.join(projectDir, '.opencode', 'state', 'coverage-baseline-js.txt');
 }
 
 // Helper: write a jest config so the runner is detected.
@@ -76,7 +76,7 @@ test('JS coverage gate writes baseline when no baseline exists yet', () => {
   // by constructing a minimal isolated call. We cannot import the hook directly
   // (it runs immediately), so we test the logic through the baseline files.
   const tmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'cov-baseline-'));
-  const stateDir = path.join(tmp, '.claude', 'state');
+  const stateDir = path.join(tmp, '.opencode', 'state');
   fs.mkdirSync(stateDir, { recursive: true });
   const baselineJs = path.join(stateDir, 'coverage-baseline-js.txt');
 
@@ -91,7 +91,7 @@ test('JS coverage gate writes baseline when no baseline exists yet', () => {
 test('JS coverage baseline file is separate from Python baseline file', () => {
   // The two baselines must not share a file to avoid cross-contamination.
   const tmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'cov-separate-'));
-  const stateDir = path.join(tmp, '.claude', 'state');
+  const stateDir = path.join(tmp, '.opencode', 'state');
   fs.mkdirSync(stateDir, { recursive: true });
 
   const pyBaseline = path.join(stateDir, 'coverage-baseline.txt');

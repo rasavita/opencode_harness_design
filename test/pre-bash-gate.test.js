@@ -11,8 +11,8 @@ function bash(projectDir, command, env) {
 }
 
 function writeTaskEnvelope(projectDir, allowedPaths, forbiddenActions) {
-  const { stampEnvelope } = require('../.claude/hooks/lib/task-envelope');
-  fs.writeFileSync(path.join(projectDir, '.claude', 'state', 'task-envelope.json'), JSON.stringify(stampEnvelope({
+  const { stampEnvelope } = require('../.opencode/hooks/lib/task-envelope');
+  fs.writeFileSync(path.join(projectDir, '.opencode', 'state', 'task-envelope.json'), JSON.stringify(stampEnvelope({
     schema_version: 1,
     task_id: 'TASK-1',
     risk_tier: 'R2',
@@ -69,9 +69,9 @@ test('with an issuer registry, merge returns to the capability path', async () =
   // service restores the original behaviour exactly.
   const projectDir = makeHookProject([HOOK]);
   writeTaskEnvelope(projectDir, ['src/**'], []);
-  fs.mkdirSync(path.join(projectDir, '.claude', 'trust'), { recursive: true });
+  fs.mkdirSync(path.join(projectDir, '.opencode', 'trust'), { recursive: true });
   fs.writeFileSync(
-    path.join(projectDir, '.claude', 'trust', 'issuers.json'),
+    path.join(projectDir, '.opencode', 'trust', 'issuers.json'),
     JSON.stringify({ schema_version: 1, issuers: [], allowed_types: ['capability'] }),
   );
   const merge = await bash(projectDir, `git ${'mer'}${'ge'} feature`);
@@ -92,7 +92,7 @@ test('task envelope applies allowed paths to Bash write targets', async () => {
 test('unattended mode routes credentialed commands to the external broker', async () => {
   const projectDir = makeHookProject([HOOK]);
   writeTaskEnvelope(projectDir, ['src/**'], []);
-  fs.writeFileSync(path.join(projectDir, '.claude', 'unattended-policy.json'), JSON.stringify({
+  fs.writeFileSync(path.join(projectDir, '.opencode', 'unattended-policy.json'), JSON.stringify({
     broker_only_commands: ['gh', 'aws'],
   }));
   const result = await bash(projectDir, 'gh api /user', { HARNESS_UNATTENDED: '1' });
@@ -103,7 +103,7 @@ test('unattended mode routes credentialed commands to the external broker', asyn
 test('unattended mode blocks opaque shells, unapproved egress, and dependency installation', async () => {
   const projectDir = makeHookProject([HOOK]);
   writeTaskEnvelope(projectDir, ['src/**'], []);
-  fs.writeFileSync(path.join(projectDir, '.claude', 'unattended-policy.json'), JSON.stringify({
+  fs.writeFileSync(path.join(projectDir, '.opencode', 'unattended-policy.json'), JSON.stringify({
     allow_package_install: false,
     broker_only_commands: ['gh', 'aws'],
     network: { default: 'deny', allowed_domains: ['registry.npmjs.org'] },
@@ -134,14 +134,14 @@ test('allows /dev/null and other device sinks (the 2>/dev/null idiom)', async ()
 // --- machinery trust boundary (the core hole this closes) ---
 
 const MACHINERY_WRITES = [
-  'echo "" > .claude/hooks/pre-write-gate.js',
-  'tee .claude/git-hooks/pre-commit < /dev/null',
-  "sed -i 's/.*/return;/' .claude/hooks/lib/tdd.js",
-  'cp /dev/null .claude/settings.json',
-  'cp /dev/null .claude/settings.auto.json',
-  'echo 100 > .claude/state/coverage-baseline.txt',
-  'echo "{}" > .claude/config/autonomy-policy.json',
-  'echo "{}" > .claude/state/autonomy-policy.json',
+  'echo "" > .opencode/hooks/pre-write-gate.js',
+  'tee .opencode/git-hooks/pre-commit < /dev/null',
+  "sed -i 's/.*/return;/' .opencode/hooks/lib/tdd.js",
+  'cp /dev/null .opencode/settings.json',
+  'cp /dev/null .opencode/settings.auto.json',
+  'echo 100 > .opencode/state/coverage-baseline.txt',
+  'echo "{}" > .opencode/config/autonomy-policy.json',
+  'echo "{}" > .opencode/state/autonomy-policy.json',
 ];
 
 test('blocks bash writes to harness machinery in a target project', async () => {
@@ -153,9 +153,9 @@ test('blocks bash writes to harness machinery in a target project', async () => 
   }
 });
 
-test('does not block bash writes to ordinary .claude content', async () => {
+test('does not block bash writes to ordinary .opencode content', async () => {
   const projectDir = makeHookProject([HOOK]);
-  for (const cmd of ['echo notes > .claude/program.md', 'echo x > .claude/state/learned-rules.md']) {
+  for (const cmd of ['echo notes > .opencode/program.md', 'echo x > .opencode/state/learned-rules.md']) {
     const result = await bash(projectDir, cmd);
     assert.strictEqual(result.status, 0, `${cmd}: ${result.stdout}`);
   }
@@ -163,15 +163,15 @@ test('does not block bash writes to ordinary .claude content', async () => {
 
 test('machinery writes are allowed inside the harness repo itself', async () => {
   const projectDir = makeHookProject([HOOK]);
-  fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify({ name: 'claude-harness-eng-v5' }));
-  const result = await bash(projectDir, 'echo ok > .claude/hooks/new-hook.js');
+  fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify({ name: 'opencode-harness-design' }));
+  const result = await bash(projectDir, 'echo ok > .opencode/hooks/new-hook.js');
   assert.strictEqual(result.status, 0, result.stdout);
 });
 
 test('HARNESS_PROTECT=off bypasses the machinery gate deliberately', async () => {
   const projectDir = makeHookProject([HOOK]);
   // Pure machinery path — not a prompt-cache prefix file (settings.json is dual-guarded).
-  const result = await bash(projectDir, 'echo "[]" > .claude/security-patterns.json', {
+  const result = await bash(projectDir, 'echo "[]" > .opencode/security-patterns.json', {
     HARNESS_PROTECT: 'off',
   });
   assert.strictEqual(result.status, 0, result.stdout);
@@ -195,7 +195,7 @@ test('ignores non-Bash tool calls', async () => {
   const projectDir = makeHookProject([HOOK]);
   const result = await runHook(projectDir, HOOK, {
     tool_name: 'Write',
-    tool_input: { file_path: path.join(projectDir, '.claude', 'settings.json'), content: '{}' },
+    tool_input: { file_path: path.join(projectDir, '.opencode', 'settings.json'), content: '{}' },
   });
   assert.strictEqual(result.status, 0, result.stdout);
 });

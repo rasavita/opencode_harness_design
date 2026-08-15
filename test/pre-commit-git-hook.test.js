@@ -133,14 +133,14 @@ test('a crashed gate fails open with a loud stderr warning, not silently', async
   // top-level try, exercising the fail-open path.
   const { makeHookProject, REPO_ROOT } = require('./helpers/hook-fixture');
   const projectDir = makeHookProject([]);
-  fs.cpSync(path.join(REPO_ROOT, '.claude', 'git-hooks'), path.join(projectDir, '.claude', 'git-hooks'), {
+  fs.cpSync(path.join(REPO_ROOT, '.opencode', 'git-hooks'), path.join(projectDir, '.opencode', 'git-hooks'), {
     recursive: true,
   });
   const result = await runGitHook(projectDir, HOOK);
   assert.strictEqual(result.status, 0, result.stdout + result.stderr);
   assert.ok(/WARNING:.*pre-commit.*(crash|skip)/i.test(result.stderr), `expected loud warning, got: ${result.stderr}`);
   assert.ok(result.stderr.includes('hook-errors.log'), result.stderr);
-  const log = fs.readFileSync(path.join(projectDir, '.claude', 'state', 'hook-errors.log'), 'utf8');
+  const log = fs.readFileSync(path.join(projectDir, '.opencode', 'state', 'hook-errors.log'), 'utf8');
   assert.ok(log.includes('pre-commit:'), log);
 });
 

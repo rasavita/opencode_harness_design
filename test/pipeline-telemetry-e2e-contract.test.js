@@ -4,7 +4,7 @@
 // must prove that a real build's run receipts reach the telemetry dashboard.
 // Runs in the cheap main suite (no live `claude -p`, no docker) and asserts the
 // wiring is present:
-//   1. the shared claude-runner sets HARNESS_PUSHGATEWAY_URL so e2e builds push
+//   1. the shared opencode-runner sets HARNESS_PUSHGATEWAY_URL so e2e builds push
 //      their receipts live via the record-run hook (same path as production);
 //   2. the build+observability e2e ASSERTS the build's own receipts landed in
 //      Prometheus (harness_conversation_turns_total), not just phase_eval.
@@ -18,12 +18,12 @@ const { test } = require('node:test');
 const ROOT = path.join(__dirname, '..');
 const read = (...p) => fs.readFileSync(path.join(ROOT, ...p), 'utf8');
 
-const RUNNER = path.join('test', 'e2e', 'helpers', 'claude-runner.js');
+const RUNNER = path.join('test', 'e2e', 'helpers', 'opencode-runner.js');
 const BUILD = path.join('test', 'e2e', 'harness-pipeline-build.test.js');
 
-test('claude-runner enables harness telemetry alongside native OTEL', () => {
+test('opencode-runner enables harness telemetry alongside native OTEL', () => {
   const runner = read(RUNNER);
-  assert.match(runner, /CLAUDE_CODE_ENABLE_TELEMETRY/, 'native OTEL still enabled');
+  assert.match(runner, /HARNESS_ENABLE_TELEMETRY/, 'native OTEL still enabled');
   assert.match(
     runner,
     /HARNESS_PUSHGATEWAY_URL:\s*process\.env\.HARNESS_PUSHGATEWAY_URL\s*\|\|\s*['"]http:\/\/localhost:9091['"]/,

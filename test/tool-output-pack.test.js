@@ -7,11 +7,11 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const { packToolOutput, estimateTextTokens } = require('../.claude/scripts/tool-output-pack');
-const { applyScaffold } = require('../.claude/scripts/scaffold-apply');
+const { packToolOutput, estimateTextTokens } = require('../.opencode/scripts/tool-output-pack');
+const { applyScaffold } = require('../.opencode/scripts/scaffold-apply');
 
 const ROOT = path.join(__dirname, '..');
-const PLUGIN_SOURCE = path.join(ROOT, '.claude');
+const PLUGIN_SOURCE = path.join(ROOT, '.opencode');
 
 function tempProject() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'tool-output-pack-'));
@@ -71,7 +71,7 @@ test('tool output pack CLI writes --out pack json while preserving raw output', 
     fs.writeFileSync(raw, 'FAIL test/auth.test.js\n  AssertionError: expected 401, got 200\n    at test/auth.test.js:52:10\n');
 
     execFileSync(process.execPath, [
-      path.join(ROOT, '.claude', 'scripts', 'tool-output-pack.js'),
+      path.join(ROOT, '.opencode', 'scripts', 'tool-output-pack.js'),
       '--root', dir,
       '--kind', 'test',
       '--command', 'npm test',
@@ -103,7 +103,7 @@ test('brownfield scaffold copies the tool-output-pack script', () => {
     }));
     applyScaffold({ profile, pluginSource: PLUGIN_SOURCE, target: path.join(dir, 'project'), scaffoldProfile: 'brownfield' });
 
-    assert.ok(fs.existsSync(path.join(dir, 'project', '.claude', 'scripts', 'tool-output-pack.js')));
+    assert.ok(fs.existsSync(path.join(dir, 'project', '.opencode', 'scripts', 'tool-output-pack.js')));
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

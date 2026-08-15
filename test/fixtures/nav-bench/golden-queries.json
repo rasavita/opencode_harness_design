@@ -4,27 +4,27 @@
     {
       "id": "symbol-exact",
       "question": "where is buildContextPack defined?",
-      "expect_paths": [".claude/scripts/context-pack.js"]
+      "expect_paths": [".opencode/scripts/context-pack.js"]
     },
     {
       "id": "wiki-domain",
       "question": "token governor broad source read advisory",
-      "expect_paths": [".claude/hooks/token-advisor.js", "docs/token-governor.md"]
+      "expect_paths": [".opencode/hooks/token-advisor.js", "docs/token-governor.md"]
     },
     {
       "id": "nav-facade",
       "question": "nav-query pack facade navigation",
-      "expect_paths": [".claude/scripts/nav-query.js"]
+      "expect_paths": [".opencode/scripts/nav-query.js"]
     },
     {
       "id": "graph-refresh",
       "question": "graph-refresh dirty list code-graph patch",
-      "expect_paths": [".claude/hooks/graph-refresh.js"]
+      "expect_paths": [".opencode/hooks/graph-refresh.js"]
     },
     {
       "id": "impact-scope",
       "question": "test impact analysis blast radius changed files",
-      "expect_paths": [".claude/scripts/impact-scope.js", ".claude/hooks/lib/impact-scope.js"]
+      "expect_paths": [".opencode/scripts/impact-scope.js", ".opencode/hooks/lib/impact-scope.js"]
     }
   ]
 }

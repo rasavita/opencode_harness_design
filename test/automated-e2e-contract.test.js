@@ -17,10 +17,10 @@ const RUNTIME = path.join(ROOT, 'test', 'e2e', 'helpers', 'app-runtime.js');
 
 function read(p) { return fs.readFileSync(p, 'utf8'); }
 
-test('smoke harness exists and reuses the shared claude-runner (no reinvented runner)', () => {
+test('smoke harness exists and reuses the shared opencode-runner (no reinvented runner)', () => {
   assert.ok(fs.existsSync(SMOKE), 'test/e2e/harness-selfheal-smoke.test.js must exist');
   const smoke = read(SMOKE);
-  assert.match(smoke, /require\(['"]\.\/helpers\/claude-runner['"]\)/);
+  assert.match(smoke, /require\(['"]\.\/helpers\/opencode-runner['"]\)/);
   assert.match(smoke, /runClaude\(/);
 });
 

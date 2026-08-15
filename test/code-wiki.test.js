@@ -4,7 +4,7 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const path = require('path');
 
-const SCRIPTS = path.join(__dirname, '..', '.claude', 'skills', 'code-map', 'scripts', 'code_wiki');
+const SCRIPTS = path.join(__dirname, '..', '.opencode', 'skills', 'code-map', 'scripts', 'code_wiki');
 const model = require(path.join(SCRIPTS, 'model'));
 const render = require(path.join(SCRIPTS, 'render'));
 const query = require(path.join(SCRIPTS, 'query'));

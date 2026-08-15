@@ -18,7 +18,7 @@ const { test } = require('node:test');
 
 const {
   adoptRequirements, adoptSafeguards, adoptAcceptance,
-} = require('../.claude/scripts/brd-adopt.js');
+} = require('../.opencode/scripts/brd-adopt.js');
 
 const FRD = [
   { id: 'FR-1', text: 'MUST accept an .xlsx upload up to 50 MB.', section: '3. Functional Requirements' },
@@ -205,7 +205,7 @@ const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const CLI = path.join(__dirname, '..', '.claude', 'scripts', 'brd-adopt.js');
+const CLI = path.join(__dirname, '..', '.opencode', 'scripts', 'brd-adopt.js');
 
 function runAdopt(spine, args = []) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'brd-adopt-cli-'));
@@ -293,8 +293,8 @@ test('no PRD copy means an empty plan, not a crash', () => {
 // them. brd-context.json already feeds the Forbidden Actions deny-list; these
 // two were written and read by nobody.
 test('every classified bucket has a documented consumer', () => {
-  const brd = fs.readFileSync(path.join(__dirname, '..', '.claude', 'skills', 'brd', 'SKILL.md'), 'utf8');
-  const render = fs.readFileSync(path.join(__dirname, '..', '.claude', 'skills', 'brd-render', 'SKILL.md'), 'utf8');
+  const brd = fs.readFileSync(path.join(__dirname, '..', '.opencode', 'skills', 'brd', 'SKILL.md'), 'utf8');
+  const render = fs.readFileSync(path.join(__dirname, '..', '.opencode', 'skills', 'brd-render', 'SKILL.md'), 'utf8');
   const corpus = `${brd}\n${render}`;
   for (const bucket of ['brd-open-questions.json', 'brd-risks.json', 'brd-context.json']) {
     assert.match(corpus, new RegExp(bucket.replace('.', '\\.')),
@@ -306,7 +306,7 @@ test("the PRD's own open questions lead the clarification budget", () => {
   // The audited run: the PRD stated five open questions, the clarification log
   // recorded six entries the planner had written both sides of, and the
   // document's actual unknowns were never systematically asked.
-  const brd = fs.readFileSync(path.join(__dirname, '..', '.claude', 'skills', 'brd', 'SKILL.md'), 'utf8');
+  const brd = fs.readFileSync(path.join(__dirname, '..', '.opencode', 'skills', 'brd', 'SKILL.md'), 'utf8');
   const idx = brd.indexOf('### Step 0.5');
   const step = brd.slice(idx, idx + 1600);
   assert.match(step, /brd-open-questions\.json/, 'the budget must start from the PRD, not from invention');

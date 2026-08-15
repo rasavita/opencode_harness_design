@@ -51,7 +51,7 @@ test('tool events append receipts without pushing; the next Stop push carries th
   assert.equal(toolResult.status, 0, toolResult.stderr);
   assert.equal(requests.length, 0, 'tool events must stay off the push path');
   const ledger = fs.readFileSync(
-    path.join(projectDir, '.claude', 'state', 'telemetry-ledger.jsonl'), 'utf8'
+    path.join(projectDir, '.opencode', 'state', 'telemetry-ledger.jsonl'), 'utf8'
   ).trim().split('\n').map((line) => JSON.parse(line));
   assert.equal(ledger.length, 1);
   assert.equal(ledger[0].kind, 'tool');
@@ -71,7 +71,7 @@ test('tool events append receipts without pushing; the next Stop push carries th
 
 test('record-run is wired for mutating tools so harness_tool_events_total publishes', () => {
   const settings = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '..', '.claude', 'settings.json'), 'utf8')
+    fs.readFileSync(path.join(__dirname, '..', '.opencode', 'settings.json'), 'utf8')
   );
   const recordRunMatchers = (settings.hooks.PostToolUse || [])
     .filter((m) => (m.hooks || []).some((h) => (h.command || '').includes('record-run.js')))

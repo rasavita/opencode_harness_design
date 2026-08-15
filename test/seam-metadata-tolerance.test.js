@@ -3,7 +3,7 @@ const path = require('path');
 const test = require('node:test');
 const assert = require('node:assert');
 
-const ownership = require(path.resolve(__dirname, '..', '.claude', 'scripts', 'ownership-check.js'));
+const ownership = require(path.resolve(__dirname, '..', '.opencode', 'scripts', 'ownership-check.js'));
 
 test('ownership parseComponentMap ignores non-path seam metadata, keeps real paths', () => {
   // seam metadata values are NOT backtick-wrapped as paths; the file path IS.

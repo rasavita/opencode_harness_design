@@ -6,7 +6,7 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'at-first-gate.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'at-first-gate.js');
 const { checkAtFirst, fileToStory, findAtFile, hasReceipt, readReceipts, run } = require(SCRIPT);
 
 const MAP = `# Component Map

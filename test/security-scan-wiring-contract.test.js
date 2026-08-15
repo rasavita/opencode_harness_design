@@ -17,27 +17,27 @@ test('pre-commit hook wires the baseline secrets sensor', () => {
   // declarative GATE_CATALOG — assert against the real catalog, not prose.
   // "Must run before the docs-only early exit" is now expressed as runsWithoutSource: true
   // (Phase A of runPreCommit runs these gates unconditionally, before the source-only exit).
-  const { GATE_CATALOG } = require('../.claude/hooks/lib/gate-registry.js');
-  const early = require('../.claude/hooks/lib/gates-early.js');
+  const { GATE_CATALOG } = require('../.opencode/hooks/lib/gate-registry.js');
+  const early = require('../.opencode/hooks/lib/gates-early.js');
   const entry = GATE_CATALOG.find((g) => g.id === 'secret-scan');
   assert.ok(entry, 'GATE_CATALOG must register secret-scan');
   assert.strictEqual(entry.run, early.checkSecrets, 'must dispatch to the real gate function, not a copy');
   assert.strictEqual(entry.runsWithoutSource, true, 'must run before the docs-only early exit (secrets hide in config/yaml)');
 
-  const src = read('.claude/hooks/lib/gates-early.js');
+  const src = read('.opencode/hooks/lib/gates-early.js');
   assert.match(src, /baselineSecretFindings/, 'must import the baseline secrets scanner');
 });
 
 test('/gate invokes the computational security scan under the boundary trigger', () => {
-  const skill = read('.claude/skills/gate/SKILL.md');
+  const skill = read('.opencode/skills/gate/SKILL.md');
   assert.match(skill, /security-scan\.js/, '/gate must reference the security-scan CLI');
   assert.match(skill, /--all --staged --boundary-only/, '/gate must run the boundary-gated scan');
 });
 
 test('security-scan CLI and lib are present and required correctly', () => {
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude/scripts/security-scan.js')));
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude/hooks/lib/security-scan.js')));
-  const cli = read('.claude/scripts/security-scan.js');
+  assert.ok(fs.existsSync(path.join(ROOT, '.opencode/scripts/security-scan.js')));
+  assert.ok(fs.existsSync(path.join(ROOT, '.opencode/hooks/lib/security-scan.js')));
+  const cli = read('.opencode/scripts/security-scan.js');
   assert.match(cli, /require\('\.\.\/hooks\/lib\/security-scan'\)/, 'CLI must reuse the tested lib');
 });
 
@@ -47,8 +47,8 @@ test('pre-commit hook wires the amendment-provenance gate before the source-only
   // "Before the source-only early exit" is now runsWithoutSource: true; "after checkSecrets"
   // (design docs are markdown/json, not SOURCE_EXTS, but secrets must be scanned first) is
   // now the relative `order` of the two catalog entries.
-  const { GATE_CATALOG } = require('../.claude/hooks/lib/gate-registry.js');
-  const early = require('../.claude/hooks/lib/gates-early.js');
+  const { GATE_CATALOG } = require('../.opencode/hooks/lib/gate-registry.js');
+  const early = require('../.opencode/hooks/lib/gates-early.js');
   const secretEntry = GATE_CATALOG.find((g) => g.id === 'secret-scan');
   const amendEntry = GATE_CATALOG.find((g) => g.id === 'amendment-provenance');
   assert.ok(amendEntry, 'GATE_CATALOG must register amendment-provenance');

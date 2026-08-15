@@ -85,10 +85,10 @@ test('workdir_unchanged detects edits, additions, and deletions', () => {
   );
 });
 
-test('workdir_unchanged ignores node_modules, .git, and .claude noise', () => {
+test('workdir_unchanged ignores node_modules, .git, and .opencode noise', () => {
   const { fixtureDir, workDir } = makeDirs(
     { 'app.js': 'x\n' },
-    { 'app.js': 'x\n', 'node_modules/dep/index.js': 'z\n', '.claude/state.json': '{}\n' }
+    { 'app.js': 'x\n', 'node_modules/dep/index.js': 'z\n', '.opencode/state.json': '{}\n' }
   );
   const ctx = { transcript: '', fixtureDir, workDir };
   assert.deepStrictEqual(applyAssertions([{ type: 'workdir_unchanged' }], ctx), []);

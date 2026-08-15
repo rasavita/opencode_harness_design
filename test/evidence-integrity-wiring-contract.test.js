@@ -15,7 +15,7 @@ const read = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
 const readJson = (p) => JSON.parse(read(p));
 
 test('the CLI exists, reuses the tested lib, and is require-safe', () => {
-  const cli = read('.claude/scripts/evidence-integrity-gate.js');
+  const cli = read('.opencode/scripts/evidence-integrity-gate.js');
   assert.match(cli, /require\('\.\.\/hooks\/lib\/evidence-integrity'\)/, 'CLI must use the tested lib');
   assert.match(cli, /require\.main === module/, 'CLI must be require-safe');
 });
@@ -23,14 +23,14 @@ test('the CLI exists, reuses the tested lib, and is require-safe', () => {
 test('package.json exposes the gate', () => {
   assert.strictEqual(
     readJson('package.json').scripts['evidence-integrity-gate'],
-    'node .claude/scripts/evidence-integrity-gate.js'
+    'node .opencode/scripts/evidence-integrity-gate.js'
   );
 });
 
 test('/gate runs the gate as a blocking registry check', () => {
-  const { loadRegistry } = require('../.claude/scripts/run-gate-checks.js');
+  const { loadRegistry } = require('../.opencode/scripts/run-gate-checks.js');
   const entry = loadRegistry(ROOT).find((c) => c.script === 'evidence-integrity-gate.js');
-  assert.ok(entry, '/gate must run the gate via .claude/config/gate-checks.json');
+  assert.ok(entry, '/gate must run the gate via .opencode/config/gate-checks.json');
   assert.strictEqual(entry.blocking, true, 'an unproven runtime pass must block, not warn');
   assert.strictEqual(entry.when, 'exists:sprint-contracts');
   assert.ok(!entry.lane_only, 'must be part of the default /gate set');
@@ -39,14 +39,14 @@ test('/gate runs the gate as a blocking registry check', () => {
 
 test('the quality card aggregates the verdict', () => {
   assert.match(
-    read('.claude/scripts/quality-card.js'),
+    read('.opencode/scripts/quality-card.js'),
     /evidence-integrity-verdict\.json/,
     'the single trust receipt must carry the evidence-integrity result'
   );
 });
 
 test('a failed evidence-integrity verdict fails the quality card (so no PR opens)', () => {
-  const qc = require('../.claude/scripts/quality-card.js');
+  const qc = require('../.opencode/scripts/quality-card.js');
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'qc-evid-'));
   const reviews = path.join(dir, 'specs', 'reviews');
   fs.mkdirSync(reviews, { recursive: true });
@@ -69,34 +69,34 @@ test('a failed evidence-integrity verdict fails the quality card (so no PR opens
 });
 
 test('the evaluator is instructed to emit the ledger and told the browser_evaluate invariant', () => {
-  const agent = read('.claude/agents/evaluator.md');
+  const agent = read('.opencode/agents/evaluator.md');
   assert.match(agent, /evaluator-evidence\.json/, 'the ledger must be emitted by the evaluator');
   assert.match(agent, /browser_evaluate/, 'the invariant must name the tool it fences');
   assert.match(agent, /untested/, 'the third verdict state must be documented');
 });
 
 test('/evaluate documents the gate and folds it into the verdict', () => {
-  const skill = read('.claude/skills/evaluate/SKILL.md');
+  const skill = read('.opencode/skills/evaluate/SKILL.md');
   assert.match(skill, /evidence-integrity-gate\.js/, '/evaluate must run the gate');
   assert.match(skill, /failure_layer: "evidence"|"evidence"/, 'the failure layer must be declared');
   assert.match(skill, /evidence-integrity-verdict\.json#pass === true/, 'the verdict must gate the PASS');
 });
 
 test('/gate records the ordering constraint (the check reads the evaluator ledger)', () => {
-  assert.match(read('.claude/skills/gate/SKILL.md'), /evidence-integrity/, '/gate must name the check');
+  assert.match(read('.opencode/skills/gate/SKILL.md'), /evidence-integrity/, '/gate must name the check');
 });
 
 test('the sensor is registered in harness-manifest.json with a justified net add', () => {
   const entry = readJson('harness-manifest.json').sensors.find((s) => s.id === 'evidence-integrity');
   assert.ok(entry, 'the control must be registered, not orphaned');
   assert.strictEqual(entry.gap_ref, 'G39');
-  assert.strictEqual(entry.wired_at, '.claude/scripts/evidence-integrity-gate.js');
+  assert.strictEqual(entry.wired_at, '.opencode/scripts/evidence-integrity-gate.js');
   assert.ok(entry.net_add_justification, 'the control budget ratchets: a net add needs a reason');
   assert.match(entry.description, /KNOWN LIMITATION/, 'the self-declared half must be disclosed');
 });
 
 test('G40: the generated Playwright config retains runtime evidence on failure', () => {
-  const tpl = read('.claude/templates/playwright.config.template.ts');
+  const tpl = read('.opencode/templates/playwright.config.template.ts');
   assert.match(tpl, /trace: 'retain-on-failure'/, 'on-first-retry captures nothing at retries:0');
   assert.match(tpl, /video: 'retain-on-failure'/);
   assert.match(tpl, /screenshot: 'only-on-failure'/);
@@ -104,15 +104,15 @@ test('G40: the generated Playwright config retains runtime evidence on failure',
 });
 
 test('G40: the evaluator cites artifact paths in its structured failure report', () => {
-  assert.match(read('.claude/agents/evaluator.md'), /"artifacts": \[/, 'failures must carry artifact paths');
+  assert.match(read('.opencode/agents/evaluator.md'), /"artifacts": \[/, 'failures must carry artifact paths');
 });
 
 // The end-to-end round trip: a REAL schema-valid contract through the REAL /gate
 // registry runner. A hand-built flat fixture would pass the unit tests while the
-// gate read nothing (CLAUDE.md principle 5).
+// gate read nothing (AGENTS.md principle 5).
 test('end to end: a js-bypass BLOCKs through the real gate runner with a real contract', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'evid-e2e-'));
-  fs.symlinkSync(path.join(ROOT, '.claude'), path.join(dir, '.claude'));
+  fs.symlinkSync(path.join(ROOT, '.opencode'), path.join(dir, '.opencode'));
   fs.mkdirSync(path.join(dir, 'sprint-contracts'), { recursive: true });
   fs.mkdirSync(path.join(dir, 'specs', 'reviews'), { recursive: true });
 
@@ -122,8 +122,8 @@ test('end to end: a js-bypass BLOCKs through the real gate runner with a real co
     features: ['F001'],
     contract: { playwright_checks: [{ id: 'PW-1', description: 'login', steps: [{ action: 'click' }] }] },
   };
-  const { validate } = require('../.claude/hooks/lib/contract-schema');
-  const schema = readJson('.claude/skills/evaluate/references/contract-schema.json');
+  const { validate } = require('../.opencode/hooks/lib/contract-schema');
+  const schema = readJson('.opencode/skills/evaluate/references/contract-schema.json');
   assert.deepStrictEqual(validate(schema, contract), [], 'the fixture must be a real sprint contract');
 
   fs.writeFileSync(path.join(dir, 'sprint-contracts', 'C.json'), JSON.stringify(contract));
@@ -148,7 +148,7 @@ test('end to end: a js-bypass BLOCKs through the real gate runner with a real co
   try {
     out = execFileSync(
       process.execPath,
-      [path.join(ROOT, '.claude/scripts/run-gate-checks.js'), '--root', dir, '--only', 'evidence-integrity'],
+      [path.join(ROOT, '.opencode/scripts/run-gate-checks.js'), '--root', dir, '--only', 'evidence-integrity'],
       { cwd: dir, encoding: 'utf8' }
     );
   } catch (e) {

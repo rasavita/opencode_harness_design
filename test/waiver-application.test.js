@@ -15,7 +15,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const { findWaiver } = require('../.claude/hooks/lib/pre-commit-util');
+const { findWaiver } = require('../.opencode/hooks/lib/pre-commit-util');
 
 const TODAY = '2026-07-23';
 const VALID = {

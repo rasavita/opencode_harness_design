@@ -11,11 +11,11 @@ const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 const { randomUUID } = require('crypto');
 
-const { runClaude } = require('./helpers/claude-runner');
+const { runClaude } = require('./helpers/opencode-runner');
 const { runProjectSuite } = require('./helpers/project-suite');
 
 const PROJECT_DIR = path.join(__dirname, 'feature-output');
-const PLUGIN_DIR = path.join(__dirname, '..', '..', '.claude');
+const PLUGIN_DIR = path.join(__dirname, '..', '..', '.opencode');
 // Fresh id per run — hardcoded session ids fail with "already in use" on re-run.
 const SESSION = randomUUID();
 

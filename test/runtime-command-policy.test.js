@@ -4,7 +4,7 @@ const assert = require('assert');
 const { test } = require('node:test');
 const {
   classifyCommand, domainAllowed, urlHosts,
-} = require('../.claude/hooks/lib/runtime-command-policy');
+} = require('../.opencode/hooks/lib/runtime-command-policy');
 
 const POLICY = {
   network: { mode: 'deny-by-default', allowed_domains: ['registry.npmjs.org'] },

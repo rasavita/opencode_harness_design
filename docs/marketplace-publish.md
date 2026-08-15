@@ -20,7 +20,7 @@ npm run release:skus
 
 **Not a SKU:** Symphony (`symphony_clone/`) — see [`docs/symphony-product.md`](symphony-product.md).
 
-Each tree is a valid `--plugin-dir` root (contains `.claude-plugin/plugin.json` plus
+Each tree is a valid `--plugin-dir` root (contains `.opencode-plugin/plugin.json` plus
 skills/agents/hooks/…).
 
 ## Version
@@ -28,7 +28,7 @@ skills/agents/hooks/…).
 Bump together:
 
 1. Root `package.json` `version`
-2. `.claude/.claude-plugin/plugin.json` `version`
+2. `.opencode/.opencode-plugin/plugin.json` `version`
 3. `CHANGELOG.md`
 4. README “Current version”
 
@@ -43,7 +43,7 @@ npm test
 npm run agent-readiness && npm run agent-readiness:assert
 npm run package:skus
 # smoke
-test -f dist/skus/harness-core/.claude-plugin/plugin.json
+test -f dist/skus/harness-core/.opencode-plugin/plugin.json
 test ! -d dist/skus/harness-core/skills/pe-ic-memo
 gitleaks detect --source . --config .gitleaks.toml   # if installed
 ```
@@ -85,25 +85,25 @@ gitleaks detect --source . --config .gitleaks.toml   # if installed
 Until a marketplace is ready, document:
 
 ```bash
-git clone --depth 1 https://github.com/cwijayasundara/claude_harness_eng_v5.git
-npm --prefix claude_harness_eng_v5 ci
-npm --prefix claude_harness_eng_v5 run package:core
-claude --plugin-dir "$PWD/claude_harness_eng_v5/dist/skus/harness-core"
+git clone --depth 1 https://github.com/cwijayasundara/opencode_harness_design.git
+npm --prefix opencode_harness_design ci
+npm --prefix opencode_harness_design run package:core
+claude --plugin-dir "$PWD/opencode_harness_design/dist/skus/harness-core"
 ```
 
 ## What not to publish
 
-- Raw monorepo `.claude/` as the only product install (includes research surface).
+- Raw monorepo `.opencode/` as the only product install (includes research surface).
 - `symphony_clone/` inside a harness SKU — separate product.
-- `.claude/runs/`, state archives, or secrets.
+- `.opencode/runs/`, state archives, or secrets.
 
 ## Upgrade path for customers
 
 After a new SKU version:
 
 ```bash
-node /path/to/harness/.claude/scripts/scaffold-upgrade.js --target ~/my-project --apply
+node /path/to/harness/.opencode/scripts/scaffold-upgrade.js --target ~/my-project --apply
 ```
 
-Does not overwrite `project-manifest.json` or `.claude/state/`. Use `--include-skills`
+Does not overwrite `project-manifest.json` or `.opencode/state/`. Use `--include-skills`
 only when skill prompt surface must refresh.

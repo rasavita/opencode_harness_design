@@ -17,7 +17,7 @@ const { test } = require('node:test');
 
 const {
   segmentsFromTranscript, costByPhase, subagentTranscriptsFor,
-} = require('../.claude/scripts/phase-cost.js');
+} = require('../.opencode/scripts/phase-cost.js');
 
 function writeTranscript(rows) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'harness-phase-cost-'));
@@ -52,7 +52,7 @@ test('extracts slash-command segments in order with start timestamps', () => {
 test('recognises the <command-name> wrapper form and strips any plugin prefix', () => {
   const file = writeTranscript([
     userTurn('2026-08-02T06:00:00.000Z',
-      '<command-message>scaffold</command-message> <command-name>claude_harness_eng_v5:scaffold</command-name>'),
+      '<command-message>scaffold</command-message> <command-name>opencode_harness_design:scaffold</command-name>'),
     assistantTurn('2026-08-02T06:10:00.000Z', 'a1', 'claude-sonnet-5', 10),
   ]);
   const segs = segmentsFromTranscript(file);
@@ -219,7 +219,7 @@ test('pools subagent transcripts into the phase window that dispatched them', ()
   assert.strictEqual(spec.subagent_output_tokens, 5000, 'subagent share is reported separately');
 });
 
-const { unpricedNote } = require('../.claude/scripts/phase-cost.js');
+const { unpricedNote } = require('../.opencode/scripts/phase-cost.js');
 
 // The note is production output whose whole purpose is that a guess is visible.
 // Computing it and never rendering it is the same silence it exists to break,

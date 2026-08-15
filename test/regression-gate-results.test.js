@@ -13,7 +13,7 @@ const { test } = require('node:test');
 
 const ROOT = path.join(__dirname, '..');
 const { extractPlaywrightFailures, extractPlaywrightResults } = require(
-  path.join(ROOT, '.claude', 'hooks', 'lib', 'regression-gate.js'),
+  path.join(ROOT, '.opencode', 'hooks', 'lib', 'regression-gate.js'),
 );
 
 // Same fixture regression-gate.test.js uses for extractPlaywrightFailures —

@@ -5,7 +5,7 @@ const assert = require('node:assert');
 const path = require('path');
 
 const { GUIDANCE, rulesInOutput, enrich } = require(
-  path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'sensor-guidance.js')
+  path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'sensor-guidance.js')
 );
 
 test('rulesInOutput finds rule ids in real-ish ruff output', () => {

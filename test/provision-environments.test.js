@@ -12,9 +12,9 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'provision-environments.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'provision-environments.js');
 const { buildDesiredEnvironment, run } = require(SCRIPT);
-const { planDiff, computeDrift, compareEnvironment } = require('../.claude/scripts/env-diff');
+const { planDiff, computeDrift, compareEnvironment } = require('../.opencode/scripts/env-diff');
 
 const PROD = { name: 'production', reviewers: [], wait_timer: 0, protected_branches: true };
 

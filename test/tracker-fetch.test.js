@@ -18,8 +18,8 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
-const lib = require(path.join(ROOT, '.claude/hooks/lib/tracker-fetch.js'));
-const { resolveTarget } = require(path.join(ROOT, '.claude/scripts/tracker-fetch.js'));
+const lib = require(path.join(ROOT, '.opencode/hooks/lib/tracker-fetch.js'));
+const { resolveTarget } = require(path.join(ROOT, '.opencode/scripts/tracker-fetch.js'));
 
 const LINEAR_BODY = `We need confidence scores on the extraction endpoint.
 
@@ -115,7 +115,7 @@ test('the CLI resolves either provider flag', () => {
 test('nothing in the inbound path can write to a tracker', () => {
   // Linear's GraphQL endpoint takes POST even for reads, so the HTTP verb proves
   // nothing. What proves it: no GraphQL mutation, and no Jira write endpoint.
-  const source = read('.claude/hooks/lib/tracker-fetch.js') + read('.claude/scripts/tracker-fetch.js');
+  const source = read('.opencode/hooks/lib/tracker-fetch.js') + read('.opencode/scripts/tracker-fetch.js');
   assert.doesNotMatch(source, /\bmutation\b/,
     'a GraphQL mutation is the only way this file could change a Linear issue');
   assert.doesNotMatch(source, /\/transitions|issueUpdate|issueCreate|\/comment\b/,
@@ -124,12 +124,12 @@ test('nothing in the inbound path can write to a tracker', () => {
   const jira = source.slice(source.indexOf('function fetchJira'));
   assert.doesNotMatch(jira.slice(0, 600), /method:/,
     'the Jira read must stay a plain GET');
-  assert.match(read('.claude/skills/change/SKILL.md'), /read-only/,
+  assert.match(read('.opencode/skills/change/SKILL.md'), /read-only/,
     '/change must state that the fetch does not move the ticket');
 });
 
 test('/change documents both inbound flags and ships the script', () => {
-  const change = read('.claude/skills/change/SKILL.md');
+  const change = read('.opencode/skills/change/SKILL.md');
   assert.match(change, /--linear KEY \| --jira KEY/, 'the argument hint must advertise the entry');
   assert.match(change, /tracker-fetch\.js --linear/);
   // In the KERNEL, not the planning pack: /change is a kernel skill, so a
@@ -137,7 +137,7 @@ test('/change documents both inbound flags and ships the script', () => {
   // install — check-partition caught exactly that. tracker-fetch is safe in the
   // kernel because it depends on no planning artifact (unlike tracker-publish,
   // which needs tracker-map.json from /spec); it reads a ticket and prints text.
-  const packs = JSON.parse(read('.claude/config/packs.json'));
+  const packs = JSON.parse(read('.opencode/config/packs.json'));
   assert.ok(packs.kernel.script.includes('tracker-fetch'));
   assert.ok(packs.kernel.lib.includes('tracker-fetch'));
   assert.ok(!packs.packs.planning.script.includes('tracker-fetch'),

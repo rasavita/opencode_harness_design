@@ -8,7 +8,7 @@ const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 const { readSkillCorpus } = require('./helpers/skill-corpus');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'trace-check.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'trace-check.js');
 const { checkTraces } = require(SCRIPT);
 
 // The generic groundedness engine: given `required` upstream items (all must be
@@ -143,13 +143,13 @@ test('/spec emits story-traces.json and runs the deterministic grounding gate', 
 });
 
 test('rubric spec phase hard-gates on spec-grounding.json', () => {
-  const rubric = JSON.parse(fsw.readFileSync(pathw.join(ROOTW, '.claude', 'templates', 'phase-eval-rubrics.json'), 'utf8'));
+  const rubric = JSON.parse(fsw.readFileSync(pathw.join(ROOTW, '.opencode', 'templates', 'phase-eval-rubrics.json'), 'utf8'));
   assert.match(rubric.phases.spec.hard_gate, /spec-grounding\.json/);
   assert.match(rubric.phases.spec.hard_gate, /net_new/);
 });
 
 test('evaluator treats a {phase}-grounding.json verdict as a hard gate', () => {
-  const ev = fsw.readFileSync(pathw.join(ROOTW, '.claude', 'agents', 'evaluator.md'), 'utf8');
+  const ev = fsw.readFileSync(pathw.join(ROOTW, '.opencode', 'agents', 'evaluator.md'), 'utf8');
   assert.match(ev, /\{phase\}-grounding\.json/);
   assert.match(ev, /spec-grounding\.json/);
 });
@@ -161,7 +161,7 @@ test('/design and /test thread their trace spine + grounding gate', () => {
   assert.match(design, /trace-check\.js/);
   assert.match(design, /design-grounding\.json/);
   assert.match(design, /HARD BLOCK/);
-  const tst = fsw.readFileSync(pathw.join(ROOTW, '.claude', 'skills', 'test', 'SKILL.md'), 'utf8');
+  const tst = fsw.readFileSync(pathw.join(ROOTW, '.opencode', 'skills', 'test', 'SKILL.md'), 'utf8');
   assert.match(tst, /test-traces\.json/);
   assert.match(tst, /trace-check\.js/);
   assert.match(tst, /test-grounding\.json/);
@@ -169,7 +169,7 @@ test('/design and /test thread their trace spine + grounding gate', () => {
 });
 
 test('rubric now has a test phase, and design/test phases hard-gate on grounding', () => {
-  const rubric = JSON.parse(fsw.readFileSync(pathw.join(ROOTW, '.claude', 'templates', 'phase-eval-rubrics.json'), 'utf8'));
+  const rubric = JSON.parse(fsw.readFileSync(pathw.join(ROOTW, '.opencode', 'templates', 'phase-eval-rubrics.json'), 'utf8'));
   assert.ok(rubric.phases.test, 'test phase must exist');
   assert.match(rubric.phases.test.hard_gate, /test-grounding\.json/);
   assert.match(rubric.phases.design.hard_gate, /design-grounding\.json/);
@@ -177,12 +177,12 @@ test('rubric now has a test phase, and design/test phases hard-gate on grounding
 
 test('verification matrix gate is wired through test, auto, generator, evaluator, and evaluate prompts', () => {
   const files = {
-    testSkill: fsw.readFileSync(pathw.join(ROOTW, '.claude', 'skills', 'test', 'SKILL.md'), 'utf8'),
+    testSkill: fsw.readFileSync(pathw.join(ROOTW, '.opencode', 'skills', 'test', 'SKILL.md'), 'utf8'),
     // Phase 4 progressive loading moved auto's verification-matrix wiring into references/.
     autoSkill: readSkillCorpus('auto'),
-    generator: fsw.readFileSync(pathw.join(ROOTW, '.claude', 'agents', 'generator.md'), 'utf8'),
-    evaluator: fsw.readFileSync(pathw.join(ROOTW, '.claude', 'agents', 'evaluator.md'), 'utf8'),
-    evaluateSkill: fsw.readFileSync(pathw.join(ROOTW, '.claude', 'skills', 'evaluate', 'SKILL.md'), 'utf8'),
+    generator: fsw.readFileSync(pathw.join(ROOTW, '.opencode', 'agents', 'generator.md'), 'utf8'),
+    evaluator: fsw.readFileSync(pathw.join(ROOTW, '.opencode', 'agents', 'evaluator.md'), 'utf8'),
+    evaluateSkill: fsw.readFileSync(pathw.join(ROOTW, '.opencode', 'skills', 'evaluate', 'SKILL.md'), 'utf8'),
   };
 
   assert.match(files.testSkill, /verification-matrix\.json/);

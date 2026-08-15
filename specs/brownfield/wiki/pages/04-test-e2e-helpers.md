@@ -10,8 +10,8 @@ flowchart LR
   n_js_test_e2e_helpers_alter_and_verify_test_js["alter-and-verify.test.js"]
   n_js_test_e2e_helpers_app_runtime_js["app-runtime.js"]
   n_js_test_e2e_helpers_app_runtime_test_js["app-runtime.test.js"]
-  n_js_test_e2e_helpers_claude_runner_js["claude-runner.js"]
-  n_js_test_e2e_helpers_claude_runner_test_js["claude-runner.test.js"]
+  n_js_test_e2e_helpers_claude_runner_js["opencode-runner.js"]
+  n_js_test_e2e_helpers_claude_runner_test_js["opencode-runner.test.js"]
   n_js_test_e2e_helpers_fresh_project_js["fresh-project.js"]
   n_js_test_e2e_helpers_fresh_project_test_js["fresh-project.test.js"]
   n_js_test_e2e_helpers_grafana_checker_js["grafana-checker.js"]
@@ -61,18 +61,18 @@ flowchart LR
 ### Symbols
   - `httpGetBody` (function) → js:test/e2e/helpers/app-runtime.test.js:14 — `function httpGetBody(url)`
 
-## `js:test/e2e/helpers/claude-runner.js`
+## `js:test/e2e/helpers/opencode-runner.js`
 
 - fan-in: 17, fan-out: 4
 
 ### Symbols
-  - `buildClaudeArgs` (function) → js:test/e2e/helpers/claude-runner.js:11 — `function buildClaudeArgs(model, budgetUsd, continueSession, pluginDir, sessionId, outputFormat)`
-  - `buildClaudeEnv` (function) → js:test/e2e/helpers/claude-runner.js:36 — `function buildClaudeEnv()`
-  - `runClaude` (function) → js:test/e2e/helpers/claude-runner.js:53 — `function runClaude(prompt, options = {})`
-  - `readTextOr` (function) → js:test/e2e/helpers/claude-runner.js:86 — `function readTextOr(p, fallback)`
-  - `spawnCapturedGroup` (function) → js:test/e2e/helpers/claude-runner.js:98 — `function spawnCapturedGroup(command, args, { input, cwd, timeoutMs, env })`
+  - `buildClaudeArgs` (function) → js:test/e2e/helpers/opencode-runner.js:11 — `function buildClaudeArgs(model, budgetUsd, continueSession, pluginDir, sessionId, outputFormat)`
+  - `buildClaudeEnv` (function) → js:test/e2e/helpers/opencode-runner.js:36 — `function buildClaudeEnv()`
+  - `runClaude` (function) → js:test/e2e/helpers/opencode-runner.js:53 — `function runClaude(prompt, options = {})`
+  - `readTextOr` (function) → js:test/e2e/helpers/opencode-runner.js:86 — `function readTextOr(p, fallback)`
+  - `spawnCapturedGroup` (function) → js:test/e2e/helpers/opencode-runner.js:98 — `function spawnCapturedGroup(command, args, { input, cwd, timeoutMs, env })`
 
-## `js:test/e2e/helpers/claude-runner.test.js`
+## `js:test/e2e/helpers/opencode-runner.test.js`
 
 - fan-in: 0, fan-out: 3
 

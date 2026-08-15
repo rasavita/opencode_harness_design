@@ -1,7 +1,7 @@
 'use strict';
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { classifyFile, classifyFiles } = require('../.claude/hooks/lib/live-externals-gate');
+const { classifyFile, classifyFiles } = require('../.opencode/hooks/lib/live-externals-gate');
 
 // Build each scheme-and-host string at runtime so the literal never appears in
 // source (the harness secret-scan gate flags a verbatim connection string, even

@@ -1,6 +1,6 @@
 # Model allocation & cost posture
 
-How the harness assigns Claude models to roles, and how to dial the cost/quality trade-off per project. Pins are set by `execution.model_tier` in `project-manifest.json`, applied to each agent's `model:` frontmatter by `.claude/scripts/model-tier.js`. The prompt bodies are model-agnostic (see [prompting-standards.md](prompting-standards.md) → "Model-agnostic by construction") — the model is named only here.
+How the harness assigns Claude models to roles, and how to dial the cost/quality trade-off per project. Pins are set by `execution.model_tier` in `project-manifest.json`, applied to each agent's `model:` frontmatter by `.opencode/scripts/model-tier.js`. The prompt bodies are model-agnostic (see [prompting-standards.md](prompting-standards.md) → "Model-agnostic by construction") — the model is named only here.
 
 Enterprise spend guidance: [token-cost-playbook.md](token-cost-playbook.md).
 
@@ -56,7 +56,7 @@ Pins are exact model IDs: `claude-opus-5`, `claude-sonnet-5`, `claude-haiku-4-5`
 
 - **Set the posture:** `execution.model_tier` in `project-manifest.json`, then:
   ```bash
-  node .claude/scripts/model-tier.js <cost|balanced|max-quality|enterprise|fusion> --apply .claude/agents
+  node .opencode/scripts/model-tier.js <cost|balanced|max-quality|enterprise|fusion> --apply .opencode/agents
   ```
 - Scaffold product apps (`web-app` / `api-service`) default to **`cost`**. Override via profile `modelTier` or the monorepo keep `balanced`.
 - **Overrides are allowed** (defaults > denials). Log tier changes; do not swap the orchestrator model mid-session (cache rule).

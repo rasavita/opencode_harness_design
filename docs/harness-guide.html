@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Claude Harness Engine — Comprehensive Guide</title>
-<meta name="description" content="Navigable field guide to the Claude Harness Engine: architecture, lanes, GAN loop, ratchets, brownfield, and effective use." />
+<title>OpenCode Harness Engine — Comprehensive Guide</title>
+<meta name="description" content="Navigable field guide to the OpenCode Harness Engine: architecture, lanes, GAN loop, ratchets, brownfield, and effective use." />
 <style>
   :root {
     --bg: #0b0f14;
@@ -719,7 +719,7 @@
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:.75rem;">
       <button class="menu-btn" onclick="openSidebar()" type="button">☰ Menu</button>
-      <div class="crumbs">Claude Harness Engine · <strong id="crumb">Overview</strong></div>
+      <div class="crumbs">OpenCode Harness Engine · <strong id="crumb">Overview</strong></div>
     </div>
     <div class="pill-row">
       <span class="pill accent">Claude Code plugin</span>
@@ -733,7 +733,7 @@
     <header class="hero" id="overview">
       <h2>Build and change software with a trustworthy agent harness</h2>
       <p>
-        The Claude Harness Engine is a <strong>Claude Code plugin</strong> that turns a raw coding model into a
+        The OpenCode Harness Engine is a <strong>Claude Code plugin</strong> that turns a raw coding model into a
         controlled engineering system: generator/evaluator separation, monotonic quality ratchets,
         session chaining, brownfield maps, and human-owned merge.
       </p>
@@ -840,7 +840,7 @@ npm run package:skus
 # → dist/skus/harness-core | harness-full | harness-lite
 
 cd ~/my-project
-claude --plugin-dir /path/to/claude_harness_eng_v5/dist/skus/harness-core</code></pre>
+claude --plugin-dir /path/to/opencode_harness_design/dist/skus/harness-core</code></pre>
         </li>
         <li>
           <strong>Scaffold</strong>
@@ -860,7 +860,7 @@ claude --plugin-dir /path/to/claude_harness_eng_v5/dist/skus/harness-core</code>
 
       <div class="callout info">
         <div class="label">Contributors</div>
-        <p>Clone the monorepo and load <code>claude --plugin-dir ~/claude_harness_eng_v5/.claude</code>. UI may show namespaced commands like <code>/claude_harness_eng_v5:scaffold</code>.</p>
+        <p>Clone the monorepo and load <code>claude --plugin-dir ~/opencode_harness_design/.opencode</code>. UI may show namespaced commands like <code>/opencode_harness_design:scaffold</code>.</p>
       </div>
     </section>
 
@@ -977,7 +977,7 @@ Always before merge ────────────────────
             <tr><td>Blocking pre-merge checks</td><td>—</td><td><code>/gate</code></td></tr>
             <tr><td>Scored app verification</td><td><code>/run</code>, <code>/verify</code></td><td><code>/evaluate</code></td></tr>
             <tr><td>Mechanical cleanup</td><td><code>/simplify</code></td><td><code>/refactor</code> wraps with purity gates</td></tr>
-            <tr><td>Bootstrap</td><td><code>/init</code> (CLAUDE.md only)</td><td><code>/scaffold</code> full harness</td></tr>
+            <tr><td>Bootstrap</td><td><code>/init</code> (AGENTS.md only)</td><td><code>/scaffold</code> full harness</td></tr>
           </tbody>
         </table>
       </div>
@@ -1153,7 +1153,7 @@ Always before merge ────────────────────
           <!-- Layer 0 -->
           <rect x="20" y="15" width="880" height="90" rx="14" fill="#151d28" stroke="#243041"/>
           <text x="40" y="42" fill="#5b9dff" font-size="11" font-weight="700" letter-spacing="1">0 · AUTHORING</text>
-          <text x="40" y="68" fill="#e7eef8" font-size="13">/scaffold → project-manifest · CLAUDE.md · agents · skills · hooks · state seeds</text>
+          <text x="40" y="68" fill="#e7eef8" font-size="13">/scaffold → project-manifest · AGENTS.md · agents · skills · hooks · state seeds</text>
           <text x="40" y="88" fill="#6b7c91" font-size="11">Optional: framework packs · tracker config · telemetry</text>
 
           <!-- Layer 1 -->
@@ -1293,7 +1293,7 @@ Always before merge ────────────────────
             <li><code>claude-progress.txt</code> — append-only resume log</li>
             <li><code>features.json</code> — pass/fail registry</li>
             <li><code>learned-rules.md</code> — monotonic institutional memory</li>
-            <li><code>.claude/program.md</code> — human steering input</li>
+            <li><code>.opencode/program.md</code> — human steering input</li>
           </ul>
         </div>
       </div>
@@ -1451,7 +1451,7 @@ Always before merge ────────────────────
 
       <div class="callout warn">
         <div class="label">Prompt cache prefix protection</div>
-        <p>Mid-session writes to <code>CLAUDE.md</code>, <code>.mcp.json</code>, and <code>.claude/settings*.json</code> are blocked. Escape only between sessions with <code>HARNESS_PREFIX_EDIT=1</code>. Don’t swap the orchestrator model mid-run.</p>
+        <p>Mid-session writes to <code>AGENTS.md</code>, <code>.mcp.json</code>, and <code>.opencode/settings*.json</code> are blocked. Escape only between sessions with <code>HARNESS_PREFIX_EDIT=1</code>. Don’t swap the orchestrator model mid-run.</p>
       </div>
 
       <h3>Sensor cadence (keep quality left)</h3>
@@ -1546,11 +1546,11 @@ Always before merge ────────────────────
           </tbody>
         </table>
       </div>
-      <p style="font-size:.85rem;color:var(--text-mute)">* When architecture/contexts/component-map are configured; otherwise no-op or loud skip. Source: <code>.claude/hooks/lib/gate-registry.js</code> + <code>docs/product-skus-and-tiers.md</code>.</p>
+      <p style="font-size:.85rem;color:var(--text-mute)">* When architecture/contexts/component-map are configured; otherwise no-op or loud skip. Source: <code>.opencode/hooks/lib/gate-registry.js</code> + <code>docs/product-skus-and-tiers.md</code>.</p>
 
       <div class="callout tip">
         <div class="label">Fail open is never silent</div>
-        <p>If a toolchain is missing or times out, the gate prints <code>WARNING: GATE SKIPPED</code> — so a silent skip is never mistaken for a pass. Hook crashes append to <code>.claude/state/hook-errors.log</code>.</p>
+        <p>If a toolchain is missing or times out, the gate prints <code>WARNING: GATE SKIPPED</code> — so a silent skip is never mistaken for a pass. Hook crashes append to <code>.opencode/state/hook-errors.log</code>.</p>
       </div>
     </section>
 
@@ -1763,13 +1763,13 @@ Always before merge ────────────────────
       </div>
 
       <pre><code># Preferred navigation order
-node .claude/scripts/context-pack.js --diff --budget 1600 "where is session validation?"
+node .opencode/scripts/context-pack.js --diff --budget 1600 "where is session validation?"
 # then read only cited ranges — not entire files
 
 # Full rebuild when needed
 /code-map
 # or
-node .claude/scripts/nav-query.js pack --diff --budget 1600 "&lt;question&gt;"</code></pre>
+node .opencode/scripts/nav-query.js pack --diff --budget 1600 "&lt;question&gt;"</code></pre>
     </section>
 
     <section class="section" id="token-gov">
@@ -1830,7 +1830,7 @@ node .claude/scripts/nav-query.js pack --diff --budget 1600 "&lt;question&gt;"</
       <div class="diagram">
         <svg class="svg-wrap" viewBox="0 0 920 260" xmlns="http://www.w3.org/2000/svg" aria-label="Harness vs Devin at a glance">
           <rect x="30" y="20" width="400" height="220" rx="16" fill="rgba(91,157,255,.08)" stroke="rgba(91,157,255,.4)"/>
-          <text x="230" y="55" text-anchor="middle" fill="#60a5fa" font-size="16" font-weight="700">Claude Harness Engine</text>
+          <text x="230" y="55" text-anchor="middle" fill="#60a5fa" font-size="16" font-weight="700">OpenCode Harness Engine</text>
           <text x="50" y="90" fill="#d2dceb" font-size="12">• Runs where Claude Code runs (local / your CI)</text>
           <text x="50" y="115" fill="#d2dceb" font-size="12">• You own models, git, secrets, merge</text>
           <text x="50" y="140" fill="#d2dceb" font-size="12">• Structural GAN + monotonic ratchets</text>
@@ -1853,7 +1853,7 @@ node .claude/scripts/nav-query.js pack --diff --budget 1600 "&lt;question&gt;"</
       <h3>1. Product &amp; packaging</h3>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Dimension</th><th>Claude Harness Engine</th><th>Devin</th></tr></thead>
+          <thead><tr><th>Dimension</th><th>OpenCode Harness Engine</th><th>Devin</th></tr></thead>
           <tbody>
             <tr><td><strong>What it is</strong></td><td>Open Claude Code plugin / scaffold (SKU: lite · core · full)</td><td>Commercial AI software engineer product (web + CLI + API)</td></tr>
             <tr><td><strong>Primary surface</strong></td><td>Claude Code chat + repo-local hooks/skills/agents</td><td>app.devin.ai session UI; Devin CLI; integrations</td></tr>
@@ -2117,8 +2117,8 @@ node .claude/scripts/nav-query.js pack --diff --budget 1600 "&lt;question&gt;"</
         </table>
       </div>
       <p>Product scaffolds default to <code>cost</code>. This monorepo dogfoods <code>balanced</code>.</p>
-      <pre><code>node .claude/scripts/model-tier.js cost --apply .claude/agents
-node .claude/scripts/cost-report.js</code></pre>
+      <pre><code>node .opencode/scripts/model-tier.js cost --apply .opencode/agents
+node .opencode/scripts/cost-report.js</code></pre>
     </section>
 
     <section class="section" id="budget">
@@ -2142,8 +2142,8 @@ node .claude/scripts/cost-report.js</code></pre>
         </table>
       </div>
       <pre><code>/status
-node .claude/scripts/pipeline-status.js status
-node .claude/scripts/build-chain.js docs/prd.md
+node .opencode/scripts/pipeline-status.js status
+node .opencode/scripts/build-chain.js docs/prd.md
 # budget via project-manifest.json#execution.budget or /build … --budget</code></pre>
     </section>
 
@@ -2185,8 +2185,8 @@ node .claude/scripts/build-chain.js docs/prd.md
 
       <h3>5. Cheap day-to-day hygiene</h3>
       <ul>
-        <li>Steer via <code>.claude/program.md</code> between sessions</li>
-        <li>Apply suggested CLAUDE.md learnings <em>between</em> sessions only</li>
+        <li>Steer via <code>.opencode/program.md</code> between sessions</li>
+        <li>Apply suggested AGENTS.md learnings <em>between</em> sessions only</li>
         <li><code>npm run drift</code> on a schedule; copy harness-drift workflow if needed</li>
         <li><code>/agent-readiness</code> monthly; raise baseline when pillars improve</li>
         <li>Upgrade control plane with <code>/scaffold-upgrade --apply</code> without wiping state</li>
@@ -2217,7 +2217,7 @@ node .claude/scripts/build-chain.js docs/prd.md
       </div>
       <div class="callout tip">
         <div class="label">Prompt-cache operating rules</div>
-        <p>Don’t churn tools/MCP, don’t edit <code>CLAUDE.md</code>, and don’t swap the orchestrator model mid-session. Apply session learnings between sessions only.</p>
+        <p>Don’t churn tools/MCP, don’t edit <code>AGENTS.md</code>, and don’t swap the orchestrator model mid-session. Apply session learnings between sessions only.</p>
       </div>
     </section>
 
@@ -2250,9 +2250,9 @@ node .claude/scripts/build-chain.js docs/prd.md
           <thead><tr><th>Path</th><th>Role</th></tr></thead>
           <tbody>
             <tr><td><code>project-manifest.json</code></td><td>Topology, layers, model tier, sensor_tier, token_governor, budget, verification mode</td></tr>
-            <tr><td><code>CLAUDE.md</code></td><td>Always-on project rules (prompt-cache prefix — edit between sessions)</td></tr>
-            <tr><td><code>.claude/program.md</code></td><td>Human steering input for <code>/auto</code></td></tr>
-            <tr><td><code>.claude/state/learned-rules.md</code></td><td>Monotonic failure-derived rules</td></tr>
+            <tr><td><code>AGENTS.md</code></td><td>Always-on project rules (prompt-cache prefix — edit between sessions)</td></tr>
+            <tr><td><code>.opencode/program.md</code></td><td>Human steering input for <code>/auto</code></td></tr>
+            <tr><td><code>.opencode/state/learned-rules.md</code></td><td>Monotonic failure-derived rules</td></tr>
             <tr><td><code>claude-progress.txt</code></td><td>Append-only resume log</td></tr>
             <tr><td><code>features.json</code></td><td>Pass/fail feature registry</td></tr>
             <tr><td><code>specs/stories/</code></td><td>Epics, stories, dependency-graph</td></tr>
@@ -2264,7 +2264,7 @@ node .claude/scripts/build-chain.js docs/prd.md
             <tr><td><code>wiki/WIKI.md</code></td><td>DeepWiki entry (also under brownfield paths in some layouts)</td></tr>
             <tr><td><code>docs/CODEBASE.md</code></td><td>Human homepage regenerated from the graph</td></tr>
             <tr><td><code>HARNESS.md</code> / <code>harness-manifest.json</code></td><td>Control-system registry (what governs what)</td></tr>
-            <tr><td><code>.claude/hooks/</code> · <code>git-hooks/</code></td><td>Session sensors + real commit gates</td></tr>
+            <tr><td><code>.opencode/hooks/</code> · <code>git-hooks/</code></td><td>Session sensors + real commit gates</td></tr>
           </tbody>
         </table>
       </div>
@@ -2279,7 +2279,7 @@ node .claude/scripts/build-chain.js docs/prd.md
 /scaffold-upgrade --apply --include-skills   # larger prompt-surface change
 
 # From shell
-node /path/to/harness/.claude/scripts/scaffold-upgrade.js --target ~/my-project
+node /path/to/harness/.opencode/scripts/scaffold-upgrade.js --target ~/my-project
 node …/scaffold-upgrade.js --target ~/my-project --apply
 node …/scaffold-upgrade.js --target ~/my-project --apply --include-skills</code></pre>
       <p>Default dry-run is intentional. Skills refresh is opt-in because it changes the cached prompt surface more aggressively than hooks/scripts alone.</p>
@@ -2308,7 +2308,7 @@ npm run test:e2e:live
 npm run test:e2e:cert
 npm run harness-coverage
 npm run drift
-npm run retention:dry    # prune .claude/runs + archive previews</code></pre>
+npm run retention:dry    # prune .opencode/runs + archive previews</code></pre>
       <p>Topology here is <code>cli-or-library</code> with architecture layers off; <code>quality.sensor_tier: standard</code>. Live E2E logs: <code>test/e2e/results/</code>. Details: <code>docs/testing.md</code>.</p>
       <div class="callout warn">
         <div class="label">iCloud / Documents path hygiene</div>
@@ -2325,7 +2325,7 @@ npm run retention:dry    # prune .claude/runs + archive previews</code></pre>
             <tr><td>Identity L / “we vibe everything”</td><td>Auth and migrations need Z</td><td>Re-score every task</td></tr>
             <tr><td>Skipping /gate because “models got better”</td><td>Ceremony ≠ evaluator</td><td>Always gate before merge</td></tr>
             <tr><td>Generator grades itself</td><td>Self-eval bias</td><td>Keep GAN roles strict</td></tr>
-            <tr><td>Editing CLAUDE.md mid-run</td><td>Busts prompt cache</td><td>Between sessions only</td></tr>
+            <tr><td>Editing AGENTS.md mid-run</td><td>Busts prompt cache</td><td>Between sessions only</td></tr>
             <tr><td>Broad whole-file reads on god modules</td><td>Token burn + lost focus</td><td>context-pack / symbol-map</td></tr>
             <tr><td>Hand-built contract fixtures</td><td>Green tests, dead feature</td><td>Round-trip real validators</td></tr>
             <tr><td>Silent env gate offs in CI</td><td>Ungoverned quality</td><td>Waivers or sensor_tier</td></tr>
@@ -2379,13 +2379,13 @@ npm run retention:dry    # prune .claude/runs + archive previews</code></pre>
             <tr><td>This field guide</td><td><code>docs/harness-guide.html</code></td></tr>
             <tr><td>Architecture reference</td><td><code>design.md</code></td></tr>
             <tr><td>Control system registry</td><td><code>HARNESS.md</code> · <code>harness-manifest.json</code></td></tr>
-            <tr><td>Pre-commit gate list</td><td><code>.claude/hooks/lib/gate-registry.js</code></td></tr>
-            <tr><td>Scaffold upgrade script</td><td><code>.claude/scripts/scaffold-upgrade.js</code></td></tr>
+            <tr><td>Pre-commit gate list</td><td><code>.opencode/hooks/lib/gate-registry.js</code></td></tr>
+            <tr><td>Scaffold upgrade script</td><td><code>.opencode/scripts/scaffold-upgrade.js</code></td></tr>
             <tr><td>Testing this harness</td><td><code>docs/testing.md</code></td></tr>
             <tr><td>Telemetry</td><td><code>docs/telemetry.md</code></td></tr>
             <tr><td>Extras / trackers / packs</td><td><code>docs/extras.md</code></td></tr>
             <tr><td>Symphony product</td><td><code>docs/symphony-product.md</code> · <code>symphony_clone/</code></td></tr>
-            <tr><td>Always-on agent rules</td><td><code>CLAUDE.md</code></td></tr>
+            <tr><td>Always-on agent rules</td><td><code>AGENTS.md</code></td></tr>
             <tr><td>SKUs &amp; sensor tiers</td><td><code>docs/product-skus-and-tiers.md</code></td></tr>
             <tr><td>Model allocation</td><td><code>docs/model-allocation.md</code></td></tr>
             <tr><td>Token governor</td><td><code>docs/token-governor.md</code></td></tr>
@@ -2396,14 +2396,14 @@ npm run retention:dry    # prune .claude/runs + archive previews</code></pre>
             <tr><td>Prompting standards</td><td><code>docs/prompting-standards.md</code></td></tr>
             <tr><td>PRD format</td><td><code>docs/prd-format.md</code></td></tr>
             <tr><td>Telemetry</td><td><code>docs/telemetry.md</code></td></tr>
-            <tr><td>Skill sources of truth</td><td><code>.claude/skills/*/SKILL.md</code></td></tr>
-            <tr><td>Agent definitions</td><td><code>.claude/agents/*.md</code></td></tr>
+            <tr><td>Skill sources of truth</td><td><code>.opencode/skills/*/SKILL.md</code></td></tr>
+            <tr><td>Agent definitions</td><td><code>.opencode/agents/*.md</code></td></tr>
           </tbody>
         </table>
       </div>
 
       <footer class="page-foot">
-        Claude Harness Engine v5 · comprehensive field guide · generated for navigable offline use.<br />
+        OpenCode Harness Engine v5 · comprehensive field guide · generated for navigable offline use.<br />
         Open this file in a browser: <code>docs/harness-guide.html</code>. Diagrams are SVG; no network required.
       </footer>
     </section>

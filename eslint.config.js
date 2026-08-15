@@ -9,9 +9,9 @@ module.exports = [
   {
     ignores: [
       '**/node_modules/**',
-      '**/.claude/state/**',
-      '**/.claude/runs/**',
-      '**/.claude/worktrees/**',
+      '**/.opencode/state/**',
+      '**/.opencode/runs/**',
+      '**/.opencode/worktrees/**',
       '**/test/e2e/**-output/**',
       '**/test/e2e/screenshots/**',
       '**/test/e2e/results/**',
@@ -27,9 +27,9 @@ module.exports = [
   },
   {
     files: [
-      '.claude/hooks/**/*.{js,cjs}',
-      '.claude/scripts/**/*.{js,cjs}',
-      '.claude/git-hooks/**/*',
+      '.opencode/hooks/**/*.{js,cjs}',
+      '.opencode/scripts/**/*.{js,cjs}',
+      '.opencode/git-hooks/**/*',
       'test/**/*.{js,cjs}',
       'eslint.config.js',
     ],

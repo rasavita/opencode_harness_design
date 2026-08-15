@@ -8,8 +8,8 @@ const { test } = require('node:test');
 const { execFileSync } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
-const SCRIPT = path.join(ROOT, '.claude', 'scripts', 'contract-drift-gate.js');
-const { verdictFromExit } = require('../.claude/scripts/contract-drift-gate.js');
+const SCRIPT = path.join(ROOT, '.opencode', 'scripts', 'contract-drift-gate.js');
+const { verdictFromExit } = require('../.opencode/scripts/contract-drift-gate.js');
 
 // Top-level helper so the brace-depth gate sees a properly bounded function.
 function gitIn(dir, args) {
@@ -80,9 +80,9 @@ test('no breaking (fake oasdiff exit 0) -> exit 0, verdict pass', () => {
 const rd = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 test('G12: contract-drift is wired + scripted + registered active', () => {
-  assert.strictEqual(JSON.parse(rd('package.json')).scripts['contract-drift'], 'node .claude/scripts/contract-drift-gate.js');
-  assert.ok(/contract-drift-gate\.js|contract-drift/.test(rd('.claude/skills/gate/SKILL.md')), '/gate must run contract-drift');
-  assert.ok(/contract-drift/.test(rd('.claude/skills/keeping-refactors-pure/SKILL.md')), 'keeping-refactors-pure must point at the gate');
+  assert.strictEqual(JSON.parse(rd('package.json')).scripts['contract-drift'], 'node .opencode/scripts/contract-drift-gate.js');
+  assert.ok(/contract-drift-gate\.js|contract-drift/.test(rd('.opencode/skills/gate/SKILL.md')), '/gate must run contract-drift');
+  assert.ok(/contract-drift/.test(rd('.opencode/skills/keeping-refactors-pure/SKILL.md')), 'keeping-refactors-pure must point at the gate');
   const m = JSON.parse(rd('harness-manifest.json'));
   const s = m.sensors.find((x) => x.id === 'api-contract-drift');
   assert.ok(s, 'api-contract-drift sensor must exist');

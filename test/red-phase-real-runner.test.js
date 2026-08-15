@@ -10,7 +10,7 @@
 // the whole G41-G43 chain was inert for this repo's own runner.
 //
 // That is the exact failure this branch exists to prevent, and it shipped inside
-// it: I invented the oracle, then tested against the invention. CLAUDE.md #5 says
+// it: I invented the oracle, then tested against the invention. AGENTS.md #5 says
 // round-trip the REAL artifact through its REAL validator. The other round-trip
 // test does that for git and the ledger; this one does it for the runner.
 //
@@ -23,7 +23,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
-const { classifyRun } = require('../.claude/hooks/lib/red-phase');
+const { classifyRun } = require('../.opencode/hooks/lib/red-phase');
 
 const PASSING = "const {test}=require('node:test');const a=require('node:assert');\ntest('adds', () => { a.strictEqual(1, 1); });\n";
 const FAILING = "const {test}=require('node:test');const a=require('node:assert');\ntest('adds', () => { a.strictEqual(1, 2); });\n";

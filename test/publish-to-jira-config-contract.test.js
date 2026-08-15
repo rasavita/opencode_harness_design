@@ -6,7 +6,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const tpl = fs.readFileSync(
-  path.join(__dirname, '..', '.claude', 'templates', 'tracker-config.template.json'), 'utf8',
+  path.join(__dirname, '..', '.opencode', 'templates', 'tracker-config.template.json'), 'utf8',
 );
 
 test('tracker-config template carries optional Jira fields and stays valid JSON', () => {

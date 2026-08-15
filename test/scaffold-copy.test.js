@@ -2,11 +2,11 @@
 
 // Locks in the two cross-cutting copy guarantees that keep a scaffolded project
 // from silently losing its hook layer:
-//   1. a {"type":"commonjs"} .claude/package.json marker — without it an app whose
+//   1. a {"type":"commonjs"} .opencode/package.json marker — without it an app whose
 //      root package.json is "type":"module" reparses every require()-based harness
 //      hook/script as ESM and crashes with "require is not defined";
-//   2. the .claude/git-hooks/ tree (entries + lib/) — Step 8 wires it via
-//      `git config core.hooksPath .claude/git-hooks`, the only location where the
+//   2. the .opencode/git-hooks/ tree (entries + lib/) — Step 8 wires it via
+//      `git config core.hooksPath .opencode/git-hooks`, the only location where the
 //      hooks' __dirname-relative require()s resolve.
 // Both must hold across every scaffold profile (selected `core`/`brownfield` and
 // the unselected `full` copy path).
@@ -17,9 +17,9 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const { applyScaffold } = require('../.claude/scripts/scaffold-apply');
+const { applyScaffold } = require('../.opencode/scripts/scaffold-apply');
 
-const PLUGIN_SOURCE = path.resolve(__dirname, '..', '.claude');
+const PLUGIN_SOURCE = path.resolve(__dirname, '..', '.opencode');
 
 const BASE_PROFILE = {
   name: 'marker-probe',
@@ -46,20 +46,20 @@ for (const profile of ['core', 'full']) {
   test(`scaffold (${profile}) copies the CommonJS marker and the git-hooks tree`, () => {
     const { workDir, target } = scaffoldInto(profile);
     try {
-      const marker = JSON.parse(fs.readFileSync(path.join(target, '.claude', 'package.json'), 'utf8'));
-      assert.strictEqual(marker.type, 'commonjs', '.claude/package.json must pin CommonJS');
+      const marker = JSON.parse(fs.readFileSync(path.join(target, '.opencode', 'package.json'), 'utf8'));
+      assert.strictEqual(marker.type, 'commonjs', '.opencode/package.json must pin CommonJS');
 
       for (const rel of ['pre-commit', 'commit-msg', 'prepare-commit-msg', path.join('lib', 'refactor-purity.js')]) {
         assert.ok(
-          fs.existsSync(path.join(target, '.claude', 'git-hooks', rel)),
+          fs.existsSync(path.join(target, '.opencode', 'git-hooks', rel)),
           `git-hooks/${rel} must be copied so core.hooksPath resolves it`,
         );
       }
 
       // The pre-commit's __dirname-relative require()s resolve only from
-      // .claude/git-hooks/ — prove the dependency targets landed alongside it.
-      assert.ok(fs.existsSync(path.join(target, '.claude', 'hooks', 'lib', 'layers.js')), 'hooks/lib/layers.js (required by pre-commit) must exist');
-      assert.ok(fs.existsSync(path.join(target, '.claude', 'hooks', 'lib', 'tdd.js')), 'hooks/lib/tdd.js (required by refactor-purity) must exist');
+      // .opencode/git-hooks/ — prove the dependency targets landed alongside it.
+      assert.ok(fs.existsSync(path.join(target, '.opencode', 'hooks', 'lib', 'layers.js')), 'hooks/lib/layers.js (required by pre-commit) must exist');
+      assert.ok(fs.existsSync(path.join(target, '.opencode', 'hooks', 'lib', 'tdd.js')), 'hooks/lib/tdd.js (required by refactor-purity) must exist');
     } finally {
       fs.rmSync(workDir, { recursive: true, force: true });
     }
@@ -71,59 +71,59 @@ for (const profile of ['core', 'brownfield', 'full']) {
     const { workDir, target } = scaffoldInto(profile);
     try {
       assert.ok(
-        fs.existsSync(path.join(target, '.claude', 'scripts', 'verification-matrix-gate.js')),
+        fs.existsSync(path.join(target, '.opencode', 'scripts', 'verification-matrix-gate.js')),
         'verification-matrix-gate.js must be copied because /test and /auto call it',
       );
       assert.ok(
-        fs.existsSync(path.join(target, '.claude', 'scripts', 'ownership-check.js')),
+        fs.existsSync(path.join(target, '.opencode', 'scripts', 'ownership-check.js')),
         'ownership-check.js must be copied because the pre-commit hook and /gate call it',
       );
       assert.ok(
-        fs.existsSync(path.join(target, '.claude', 'scripts', 'pr-poll.js')),
+        fs.existsSync(path.join(target, '.opencode', 'scripts', 'pr-poll.js')),
         'pr-poll.js must be copied because /pr-respond calls it',
       );
       assert.ok(
-        fs.existsSync(path.join(target, '.claude', 'skills', 'pr-respond', 'SKILL.md')),
+        fs.existsSync(path.join(target, '.opencode', 'skills', 'pr-respond', 'SKILL.md')),
         'pr-respond/SKILL.md must be copied — the scaffold ships the skill that invokes pr-poll.js',
       );
       assert.ok(
-        fs.existsSync(path.join(target, '.claude', 'skills', 'writing-acceptance-tests-first', 'SKILL.md')),
+        fs.existsSync(path.join(target, '.opencode', 'skills', 'writing-acceptance-tests-first', 'SKILL.md')),
         'writing-acceptance-tests-first/SKILL.md must be copied — /test Step 4.6 and /change Step S4 both reference it as a REQUIRED SUB-SKILL',
       );
       assert.ok(
-        fs.existsSync(path.join(target, '.claude', 'skills', 'agent-readiness', 'SKILL.md')),
+        fs.existsSync(path.join(target, '.opencode', 'skills', 'agent-readiness', 'SKILL.md')),
         'agent-readiness/SKILL.md must be copied so /agent-readiness works in a scaffolded project',
       );
       assert.ok(
-        fs.existsSync(path.join(target, '.claude', 'scripts', 'agent-readiness.js')),
+        fs.existsSync(path.join(target, '.opencode', 'scripts', 'agent-readiness.js')),
         'agent-readiness.js must be copied because agent-readiness/SKILL.md invokes it',
       );
       assert.ok(
-        fs.existsSync(path.join(target, '.claude', 'scripts', 'cycle-gate.js')),
+        fs.existsSync(path.join(target, '.opencode', 'scripts', 'cycle-gate.js')),
         'cycle-gate.js must be copied because /gate and /auto Gate 4 both invoke it',
       );
       assert.ok(
-        fs.existsSync(path.join(target, '.claude', 'scripts', 'coupling-gate.js')),
+        fs.existsSync(path.join(target, '.opencode', 'scripts', 'coupling-gate.js')),
         'coupling-gate.js must be copied because /gate and /auto Gate 4 both invoke it',
       );
       assert.ok(
-        fs.existsSync(path.join(target, '.claude', 'scripts', 'regression-gate.js')),
+        fs.existsSync(path.join(target, '.opencode', 'scripts', 'regression-gate.js')),
         'regression-gate.js must be copied because /gate and /auto\'s pre-merge step invoke it',
       );
       assert.ok(
-        fs.existsSync(path.join(target, '.claude', 'scripts', 'local-regression-gate.js')),
+        fs.existsSync(path.join(target, '.opencode', 'scripts', 'local-regression-gate.js')),
         'local-regression-gate.js must be copied because /change Step S5 and /vibe Step 6 invoke it',
       );
       assert.ok(
-        fs.existsSync(path.join(target, '.claude', 'scripts', 'legacy-discipline-gate.js')),
+        fs.existsSync(path.join(target, '.opencode', 'scripts', 'legacy-discipline-gate.js')),
         'legacy-discipline-gate.js must be copied because the pre-commit hook invokes it by default',
       );
       assert.ok(
-        fs.existsSync(path.join(target, '.claude', 'scripts', 'record-coverage-verdict.js')),
+        fs.existsSync(path.join(target, '.opencode', 'scripts', 'record-coverage-verdict.js')),
         'record-coverage-verdict.js must be copied because checking-coverage-before-change Step 2 pipes through it',
       );
       assert.ok(
-        fs.existsSync(path.join(target, '.claude', 'scripts', 'record-modularity-review.js')),
+        fs.existsSync(path.join(target, '.opencode', 'scripts', 'record-modularity-review.js')),
         'record-modularity-review.js must be copied because /brownfield Step 3.6 and /design --delta Step D3.5 invoke it',
       );
     } finally {
@@ -135,15 +135,15 @@ for (const profile of ['core', 'brownfield', 'full']) {
 test('scaffold (core) installs a deny-by-default unattended policy', () => {
   const { workDir, target } = scaffoldInto('core');
   try {
-    const policyPath = path.join(target, '.claude', 'unattended-policy.json');
+    const policyPath = path.join(target, '.opencode', 'unattended-policy.json');
     assert.ok(fs.existsSync(policyPath));
     const policy = JSON.parse(fs.readFileSync(policyPath, 'utf8'));
     assert.strictEqual(policy.network.mode, 'deny-by-default');
     assert.deepStrictEqual(policy.network.allowed_domains, []);
-    assert.ok(policy.read_only_paths.includes('.claude/trust'));
-    assert.ok(policy.read_only_paths.includes('.claude/certification'));
-    assert.ok(policy.read_only_paths.includes('.claude/state/autonomy-policy.json'));
-    assert.ok(policy.read_only_paths.includes('.claude/config/autonomy-policy.json'));
+    assert.ok(policy.read_only_paths.includes('.opencode/trust'));
+    assert.ok(policy.read_only_paths.includes('.opencode/certification'));
+    assert.ok(policy.read_only_paths.includes('.opencode/state/autonomy-policy.json'));
+    assert.ok(policy.read_only_paths.includes('.opencode/config/autonomy-policy.json'));
     assert.ok(policy.broker_only_commands.includes('gh'));
     assert.strictEqual(policy.allow_package_install, false);
     assert.deepStrictEqual(policy.credentials, {});
@@ -155,7 +155,7 @@ test('scaffold (core) installs a deny-by-default unattended policy', () => {
 test('scaffold (core) installs an empty trusted issuer registry', () => {
   const { workDir, target } = scaffoldInto('core');
   try {
-    const registry = JSON.parse(fs.readFileSync(path.join(target, '.claude', 'trust', 'issuers.json'), 'utf8'));
+    const registry = JSON.parse(fs.readFileSync(path.join(target, '.opencode', 'trust', 'issuers.json'), 'utf8'));
     assert.strictEqual(registry.schema_version, 1);
     assert.deepStrictEqual(registry.issuers, []);
   } finally {
@@ -163,11 +163,11 @@ test('scaffold (core) installs an empty trusted issuer registry', () => {
   }
 });
 
-test('scaffold (full) copies the .claude/config/ registry directory', () => {
+test('scaffold (full) copies the .opencode/config/ registry directory', () => {
   const { workDir, target } = scaffoldInto('full');
   try {
     assert.ok(
-      fs.existsSync(path.join(target, '.claude', 'config', 'scaffold-packs.json')),
+      fs.existsSync(path.join(target, '.opencode', 'config', 'scaffold-packs.json')),
       'config/scaffold-packs.json must be copied so vertical-glossary-pack.js finds its registry in a scaffolded project',
     );
   } finally {
@@ -179,15 +179,15 @@ test('scaffold (core) copies the sprint skill and its supporting scripts', () =>
   const { workDir, target } = scaffoldInto('core');
   try {
     assert.ok(
-      fs.existsSync(path.join(target, '.claude', 'skills', 'sprint', 'SKILL.md')),
+      fs.existsSync(path.join(target, '.opencode', 'skills', 'sprint', 'SKILL.md')),
       'skills/sprint/SKILL.md must be copied so /sprint is available in a default-scaffolded project',
     );
     assert.ok(
-      fs.existsSync(path.join(target, '.claude', 'scripts', 'impact-classifier.js')),
+      fs.existsSync(path.join(target, '.opencode', 'scripts', 'impact-classifier.js')),
       'impact-classifier.js must be copied because /feature\'s single-story lane calls it unconditionally',
     );
     assert.ok(
-      fs.existsSync(path.join(target, '.claude', 'scripts', 'amendment-provenance-check.js')),
+      fs.existsSync(path.join(target, '.opencode', 'scripts', 'amendment-provenance-check.js')),
       'amendment-provenance-check.js must be copied because the pre-commit hook\'s amendment-provenance gate requires it',
     );
   } finally {

@@ -9,7 +9,7 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'generate-codeowners.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'generate-codeowners.js');
 const { renderCodeowners, writeCodeowners } = require(SCRIPT);
 
 function tmp() {

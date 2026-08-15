@@ -1,7 +1,7 @@
 'use strict';
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { main, disposition } = require('../.claude/scripts/sensor-withhold');
+const { main, disposition } = require('../.opencode/scripts/sensor-withhold');
 
 // The disposition string is what the operator reads back to confirm the experiment was
 // captured as they intended, so its polarity must not silently invert.

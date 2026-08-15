@@ -2,7 +2,7 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { mergeVerdicts } = require('../.claude/scripts/merge-review-verdicts');
+const { mergeVerdicts } = require('../.opencode/scripts/merge-review-verdicts');
 
 const blockA = {
   gate: 'code-review',

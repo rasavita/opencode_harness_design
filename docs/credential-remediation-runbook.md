@@ -38,7 +38,7 @@ You cannot rotate or scrub what you haven't enumerated. Scan **both** the workin
 
 ```bash
 # Working tree + staged (the harness's tier-aware scan: baseline regex + gitleaks):
-node .claude/scripts/security-scan.js --secrets
+node .opencode/scripts/security-scan.js --secrets
 
 # FULL HISTORY across all refs (this is what a leak audit needs — a secret can be
 # gone from HEAD but alive in an old commit):

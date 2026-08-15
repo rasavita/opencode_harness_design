@@ -11,8 +11,8 @@ const os = require('os');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const { buildSemanticReview, renderSemanticReview } = require(path.join(ROOT, '.claude', 'hooks', 'lib', 'canvas-sync.js'));
-const { run } = require(path.join(ROOT, '.claude', 'scripts', 'canvas-semantic-check.js'));
+const { buildSemanticReview, renderSemanticReview } = require(path.join(ROOT, '.opencode', 'hooks', 'lib', 'canvas-sync.js'));
+const { run } = require(path.join(ROOT, '.opencode', 'scripts', 'canvas-semantic-check.js'));
 
 const CANVAS = `# Billing Canvas
 

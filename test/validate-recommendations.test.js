@@ -5,7 +5,7 @@ const assert = require('node:assert');
 const path = require('path');
 
 const { validate, validateAll } = require(
-  path.resolve(__dirname, '..', '.claude', 'scripts', 'validate-recommendations.js'),
+  path.resolve(__dirname, '..', '.opencode', 'scripts', 'validate-recommendations.js'),
 );
 
 function rec(overrides) {

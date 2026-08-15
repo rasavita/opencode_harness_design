@@ -16,11 +16,11 @@ const os = require('os');
 const path = require('path');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
-const SCRIPTS = path.join(REPO_ROOT, '.claude', 'scripts');
+const SCRIPTS = path.join(REPO_ROOT, '.opencode', 'scripts');
 const { generateAttestation, verifyAttestation } = require(path.join(SCRIPTS, 'generate-attestation'));
 const { validate } = require(path.join(SCRIPTS, 'validate-harness-manifest'));
 const { contentHash } = require(path.join(SCRIPTS, 'canonical-json'));
-const { controlIds, budgetDecision, justifiedIds } = require(path.join(REPO_ROOT, '.claude', 'hooks', 'lib', 'control-budget'));
+const { controlIds, budgetDecision, justifiedIds } = require(path.join(REPO_ROOT, '.opencode', 'hooks', 'lib', 'control-budget'));
 
 const NOW = '2026-07-19T00:00:00.000Z';
 const SHA = 'deadbeefcafe0001';
@@ -37,29 +37,29 @@ const shaRunner = (sha) => (_cmd, args) => (args[0] === 'rev-parse' ? `${sha}\n`
 // map; each test drops in only the optional inputs it exercises.
 function makeRoot(opts = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'attest-'));
-  fs.mkdirSync(path.join(root, '.claude', 'state'), { recursive: true });
-  fs.mkdirSync(path.join(root, '.claude', 'templates'), { recursive: true });
+  fs.mkdirSync(path.join(root, '.opencode', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(root, '.opencode', 'templates'), { recursive: true });
   fs.mkdirSync(path.join(root, 'specs', 'reviews'), { recursive: true });
   fs.copyFileSync(path.join(REPO_ROOT, 'harness-manifest.json'), path.join(root, 'harness-manifest.json'));
   fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ version: '2.5.0' }));
   const stdMap = opts.standardMap || readTemplateStandardMap();
-  fs.writeFileSync(path.join(root, '.claude', 'templates', 'standard-map.json'), JSON.stringify(stdMap));
+  fs.writeFileSync(path.join(root, '.opencode', 'templates', 'standard-map.json'), JSON.stringify(stdMap));
   for (const [name, body] of Object.entries(opts.reviews || {})) {
     fs.writeFileSync(path.join(root, 'specs', 'reviews', name), JSON.stringify(body));
   }
   for (const [name, body] of Object.entries(opts.state || {})) {
     const val = typeof body === 'string' ? body : JSON.stringify(body);
-    fs.writeFileSync(path.join(root, '.claude', 'state', name), val);
+    fs.writeFileSync(path.join(root, '.opencode', 'state', name), val);
   }
   return root;
 }
 
 function readTemplateStandardMap() {
-  return JSON.parse(fs.readFileSync(path.join(REPO_ROOT, '.claude', 'templates', 'standard-map.json'), 'utf8'));
+  return JSON.parse(fs.readFileSync(path.join(REPO_ROOT, '.opencode', 'templates', 'standard-map.json'), 'utf8'));
 }
 
 function gen(root, extra = {}) {
-  return generateAttestation({ root, attestDir: path.join(root, '.claude', 'attestations'), runner, now: () => NOW, ...extra });
+  return generateAttestation({ root, attestDir: path.join(root, '.opencode', 'attestations'), runner, now: () => NOW, ...extra });
 }
 
 test('control_inventory round-trips the REAL manifest: total == guides+sensors == 162', () => {
@@ -216,17 +216,17 @@ test('immutability: a second run on the same SHA is a no-op; --force overwrites'
   const root = makeRoot();
   const first = gen(root);
   assert.strictEqual(first.action, 'written');
-  const second = generateAttestation({ root, attestDir: path.join(root, '.claude', 'attestations'), runner, now: () => '2026-07-19T11:11:11.000Z' });
+  const second = generateAttestation({ root, attestDir: path.join(root, '.opencode', 'attestations'), runner, now: () => '2026-07-19T11:11:11.000Z' });
   assert.strictEqual(second.action, 'already-attested');
   assert.strictEqual(second.bundle.generated_at, NOW, 'no-op must not rewrite generated_at');
-  const forced = generateAttestation({ root, attestDir: path.join(root, '.claude', 'attestations'), runner, now: () => '2026-07-19T12:00:00.000Z', force: true });
+  const forced = generateAttestation({ root, attestDir: path.join(root, '.opencode', 'attestations'), runner, now: () => '2026-07-19T12:00:00.000Z', force: true });
   assert.strictEqual(forced.action, 'written');
   assert.strictEqual(forced.bundle.generated_at, '2026-07-19T12:00:00.000Z');
 });
 
 test('index.json appends and dedupes by commit_sha', () => {
   const root = makeRoot();
-  const attestDir = path.join(root, '.claude', 'attestations');
+  const attestDir = path.join(root, '.opencode', 'attestations');
   gen(root);
   gen(root, { force: true }); // same SHA again
   const index = JSON.parse(fs.readFileSync(path.join(attestDir, 'index.json'), 'utf8'));
@@ -284,7 +284,7 @@ test('manifest is valid with the new sensors and the control budget holds at 162
   assert.strictEqual(ids.length, 162);
   assert.ok(ids.includes('compliance-attestation'));
   assert.ok(ids.includes('portfolio-compliance-rollup'));
-  const baseline = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, '.claude', 'state', 'control-budget-baseline.json'), 'utf8'));
+  const baseline = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, '.opencode', 'state', 'control-budget-baseline.json'), 'utf8'));
   const decision = budgetDecision(ids, baseline, justifiedIds(manifest));
   assert.strictEqual(decision.blocked, false, 'control budget must not block at 162');
 });
@@ -300,8 +300,8 @@ test('scaffold round-trip: generator script, attestation skill, and standard-map
     projectType: 'D', verificationMode: 'C', modelTier: 'balanced',
     tracker: 'A', frameworkPacks: [], lsp: [],
   }));
-  applyScaffold({ profile: profilePath, pluginSource: path.join(REPO_ROOT, '.claude'), target, scaffoldProfile: 'full' });
-  const dc = path.join(target, '.claude');
+  applyScaffold({ profile: profilePath, pluginSource: path.join(REPO_ROOT, '.opencode'), target, scaffoldProfile: 'full' });
+  const dc = path.join(target, '.opencode');
   for (const rel of [
     path.join('scripts', 'generate-attestation.js'),
     path.join('scripts', 'attestation-bundle.js'),

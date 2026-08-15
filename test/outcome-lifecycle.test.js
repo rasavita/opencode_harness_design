@@ -5,12 +5,12 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
-const { buildOutcomeRecord, parseArgs } = require('../.claude/scripts/record-outcome');
-const { summarize } = require('../.claude/scripts/outcome-report');
+const { buildOutcomeRecord, parseArgs } = require('../.opencode/scripts/record-outcome');
+const { summarize } = require('../.opencode/scripts/outcome-report');
 
 function stateFixture() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'outcome-lifecycle-'));
-  const state = path.join(root, '.claude', 'state');
+  const state = path.join(root, '.opencode', 'state');
   fs.mkdirSync(state, { recursive: true });
   fs.writeFileSync(path.join(state, 'current-run-id'), 'run-1\n');
   fs.writeFileSync(path.join(state, 'current-task'), 'TASK-1\n');

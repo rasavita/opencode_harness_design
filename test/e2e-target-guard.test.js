@@ -17,7 +17,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { resolveTarget } = require('../.claude/scripts/e2e-target-guard.js');
+const { resolveTarget } = require('../.opencode/scripts/e2e-target-guard.js');
 
 const ALLOW = ['https://test.example.com', 'https://*.staging.example.com'];
 

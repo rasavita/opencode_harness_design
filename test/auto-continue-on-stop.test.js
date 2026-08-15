@@ -5,11 +5,11 @@ const { test } = require('node:test');
 const { makeHookProject, runHook } = require('./helpers/hook-fixture');
 
 const HOOK = 'auto-continue-on-stop.js';
-const ON = { CLAUDE_AUTO_CONTINUE: '1' };
+const ON = { HARNESS_AUTO_CONTINUE: '1' };
 // Explicit off — empty string reads as disabled (see enabled() in the hook).
 // Set it rather than relying on an absent ambient var, since the harness's own
-// settings.json now ships CLAUDE_AUTO_CONTINUE=1 and would leak into the runner.
-const OFF = { CLAUDE_AUTO_CONTINUE: '' };
+// settings.json now ships HARNESS_AUTO_CONTINUE=1 and would leak into the runner.
+const OFF = { HARNESS_AUTO_CONTINUE: '' };
 
 function writeProgress(projectDir, fields) {
   const body = Object.entries(fields).map(([k, v]) => `${k}: ${v}`).join('\n') + '\n';
@@ -22,7 +22,7 @@ function writeFeatures(projectDir, passes) {
 }
 
 function statePath(projectDir, name) {
-  return path.join(projectDir, '.claude', 'state', name);
+  return path.join(projectDir, '.opencode', 'state', name);
 }
 
 function seedState(projectDir, count, progress) {
@@ -30,7 +30,7 @@ function seedState(projectDir, count, progress) {
   if (progress !== undefined) fs.writeFileSync(statePath(projectDir, 'auto-continue-progress'), `${progress}\n`);
 }
 
-test('no-ops entirely when CLAUDE_AUTO_CONTINUE is off, even with work remaining', async () => {
+test('no-ops entirely when HARNESS_AUTO_CONTINUE is off, even with work remaining', async () => {
   const projectDir = makeHookProject([HOOK]);
   writeProgress(projectDir, { groups_remaining: '[A]', current_group: 'A', next_action: 'build' });
   const result = await runHook(projectDir, HOOK, {}, OFF);

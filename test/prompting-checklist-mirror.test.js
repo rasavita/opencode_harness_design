@@ -2,7 +2,7 @@
 
 // The authoring checklist exists in two places on purpose:
 //   docs/prompting-standards.md  — the standard a human reads
-//   .claude/skills/author-prompt-surface/SKILL.md — the control an agent applies
+//   .opencode/skills/author-prompt-surface/SKILL.md — the control an agent applies
 // The skill is what actually gates an edit to any agent/skill/command prompt, so
 // if the two drift the harness enforces a rule the standard no longer states (or
 // silently stops enforcing one it does). That drift happened and was caught by
@@ -22,7 +22,7 @@ const { test } = require('node:test');
 
 const ROOT = path.resolve(__dirname, '..');
 const STANDARD = path.join(ROOT, 'docs', 'prompting-standards.md');
-const SKILL = path.join(ROOT, '.claude', 'skills', 'author-prompt-surface', 'SKILL.md');
+const SKILL = path.join(ROOT, '.opencode', 'skills', 'author-prompt-surface', 'SKILL.md');
 
 const MIN_SHARED_TOKENS = 3;
 

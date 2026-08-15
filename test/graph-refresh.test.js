@@ -4,9 +4,9 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { test } = require('node:test');
 const { REPO_ROOT, makeHookProject, runHook } = require('./helpers/hook-fixture');
-const { STALE_MARK } = require(path.join(REPO_ROOT, '.claude', 'hooks', 'lib', 'stale-stamp'));
+const { STALE_MARK } = require(path.join(REPO_ROOT, '.opencode', 'hooks', 'lib', 'stale-stamp'));
 
-const SCRIPTS_REL = path.join('.claude', 'skills', 'code-map', 'scripts');
+const SCRIPTS_REL = path.join('.opencode', 'skills', 'code-map', 'scripts');
 const INDEXER_REL = path.join(SCRIPTS_REL, 'code_index');
 const WIKI_DIR_REL = path.join(SCRIPTS_REL, 'code_wiki');
 const WIKI_CLI_REL = path.join(SCRIPTS_REL, 'code_wiki.js');
@@ -20,7 +20,7 @@ function graphPath(projectDir) {
 }
 
 function dirtyPath(projectDir) {
-  return path.join(projectDir, '.claude', 'state', 'graph-dirty.jsonl');
+  return path.join(projectDir, '.opencode', 'state', 'graph-dirty.jsonl');
 }
 
 function makeIndexedProject(hookNames) {
@@ -32,10 +32,10 @@ function makeIndexedProject(hookNames) {
   for (const f of BUILD_GRAPH_FILES) {
     fs.copyFileSync(path.join(REPO_ROOT, SCRIPTS_REL, f), path.join(dir, SCRIPTS_REL, f));
   }
-  fs.mkdirSync(path.join(dir, '.claude', 'scripts'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'scripts'), { recursive: true });
   fs.copyFileSync(
-    path.join(REPO_ROOT, '.claude', 'scripts', 'navigation-refresh.js'),
-    path.join(dir, '.claude', 'scripts', 'navigation-refresh.js')
+    path.join(REPO_ROOT, '.opencode', 'scripts', 'navigation-refresh.js'),
+    path.join(dir, '.opencode', 'scripts', 'navigation-refresh.js')
   );
   const res = spawnSync('python3', [
     path.join(dir, INDEXER_REL, 'code_index.py'),
@@ -125,10 +125,10 @@ test('graph-refresh bootstraps a placeholder graph after first greenfield source
   fs.cpSync(path.join(REPO_ROOT, INDEXER_REL), path.join(dir, INDEXER_REL), { recursive: true });
   fs.cpSync(path.join(REPO_ROOT, WIKI_DIR_REL), path.join(dir, WIKI_DIR_REL), { recursive: true });
   fs.copyFileSync(path.join(REPO_ROOT, WIKI_CLI_REL), path.join(dir, WIKI_CLI_REL));
-  fs.mkdirSync(path.join(dir, '.claude', 'scripts'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'scripts'), { recursive: true });
   fs.copyFileSync(
-    path.join(REPO_ROOT, '.claude', 'scripts', 'navigation-refresh.js'),
-    path.join(dir, '.claude', 'scripts', 'navigation-refresh.js')
+    path.join(REPO_ROOT, '.opencode', 'scripts', 'navigation-refresh.js'),
+    path.join(dir, '.opencode', 'scripts', 'navigation-refresh.js')
   );
   fs.mkdirSync(path.join(dir, 'specs', 'brownfield', 'wiki'), { recursive: true });
   fs.writeFileSync(graphPath(dir), JSON.stringify({

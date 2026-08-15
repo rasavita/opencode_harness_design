@@ -7,7 +7,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'mutation-smoke.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'mutation-smoke.js');
 const { detectLang, findMutationSites, applyMutationToSource } = require(SCRIPT);
 
 // mutation-smoke generalizes the manual "flip a behavior, confirm the test goes
@@ -186,7 +186,7 @@ test('CLI: no --files is a usage error (exit 2)', () => {
 const ROOT = path.join(__dirname, '..');
 
 test('mutation-smoke.md reference exists and states the no-false-survivor principle', () => {
-  const p = path.join(ROOT, '.claude', 'skills', 'test', 'references', 'mutation-smoke.md');
+  const p = path.join(ROOT, '.opencode', 'skills', 'test', 'references', 'mutation-smoke.md');
   assert.ok(fs.existsSync(p), 'reference present');
   const doc = fs.readFileSync(p, 'utf8').toLowerCase();
   assert.ok(doc.includes('survivor'), 'explains survivors');
@@ -194,6 +194,6 @@ test('mutation-smoke.md reference exists and states the no-false-survivor princi
 });
 
 test('pinning-down-behavior generalizes its mutation-smoke checkpoint to the script', () => {
-  const skill = fs.readFileSync(path.join(ROOT, '.claude', 'skills', 'pinning-down-behavior', 'SKILL.md'), 'utf8');
+  const skill = fs.readFileSync(path.join(ROOT, '.opencode', 'skills', 'pinning-down-behavior', 'SKILL.md'), 'utf8');
   assert.match(skill, /mutation-smoke\.js/, 'points the checkpoint at the shared runner');
 });

@@ -8,15 +8,15 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const { buildManifest, defaultSensorTier } = require('../.claude/scripts/scaffold-render');
+const { buildManifest, defaultSensorTier } = require('../.opencode/scripts/scaffold-render');
 const {
   CORE_SKILLS,
   OPTIONAL_SKILLS,
   selectedCopySet,
   copyScaffoldTree,
-} = require('../.claude/scripts/scaffold-copy');
+} = require('../.opencode/scripts/scaffold-copy');
 
-const PLUGIN_SOURCE = path.resolve(__dirname, '..', '.claude');
+const PLUGIN_SOURCE = path.resolve(__dirname, '..', '.opencode');
 
 test('defaultSensorTier: cli-or-library → minimal, web-app → standard', () => {
   assert.strictEqual(defaultSensorTier({}, 'cli-or-library'), 'minimal');
@@ -87,11 +87,11 @@ test('copyScaffoldTree(core) does not copy pe-ic-memo or install-framework-packs
   const target = path.join(workDir, 'project');
   try {
     copyScaffoldTree(PLUGIN_SOURCE, target, 'core');
-    assert.ok(!fs.existsSync(path.join(target, '.claude', 'skills', 'pe-ic-memo')));
-    assert.ok(!fs.existsSync(path.join(target, '.claude', 'skills', 'install-framework-packs')));
-    assert.ok(!fs.existsSync(path.join(target, '.claude', 'skills', 'fastapi-code')));
-    assert.ok(fs.existsSync(path.join(target, '.claude', 'skills', 'build', 'SKILL.md')));
-    assert.ok(fs.existsSync(path.join(target, '.claude', 'skills', 'writing-acceptance-tests-first', 'SKILL.md')));
+    assert.ok(!fs.existsSync(path.join(target, '.opencode', 'skills', 'pe-ic-memo')));
+    assert.ok(!fs.existsSync(path.join(target, '.opencode', 'skills', 'install-framework-packs')));
+    assert.ok(!fs.existsSync(path.join(target, '.opencode', 'skills', 'fastapi-code')));
+    assert.ok(fs.existsSync(path.join(target, '.opencode', 'skills', 'build', 'SKILL.md')));
+    assert.ok(fs.existsSync(path.join(target, '.opencode', 'skills', 'writing-acceptance-tests-first', 'SKILL.md')));
   } finally {
     fs.rmSync(workDir, { recursive: true, force: true });
   }
@@ -99,7 +99,7 @@ test('copyScaffoldTree(core) does not copy pe-ic-memo or install-framework-packs
 
 test('scaffold.md documents quality.sensor_tier', () => {
   const md = fs.readFileSync(
-    path.join(__dirname, '..', '.claude', 'commands', 'scaffold.md'),
+    path.join(__dirname, '..', '.opencode', 'commands', 'scaffold.md'),
     'utf8'
   );
   assert.match(md, /quality\.sensor_tier/);

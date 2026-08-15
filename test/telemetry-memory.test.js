@@ -9,7 +9,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { pushSnapshot, buildSnapshot, stableProjectInstance } = require(
-  path.join(__dirname, '..', '.claude', 'scripts', 'telemetry-memory')
+  path.join(__dirname, '..', '.opencode', 'scripts', 'telemetry-memory')
 );
 
 test('stableProjectInstance disambiguates same-named projects on different paths', () => {
@@ -47,7 +47,7 @@ test('pushSnapshot resolves pushed:false (empty snapshot) when no ledger exists'
   const os = require('os');
   const fs = require('fs');
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pushsnapshot-empty-'));
-  const stateDir = path.join(tmpDir, '.claude', 'state');
+  const stateDir = path.join(tmpDir, '.opencode', 'state');
   fs.mkdirSync(stateDir, { recursive: true });
   // No ledger file → buildSnapshot returns empty string → pushed:false before HTTP.
   const { server, port } = await makeGateway(200);
@@ -63,7 +63,7 @@ test('pushSnapshot resolves pushed:false when server returns 500', async () => {
   const os = require('os');
   const fs = require('fs');
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pushsnapshot-'));
-  const stateDir = path.join(tmpDir, '.claude', 'state');
+  const stateDir = path.join(tmpDir, '.opencode', 'state');
   fs.mkdirSync(stateDir, { recursive: true });
   const record = {
     kind: 'turn', ts: Date.now(), user: 'test', lane: 'spec', mode: 'full',
@@ -91,7 +91,7 @@ test('pushSnapshot resolves pushed:true when server returns 202', async () => {
   const os = require('os');
   const fs = require('fs');
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pushsnapshot-202-'));
-  const stateDir = path.join(tmpDir, '.claude', 'state');
+  const stateDir = path.join(tmpDir, '.opencode', 'state');
   fs.mkdirSync(stateDir, { recursive: true });
   const record = {
     kind: 'turn', ts: Date.now(), user: 'test', lane: 'spec', mode: 'full',

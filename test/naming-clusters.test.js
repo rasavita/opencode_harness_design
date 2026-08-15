@@ -7,7 +7,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const LIB = path.join(__dirname, '..', '.claude', 'hooks', 'lib', 'naming-clusters.js');
+const LIB = path.join(__dirname, '..', '.opencode', 'hooks', 'lib', 'naming-clusters.js');
 const { stripRoleSuffix, isCandidateRoot, clusterNamingEvidence, renderCandidates } = require(LIB);
 
 test('stripRoleSuffix removes known technical-role suffixes', () => {
@@ -64,7 +64,7 @@ test('CLI: writes specs/brownfield/naming-clusters.md from code-graph.json', () 
     { id: 'py:a.py', path: 'a.py', symbols: ['AccountController', 'AccountService'] },
   ] };
   fs.writeFileSync(path.join(dir, 'specs', 'brownfield', 'code-graph.json'), JSON.stringify(graph));
-  const script = path.join(__dirname, '..', '.claude', 'scripts', 'naming-clusters.js');
+  const script = path.join(__dirname, '..', '.opencode', 'scripts', 'naming-clusters.js');
   execFileSync(process.execPath, [script], { cwd: dir });
   const out = fs.readFileSync(path.join(dir, 'specs', 'brownfield', 'naming-clusters.md'), 'utf8');
   assert.match(out, /Account/);
@@ -72,7 +72,7 @@ test('CLI: writes specs/brownfield/naming-clusters.md from code-graph.json', () 
 
 test('CLI: exits 2 when no code-graph.json exists', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'naming-clusters-'));
-  const script = path.join(__dirname, '..', '.claude', 'scripts', 'naming-clusters.js');
+  const script = path.join(__dirname, '..', '.opencode', 'scripts', 'naming-clusters.js');
   let code = 0;
   try {
     execFileSync(process.execPath, [script], { cwd: dir, stdio: 'pipe' });

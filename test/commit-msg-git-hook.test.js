@@ -133,7 +133,7 @@ test('commit-msg: blocks for "move!: ..." breaking-change refactor subject', asy
 // --- claimsRefactor: widened subject detection ---
 
 const { claimsRefactor } = require(
-  path.join(__dirname, '..', '.claude', 'git-hooks', 'lib', 'refactor-purity')
+  path.join(__dirname, '..', '.opencode', 'git-hooks', 'lib', 'refactor-purity')
 );
 
 test('claimsRefactor: existing prefix forms still match', () => {

@@ -4,7 +4,7 @@
 //
 // check-partition proves no kernel unit hard-references a pack; this proves the
 // consequence — that a tree containing only the kernel actually works. The two are
-// different claims, and only this one would have caught .claude/git-hooks/lib being
+// different claims, and only this one would have caught .opencode/git-hooks/lib being
 // undeclared: the hooks loaded fine and then gate-registry died on a missing module.
 
 const test = require('node:test');
@@ -18,8 +18,8 @@ const ROOT = path.resolve(__dirname, '..');
 const { loadPartition, resolveSelection, filesFor, materialize, undeclaredUnits } = require('../tools/pack-install');
 
 const ALWAYS = [
-  '.claude/.claude-plugin', '.claude/settings.json', '.claude/config',
-  '.claude/templates/state-seeds', '.claude/git-hooks/lib',
+  '.opencode/.opencode-plugin', '.opencode/settings.json', '.opencode/config',
+  '.opencode/templates/state-seeds', '.opencode/git-hooks/lib',
 ];
 
 let kernelTree = null;
@@ -61,7 +61,7 @@ const CORE_MODULES_THAT_MUST_LOAD = [
 test('every fixed core-profile module loads without the brownfield pack', () => {
   const out = coreProfile();
   for (const parts of CORE_MODULES_THAT_MUST_LOAD) {
-    const p = path.join(out, '.claude', ...parts);
+    const p = path.join(out, '.opencode', ...parts);
     const r = node(['-e', `require(${JSON.stringify(p)})`]);
     assert.strictEqual(r.status, 0,
       `${parts.join('/')} must load in a core install: ${(r.stderr || '').split('\n').find((l) => l.includes('Error')) || ''}`);
@@ -89,7 +89,7 @@ const BROWNFIELD_MODULES_THAT_MUST_LOAD = [
 test('every fixed brownfield-profile module loads without the dist pack', () => {
   const out = brownfieldProfile();
   for (const parts of BROWNFIELD_MODULES_THAT_MUST_LOAD) {
-    const p = path.join(out, '.claude', ...parts);
+    const p = path.join(out, '.opencode', ...parts);
     const r = node(['-e', `require(${JSON.stringify(p)})`]);
     assert.strictEqual(r.status, 0,
       `${parts.join('/')} must load in a brownfield install: ${(r.stderr || '').split('\n').find((l) => l.includes('Error')) || ''}`);
@@ -99,7 +99,7 @@ test('every fixed brownfield-profile module loads without the dist pack', () => 
 test('every kernel hook loads with no pack installed', () => {
   const out = kernelOnly();
   for (const h of ['pre-write-gate', 'pre-bash-gate', 'verify-on-save', 'record-run', 'check-git-hooks']) {
-    const p = path.join(out, '.claude', 'hooks', `${h}.js`);
+    const p = path.join(out, '.opencode', 'hooks', `${h}.js`);
     const r = node(['-e', `require(${JSON.stringify(p)})`]);
     assert.strictEqual(r.status, 0, `${h} must load without packs: ${(r.stderr || '').split('\n')[0]}`);
   }
@@ -107,7 +107,7 @@ test('every kernel hook loads with no pack installed', () => {
 
 test('the commit gate registry loads and selects its gates with no pack installed', () => {
   const out = kernelOnly();
-  const reg = path.join(out, '.claude', 'hooks', 'lib', 'gate-registry.js');
+  const reg = path.join(out, '.opencode', 'hooks', 'lib', 'gate-registry.js');
   const r = node(['-e', `const {selectGates}=require(${JSON.stringify(reg)});process.stdout.write(String(selectGates('standard').length))`]);
   assert.strictEqual(r.status, 0, `gate-registry must load without packs: ${(r.stderr || '').split('\n')[0]}`);
   assert.ok(Number(r.stdout) > 0, 'the standard tier must still select gates');
@@ -116,7 +116,7 @@ test('the commit gate registry loads and selects its gates with no pack installe
 test('a kernel-only /gate reports pack checks as not installed, and does not block', () => {
   const out = kernelOnly();
   fs.mkdirSync(path.join(out, 'specs', 'reviews'), { recursive: true });
-  const r = node([path.join(out, '.claude', 'scripts', 'run-gate-checks.js'), '--root', out]);
+  const r = node([path.join(out, '.opencode', 'scripts', 'run-gate-checks.js'), '--root', out]);
   assert.match(r.stdout, /pack not installed/, 'an absent pack must be reported, not silently dropped');
   assert.doesNotMatch(r.stdout, /BLOCK/, 'an uninstalled pack is a configuration, not a failure');
   assert.strictEqual(r.status, 0);
@@ -134,7 +134,7 @@ test('no pack unit leaks into a kernel-only tree', () => {
   const out = kernelOnly();
   const partition = loadPartition();
   const kernelSkills = new Set(partition.kernel.skill || []);
-  const installed = fs.readdirSync(path.join(out, '.claude', 'skills'));
+  const installed = fs.readdirSync(path.join(out, '.opencode', 'skills'));
   for (const s of installed) {
     assert.ok(kernelSkills.has(s), `${s} is a pack skill but shipped in the kernel-only install`);
   }
@@ -150,7 +150,7 @@ test('check-partition --strict passes: no kernel violations and no profile-break
   // proof the run was real, so an unreadable partition fails loud instead of vacuously.
   const seen = /^partition: (\d+) units/m.exec(r.stdout || '');
   assert.ok(seen && Number(seen[1]) > 100,
-    `check-partition loaded ${seen ? seen[1] : 'no'} units — the partition or the .claude tree did not load`);
+    `check-partition loaded ${seen ? seen[1] : 'no'} units — the partition or the .opencode tree did not load`);
 });
 
 test('every file in the accounted directories is claimed by some pack', () => {

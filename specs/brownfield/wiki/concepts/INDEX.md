@@ -4,7 +4,7 @@ Hash-cached, deterministic cluster summaries. Regenerated when member file hashe
 
 ## Repo notes
 
-- Primary harness control plane lives under .claude/ (hooks, scripts, skills). Brownfield navigation artifacts live under specs/brownfield/. Prefer /context or nav-query pack before broad source reads.
+- Primary harness control plane lives under .opencode/ (hooks, scripts, skills). Brownfield navigation artifacts live under specs/brownfield/. Prefer /context or nav-query pack before broad source reads.
 
 ## Pages
 

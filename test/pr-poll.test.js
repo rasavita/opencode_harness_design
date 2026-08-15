@@ -6,7 +6,7 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'pr-poll.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'pr-poll.js');
 const { poll, recordHandled, loadState, run } = require(SCRIPT);
 
 // gh stub: maps the first distinctive arg sequence to a canned payload.

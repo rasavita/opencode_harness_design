@@ -19,7 +19,7 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const { usageFromTranscript } = require('../.claude/hooks/lib/transcript-usage');
+const { usageFromTranscript } = require('../.opencode/hooks/lib/transcript-usage');
 
 function writeTranscript(lines) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'harness-transcript-'));

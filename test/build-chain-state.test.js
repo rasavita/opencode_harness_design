@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const { test } = require('node:test');
-const S = require('../.claude/scripts/build-chain-state.js');
+const S = require('../.opencode/scripts/build-chain-state.js');
 
 const BLOCK_MID = [
   '=== Session 3 ===',

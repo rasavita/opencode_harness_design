@@ -1,6 +1,6 @@
 # Proposal: Confidence-Gated Planning Checkpoint
 
-Status: **Implemented** (skill prose + `plan-confidence.js --gate` exit codes; see `.claude/skills/build/SKILL.md` Phase 3 / 3.5 and lite-lane headless notes)
+Status: **Implemented** (skill prose + `plan-confidence.js --gate` exit codes; see `.opencode/skills/build/SKILL.md` Phase 3 / 3.5 and lite-lane headless notes)
 Author: harness maintainers
 Roadmap link: S2 "symphony Planning state" in `autonomous-engineer-roadmap` memory.
 
@@ -135,11 +135,11 @@ Absent file → omit the line (backward compatible; pre-existing runs are unaffe
 
 | File | Change |
 |---|---|
-| `.claude/agents/planner.md` | After Step 5, compute and write `specs/plan-confidence.json` from the signals in §1. Add to Quality Gates: "confidence artifact written." |
-| `.claude/scripts/plan-confidence.js` *(new)* | Pure function: read BRD/stories/schemas/brownfield, emit band+score+drivers. Deterministic, unit-testable, no model call. Mirrors `build-chain-state.js` style. |
-| `.claude/skills/build/SKILL.md` | Phase 3.5: render confidence + drivers; confidence-aware question. `--auto`: clarify-on-low path before Phase 4. |
-| `.claude/skills/build/references/lite-lane.md` | Add low confidence to the auto-escalation triggers. |
-| `.claude/scripts/pipeline-status.js` | Add the `Plan:` line when `plan-confidence.json` exists. |
+| `.opencode/agents/planner.md` | After Step 5, compute and write `specs/plan-confidence.json` from the signals in §1. Add to Quality Gates: "confidence artifact written." |
+| `.opencode/scripts/plan-confidence.js` *(new)* | Pure function: read BRD/stories/schemas/brownfield, emit band+score+drivers. Deterministic, unit-testable, no model call. Mirrors `build-chain-state.js` style. |
+| `.opencode/skills/build/SKILL.md` | Phase 3.5: render confidence + drivers; confidence-aware question. `--auto`: clarify-on-low path before Phase 4. |
+| `.opencode/skills/build/references/lite-lane.md` | Add low confidence to the auto-escalation triggers. |
+| `.opencode/scripts/pipeline-status.js` | Add the `Plan:` line when `plan-confidence.json` exists. |
 | `calibration-profile.json` (template) | Add `plan_confidence.threshold` and per-signal weights (defaults baked in script). |
 | `test/plan-confidence.test.js` *(new)* | Cover band boundaries: clean plan → high; one open question → low; thin stories → medium; brownfield conflict → low. |
 

@@ -3,9 +3,9 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs'), os = require('os'), path = require('path');
 const { recordVerdict, readVerdicts, latestBySensor, WITHHOLD_REL } =
-  require('../.claude/hooks/lib/withhold-verdicts');
+  require('../.opencode/hooks/lib/withhold-verdicts');
 
-function tmp() { const d = fs.mkdtempSync(path.join(os.tmpdir(), 'wv-')); fs.mkdirSync(path.join(d, '.claude/state'), { recursive: true }); return d; }
+function tmp() { const d = fs.mkdtempSync(path.join(os.tmpdir(), 'wv-')); fs.mkdirSync(path.join(d, '.opencode/state'), { recursive: true }); return d; }
 
 // The withhold verdict is the real-job evidence the canary (mechanical liveness only)
 // cannot supply, so the fields the value meter reads have to survive a round-trip.
@@ -54,5 +54,5 @@ test('latestBySensor keeps only the most recent verdict per control', () => {
 });
 
 test('WITHHOLD_REL is a distinct ledger from the bite ledger', () => {
-  assert.ok(WITHHOLD_REL.endsWith(path.join('.claude', 'state', 'sensor-withhold.jsonl')));
+  assert.ok(WITHHOLD_REL.endsWith(path.join('.opencode', 'state', 'sensor-withhold.jsonl')));
 });

@@ -6,7 +6,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { buildGraphifyGraph } = require(
-  path.join(__dirname, '..', '.claude', 'skills', 'code-map', 'scripts', 'import_graphify_graph')
+  path.join(__dirname, '..', '.opencode', 'skills', 'code-map', 'scripts', 'import_graphify_graph')
 );
 
 const FIXTURE = path.join(__dirname, 'fixtures', 'graphify', 'sample-graph.json');

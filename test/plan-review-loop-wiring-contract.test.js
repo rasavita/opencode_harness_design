@@ -14,12 +14,12 @@ const { readSkillCorpus } = require('./helpers/skill-corpus');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
-const { PHASES } = require(path.join(ROOT, '.claude/scripts/plan-approval.js'));
+const { PHASES } = require(path.join(ROOT, '.opencode/scripts/plan-approval.js'));
 
 test('package.json exposes the gate', () => {
   assert.strictEqual(
     JSON.parse(read('package.json')).scripts['plan-approval'],
-    'node .claude/scripts/plan-approval.js',
+    'node .opencode/scripts/plan-approval.js',
   );
 });
 
@@ -66,12 +66,12 @@ test('the headless lanes record a waiver rather than leaving the receipt absent'
   const build = readSkillCorpus('build');
   assert.match(build, /plan-approval\.js waive/, '/build must waive for the collapsed lanes');
   assert.match(build, /--lane --auto(nomous)?\b/, 'a waiver must name the lane that granted it');
-  const loop = read('.claude/skills/plan-review-loop/SKILL.md');
+  const loop = read('.opencode/skills/plan-review-loop/SKILL.md');
   assert.match(loop, /--require-human/, 'the loop must document how a gated lane refuses waivers');
 });
 
 test('the loop keeps the dialogue shape that distinguishes it from approve/reject', () => {
-  const loop = read('.claude/skills/plan-review-loop/SKILL.md');
+  const loop = read('.opencode/skills/plan-review-loop/SKILL.md');
   for (const [label, pattern] of [
     ['a review brief rather than an artifact dump', /review brief/i],
     ['one question at a time', /[Oo]ne question at a time/],
@@ -120,12 +120,12 @@ test('manifest and HARNESS.md register both controls with budget justifications'
   assert.strictEqual(sensor.axis, 'traceability');
   assert.strictEqual(sensor.cadence, 'planning');
   assert.strictEqual(sensor.status, 'active');
-  assert.strictEqual(sensor.wired_at, '.claude/scripts/plan-approval.js');
+  assert.strictEqual(sensor.wired_at, '.opencode/scripts/plan-approval.js');
   assert.ok(sensor.net_add_justification);
 
   const guide = manifest.guides.find((x) => x.id === 'plan-review-loop');
   assert.ok(guide, 'expected a plan-review-loop guide entry');
-  assert.strictEqual(guide.wired_at, '.claude/skills/plan-review-loop/SKILL.md');
+  assert.strictEqual(guide.wired_at, '.opencode/skills/plan-review-loop/SKILL.md');
   assert.ok(guide.net_add_justification);
 
   const harness = read('HARNESS.md');

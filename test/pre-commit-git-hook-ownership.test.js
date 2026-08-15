@@ -10,10 +10,10 @@ const { stage } = require('./helpers/pre-commit-fixtures');
 const HOOK = 'pre-commit';
 
 function installOwnershipScript(projectDir) {
-  const dir = path.join(projectDir, '.claude', 'scripts');
+  const dir = path.join(projectDir, '.opencode', 'scripts');
   fs.mkdirSync(dir, { recursive: true });
   fs.copyFileSync(
-    path.join(__dirname, '..', '.claude', 'scripts', 'ownership-check.js'),
+    path.join(__dirname, '..', '.opencode', 'scripts', 'ownership-check.js'),
     path.join(dir, 'ownership-check.js')
   );
 }

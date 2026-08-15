@@ -5,7 +5,7 @@ const assert = require('node:assert');
 const path = require('path');
 
 const { unstableHubKeys, gateDecision } = require(
-  path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'coupling-gate.js')
+  path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'coupling-gate.js')
 );
 
 function graphWith(hubs) {

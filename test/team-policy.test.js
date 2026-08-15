@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const { test } = require('node:test');
-const { decideTeamMode } = require('../.claude/scripts/team-policy');
+const { decideTeamMode } = require('../.opencode/scripts/team-policy');
 
 test('single story is solo', () => {
   const d = decideTeamMode({ stories: [{ id: 'S1', files: ['a.js', 'b.js', 'c.js'] }] });

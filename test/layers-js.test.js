@@ -11,7 +11,7 @@ const { makeHookProject, runHook } = require('./helpers/hook-fixture');
 // --- Unit tests for checkContentViolations (JS/TS path) ---
 
 const { checkContentViolations, getLayer, getHigherLayers } = require(
-  path.join(__dirname, '..', '.claude', 'hooks', 'lib', 'layers')
+  path.join(__dirname, '..', '.opencode', 'hooks', 'lib', 'layers')
 );
 
 test('getLayer returns null for a file outside any recognised layer', () => {

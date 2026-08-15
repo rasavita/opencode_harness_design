@@ -17,11 +17,11 @@ const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
-const drift = require(path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'drift.js'));
+const drift = require(path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'drift.js'));
 
 const REPO = path.resolve(__dirname, '..');
 const INDEXER = path.join(
-  REPO, '.claude', 'skills', 'code-map', 'scripts', 'code_index', 'code_index.py'
+  REPO, '.opencode', 'skills', 'code-map', 'scripts', 'code_index', 'code_index.py'
 );
 
 // --- (a) a 26th-ranked unstable hub, absent from the capped `hubs` list,

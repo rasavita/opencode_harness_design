@@ -17,7 +17,7 @@ function writeManifest(projectDir, tier) {
 }
 
 function installLegacyScripts(projectDir) {
-  const dir = path.join(projectDir, '.claude', 'scripts');
+  const dir = path.join(projectDir, '.opencode', 'scripts');
   fs.mkdirSync(dir, { recursive: true });
   for (const name of [
     'legacy-discipline-gate.js',
@@ -25,7 +25,7 @@ function installLegacyScripts(projectDir) {
     'at-first-gate.js',
     'test-deletion-gate.js',
   ]) {
-    const src = path.join(__dirname, '..', '.claude', 'scripts', name);
+    const src = path.join(__dirname, '..', '.opencode', 'scripts', name);
     if (fs.existsSync(src)) fs.copyFileSync(src, path.join(dir, name));
   }
 }
@@ -108,9 +108,9 @@ test('strict tier runs cycle-detection when graph present', async () => {
   const projectDir = makeGitProject();
   writeManifest(projectDir, 'strict');
   fs.mkdirSync(path.join(projectDir, 'specs', 'brownfield'), { recursive: true });
-  fs.mkdirSync(path.join(projectDir, '.claude', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(projectDir, '.opencode', 'state'), { recursive: true });
   // Baseline 0 cycles; graph has 1 cycle → block
-  fs.writeFileSync(path.join(projectDir, '.claude', 'state', 'cycle-baseline.txt'), '0\n');
+  fs.writeFileSync(path.join(projectDir, '.opencode', 'state', 'cycle-baseline.txt'), '0\n');
   fs.writeFileSync(
     path.join(projectDir, 'specs', 'brownfield', 'code-graph.json'),
     JSON.stringify({

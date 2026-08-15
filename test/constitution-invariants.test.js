@@ -3,7 +3,7 @@ const path = require('path');
 const test = require('node:test');
 const assert = require('node:assert');
 const { parseInvariants } = require(
-  path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'constitution-invariants.js')
+  path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'constitution-invariants.js')
 );
 
 const SAMPLE = [

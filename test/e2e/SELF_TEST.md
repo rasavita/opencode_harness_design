@@ -45,7 +45,7 @@ Plus the pre-existing certification layers (`harness-real-workflow`,
   `fixtures/sample-prd.md` (bookmarks, for plan-only).
 - **Output** (gitignored): `*-output/` dirs + `screenshots/`.
 - **Reused, not reinvented:** every harness uses the shared
-  `helpers/claude-runner.js` (budgeted, MCP-isolated `claude -p`); only the
+  `helpers/opencode-runner.js` (budgeted, MCP-isolated `claude -p`); only the
   browser oracle (`helpers/app-runtime.js`) and the `specs/` summary
   (`helpers/specs-summary.js`) are harness-specific. Both have unit tests that
   run in `npm test`.

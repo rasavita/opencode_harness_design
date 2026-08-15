@@ -9,7 +9,7 @@ const {
   makeProject,
 } = require('./helpers/record-run-fixture');
 const { stableProjectInstance } = require(
-  path.join(__dirname, '..', '.claude', 'scripts', 'telemetry-memory')
+  path.join(__dirname, '..', '.opencode', 'scripts', 'telemetry-memory')
 );
 
 test('record-run pushes escaped custom metrics to a configured Pushgateway path', async () => {
@@ -36,7 +36,7 @@ test('record-run pushes escaped custom metrics to a configured Pushgateway path'
   assert.match(gateway.body, /agent="test\\"agent"/);
   assert.match(gateway.body, /group="group \\"A\\""/);
   assert.match(gateway.body, /story="story\\\\one"/);
-  const ledgerPath = path.join(projectDir, '.claude', 'state', 'telemetry-ledger.jsonl');
+  const ledgerPath = path.join(projectDir, '.opencode', 'state', 'telemetry-ledger.jsonl');
   const ledger = fs.readFileSync(ledgerPath, 'utf8').trim().split('\n').map((line) => JSON.parse(line));
   assert.equal(ledger.length, 1);
   assert.equal(ledger[0].kind, 'subagent');
@@ -89,19 +89,19 @@ test('record-run emits prompt telemetry and updates lane for slash commands', as
   assert.match(gateway.body, /harness_conversation_turns_total\{[^}]*kind="prompt"/);
   assert.match(gateway.body, /harness_conversation_turns_total\{[^}]*lane="brd"/);
   assert.match(gateway.body, /harness_command_invocations_total\{[^}]*command="brd"/);
-  assert.match(gateway.body, /harness_skill_info\{[^}]*skill="brd"[^}]*path="\.claude\/skills\/brd\/SKILL\.md"/);
-  assert.match(gateway.body, /harness_skill_info\{[^}]*skill="spec"[^}]*path="\.claude\/skills\/spec\/SKILL\.md"/);
+  assert.match(gateway.body, /harness_skill_info\{[^}]*skill="brd"[^}]*path="\.opencode\/skills\/brd\/SKILL\.md"/);
+  assert.match(gateway.body, /harness_skill_info\{[^}]*skill="spec"[^}]*path="\.opencode\/skills\/spec\/SKILL\.md"/);
   assert.match(gateway.body, /harness_skill_usage_total\{[^}]*skill="brd"[^}]*kind="prompt"[^}]*command="brd"/);
   assert.equal(
-    fs.readFileSync(path.join(projectDir, '.claude', 'state', 'current-lane'), 'utf8').trim(),
+    fs.readFileSync(path.join(projectDir, '.opencode', 'state', 'current-lane'), 'utf8').trim(),
     'brd'
   );
-  const ledger = fs.readFileSync(path.join(projectDir, '.claude', 'state', 'telemetry-ledger.jsonl'), 'utf8')
+  const ledger = fs.readFileSync(path.join(projectDir, '.opencode', 'state', 'telemetry-ledger.jsonl'), 'utf8')
     .trim()
     .split('\n')
     .map((line) => JSON.parse(line));
   assert.deepEqual(ledger[0].skill_names, ['brd']);
-  assert.equal(ledger[0].skills[0].path, '.claude/skills/brd/SKILL.md');
+  assert.equal(ledger[0].skills[0].path, '.opencode/skills/brd/SKILL.md');
   // Full catalog must not be embedded per-record (REC-20260713-002); only a
   // lightweight count travels with each event. See replay-telemetry.test.js
   // for the round-trip proof that the full catalog is still recoverable.
@@ -111,7 +111,7 @@ test('record-run emits prompt telemetry and updates lane for slash commands', as
 
 test('record-run attaches canonical run, task, and risk context to events', async () => {
   const projectDir = makeProject();
-  const stateDir = path.join(projectDir, '.claude', 'state');
+  const stateDir = path.join(projectDir, '.opencode', 'state');
   fs.writeFileSync(path.join(stateDir, 'current-task'), 'TASK-42\n');
   fs.writeFileSync(path.join(stateDir, 'current-risk-tier'), 'R3\n');
   const result = await runHook(projectDir, {
@@ -120,7 +120,7 @@ test('record-run attaches canonical run, task, and risk context to events', asyn
     prompt: '/feature secure login',
   }, {});
   assert.strictEqual(result.status, 0);
-  const runsDir = path.join(projectDir, '.claude', 'runs');
+  const runsDir = path.join(projectDir, '.opencode', 'runs');
   const record = JSON.parse(fs.readFileSync(path.join(runsDir, fs.readdirSync(runsDir)[0]), 'utf8').trim());
   assert.strictEqual(record.schema_version, 1);
   assert.strictEqual(record.run_id, 'run-session-42');
@@ -145,7 +145,7 @@ test('record-run records normalized build lane variants, not just generic build'
 
   assert.match(gateway.body, /harness_conversation_turns_total\{[^}]*lane="lite-auto"/);
   assert.equal(
-    fs.readFileSync(path.join(projectDir, '.claude', 'state', 'current-lane'), 'utf8').trim(),
+    fs.readFileSync(path.join(projectDir, '.opencode', 'state', 'current-lane'), 'utf8').trim(),
     'lite-auto'
   );
 });
@@ -168,7 +168,7 @@ test('record-run emits command telemetry for any non-scaffold slash command', as
   assert.match(gateway.body, /harness_command_invocations_total\{[^}]*command="brownfield"/);
   assert.match(gateway.body, /harness_conversation_turns_total\{[^}]*lane="brownfield"/);
   assert.equal(
-    fs.readFileSync(path.join(projectDir, '.claude', 'state', 'current-lane'), 'utf8').trim(),
+    fs.readFileSync(path.join(projectDir, '.opencode', 'state', 'current-lane'), 'utf8').trim(),
     'brownfield'
   );
 });
@@ -185,22 +185,22 @@ test('record-run skips command telemetry for scaffold', async () => {
   });
 
   assert.equal(child.status, 0, child.stderr);
-  assert.equal(fs.existsSync(path.join(projectDir, '.claude', 'runs')), true);
-  const files = fs.readdirSync(path.join(projectDir, '.claude', 'runs'));
+  assert.equal(fs.existsSync(path.join(projectDir, '.opencode', 'runs')), true);
+  const files = fs.readdirSync(path.join(projectDir, '.opencode', 'runs'));
   assert.deepEqual(files, []);
   assert.equal(
-    fs.readFileSync(path.join(projectDir, '.claude', 'state', 'current-lane'), 'utf8').trim(),
+    fs.readFileSync(path.join(projectDir, '.opencode', 'state', 'current-lane'), 'utf8').trim(),
     'improve'
   );
 });
 
 test('telemetry is OFF by default — no OTEL/Pushgateway env vars, but record-run stays wired', () => {
-  const settings = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '.claude', 'settings.json'), 'utf8'));
+  const settings = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '.opencode', 'settings.json'), 'utf8'));
 
   // The harness's OWN repo stays telemetry-off — its dev/CI runs must not export
   // OTEL or push to a Pushgateway. (Scaffolded *projects* default telemetry ON;
   // that is injected into the copied settings and asserted in scaffold-apply.test.js.)
-  assert.equal(settings.env.CLAUDE_CODE_ENABLE_TELEMETRY, undefined);
+  assert.equal(settings.env.HARNESS_ENABLE_TELEMETRY, undefined);
   assert.equal(settings.env.OTEL_METRICS_EXPORTER, undefined);
   assert.equal(settings.env.OTEL_EXPORTER_OTLP_ENDPOINT, undefined);
   assert.equal(settings.env.HARNESS_PUSHGATEWAY_URL, undefined);
@@ -268,7 +268,7 @@ test('record-run keeps every event kind free of the embedded skill catalog', asy
 
   gateway.server.close();
 
-  const ledgerPath = path.join(projectDir, '.claude', 'state', 'telemetry-ledger.jsonl');
+  const ledgerPath = path.join(projectDir, '.opencode', 'state', 'telemetry-ledger.jsonl');
   const records = fs.readFileSync(ledgerPath, 'utf8').trim().split('\n').map((line) => JSON.parse(line));
   for (const record of records) {
     assert.equal(record.skill_inventory, undefined, `${record.kind} record must not embed skill_inventory`);
@@ -281,7 +281,7 @@ test('record-run keeps every event kind free of the embedded skill catalog', asy
   // full installed-skill catalog — it re-reads from disk at push time instead
   // of depending on any per-record copy.
   const lastBody = gateway.requests[gateway.requests.length - 1].body;
-  assert.match(lastBody, /harness_skill_info\{[^}]*skill="brd"[^}]*path="\.claude\/skills\/brd\/SKILL\.md"/);
-  assert.match(lastBody, /harness_skill_info\{[^}]*skill="spec"[^}]*path="\.claude\/skills\/spec\/SKILL\.md"/);
-  assert.match(lastBody, /harness_skill_info\{[^}]*skill="brownfield"[^}]*path="\.claude\/skills\/brownfield\/SKILL\.md"/);
+  assert.match(lastBody, /harness_skill_info\{[^}]*skill="brd"[^}]*path="\.opencode\/skills\/brd\/SKILL\.md"/);
+  assert.match(lastBody, /harness_skill_info\{[^}]*skill="spec"[^}]*path="\.opencode\/skills\/spec\/SKILL\.md"/);
+  assert.match(lastBody, /harness_skill_info\{[^}]*skill="brownfield"[^}]*path="\.opencode\/skills\/brownfield\/SKILL\.md"/);
 });

@@ -7,7 +7,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { test } = require('node:test');
 
-const GATE = path.join(__dirname, '..', '.claude', 'hooks', 'concurrency-gate.js');
+const GATE = path.join(__dirname, '..', '.opencode', 'hooks', 'concurrency-gate.js');
 const { decideSpawn, decideStop, resolveCap, normalizeState } = require(GATE);
 
 const NOW = 1_000_000_000_000;
@@ -62,12 +62,12 @@ function runGate(payload, env) {
 
 test('hook denies (exit 2) a Task spawn when state is at cap', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-gate-'));
-  fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
   const now = Date.now();
-  fs.writeFileSync(path.join(dir, '.claude', 'state', 'inflight-agents.json'),
+  fs.writeFileSync(path.join(dir, '.opencode', 'state', 'inflight-agents.json'),
     JSON.stringify({ active: [now, now, now] }));
   const r = runGate({ hook_event_name: 'PreToolUse', tool_name: 'Task' },
-    { CLAUDE_PROJECT_DIR: dir, CLAUDE_MAX_CONCURRENT_AGENTS: '3' });
+    { OPENCODE_PROJECT_DIR: dir, CLAUDE_MAX_CONCURRENT_AGENTS: '3' });
   assert.strictEqual(r.status, 2);
   assert.match(r.stderr, /cap reached/i);
 });
@@ -75,17 +75,17 @@ test('hook denies (exit 2) a Task spawn when state is at cap', () => {
 test('hook allows (exit 0) a Task spawn under cap and records it', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-gate-'));
   const r = runGate({ hook_event_name: 'PreToolUse', tool_name: 'Task' },
-    { CLAUDE_PROJECT_DIR: dir, CLAUDE_MAX_CONCURRENT_AGENTS: '3' });
+    { OPENCODE_PROJECT_DIR: dir, CLAUDE_MAX_CONCURRENT_AGENTS: '3' });
   assert.strictEqual(r.status, 0);
-  const state = JSON.parse(fs.readFileSync(path.join(dir, '.claude', 'state', 'inflight-agents.json'), 'utf8'));
+  const state = JSON.parse(fs.readFileSync(path.join(dir, '.opencode', 'state', 'inflight-agents.json'), 'utf8'));
   assert.strictEqual(state.active.length, 1);
 });
 
 test('hook ignores non-Task PreToolUse (exit 0, no state)', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-gate-'));
-  const r = runGate({ hook_event_name: 'PreToolUse', tool_name: 'Bash' }, { CLAUDE_PROJECT_DIR: dir });
+  const r = runGate({ hook_event_name: 'PreToolUse', tool_name: 'Bash' }, { OPENCODE_PROJECT_DIR: dir });
   assert.strictEqual(r.status, 0);
-  assert.strictEqual(fs.existsSync(path.join(dir, '.claude', 'state', 'inflight-agents.json')), false);
+  assert.strictEqual(fs.existsSync(path.join(dir, '.opencode', 'state', 'inflight-agents.json')), false);
 });
 
 // The real subagent-dispatch tool's tool_name is "Agent" in this environment, not the
@@ -94,12 +94,12 @@ test('hook ignores non-Task PreToolUse (exit 0, no state)', () => {
 
 test('hook denies (exit 2) an Agent spawn when state is at cap', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-gate-'));
-  fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
   const now = Date.now();
-  fs.writeFileSync(path.join(dir, '.claude', 'state', 'inflight-agents.json'),
+  fs.writeFileSync(path.join(dir, '.opencode', 'state', 'inflight-agents.json'),
     JSON.stringify({ active: [now, now, now] }));
   const r = runGate({ hook_event_name: 'PreToolUse', tool_name: 'Agent' },
-    { CLAUDE_PROJECT_DIR: dir, CLAUDE_MAX_CONCURRENT_AGENTS: '3' });
+    { OPENCODE_PROJECT_DIR: dir, CLAUDE_MAX_CONCURRENT_AGENTS: '3' });
   assert.strictEqual(r.status, 2);
   assert.match(r.stderr, /cap reached/i);
 });
@@ -107,9 +107,9 @@ test('hook denies (exit 2) an Agent spawn when state is at cap', () => {
 test('hook allows (exit 0) an Agent spawn under cap and records it', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-gate-'));
   const r = runGate({ hook_event_name: 'PreToolUse', tool_name: 'Agent' },
-    { CLAUDE_PROJECT_DIR: dir, CLAUDE_MAX_CONCURRENT_AGENTS: '3' });
+    { OPENCODE_PROJECT_DIR: dir, CLAUDE_MAX_CONCURRENT_AGENTS: '3' });
   assert.strictEqual(r.status, 0);
-  const state = JSON.parse(fs.readFileSync(path.join(dir, '.claude', 'state', 'inflight-agents.json'), 'utf8'));
+  const state = JSON.parse(fs.readFileSync(path.join(dir, '.opencode', 'state', 'inflight-agents.json'), 'utf8'));
   assert.strictEqual(state.active.length, 1);
 });
 

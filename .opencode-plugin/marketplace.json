@@ -1,0 +1,14 @@
+{
+  "name": "opencode-harness-local",
+  "description": "Local marketplace for installing the OpenCode Harness Engine v5 plugin from this checkout.",
+  "owner": {
+    "name": "OpenCode Harness Engine"
+  },
+  "plugins": [
+    {
+      "name": "opencode_harness_design",
+      "source": "./.opencode",
+      "description": "OpenCode Harness Engine v5 — generator/evaluator SDLC pipeline, ratcheting quality gates, and project scaffolding. Run /scaffold to initialize a project."
+    }
+  ]
+}

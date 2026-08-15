@@ -58,7 +58,7 @@ test('pre-write-gate blocks a /tmp-sibling path that is not actually under /tmp'
 });
 
 // VULN-004 — secret-scan exemption must be anchored to the harness's own
-// .claude/ tree, not any path containing /hooks/ or /templates/.
+// .opencode/ tree, not any path containing /hooks/ or /templates/.
 test('pre-write-gate scans secrets in an app src/hooks/ directory', async () => {
   const projectDir = makeHookProject(['pre-write-gate.js']);
   const awsKey = 'AKIA' + 'ABCDEFGHIJKLMNOP';
@@ -73,16 +73,16 @@ test('pre-write-gate scans secrets in an app src/hooks/ directory', async () => 
   assert.ok(result.stdout.includes('AWS Access Key'), result.stdout);
 });
 
-test('pre-write-gate still exempts the harness own .claude/hooks tree', async () => {
+test('pre-write-gate still exempts the harness own .opencode/hooks tree', async () => {
   const projectDir = makeHookProject(['pre-write-gate.js']);
-  // The trust boundary blocks .claude/hooks/ writes in target projects, so the
+  // The trust boundary blocks .opencode/hooks/ writes in target projects, so the
   // secret-scan exemption is only reachable in the harness repo itself.
-  fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify({ name: 'claude-harness-eng-v5' }));
+  fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify({ name: 'opencode-harness-design' }));
   const ssn = ['123', '45', '6789'].join('-');
   const result = await runHook(projectDir, 'pre-write-gate.js', {
     tool_name: 'Write',
     tool_input: {
-      file_path: path.join(projectDir, '.claude', 'hooks', 'lib', 'fixture.js'),
+      file_path: path.join(projectDir, '.opencode', 'hooks', 'lib', 'fixture.js'),
       content: `const ssn = "${ssn}";\n`,
     },
   }, { HARNESS_TDD_GATE: 'off' });

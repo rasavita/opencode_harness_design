@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { openPr } = require('../.claude/scripts/wave-pr.js');
+const { openPr } = require('../.opencode/scripts/wave-pr.js');
 
 test('openPr is idempotent: returns the existing PR and never creates', () => {
   const calls = [];

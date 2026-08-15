@@ -1,6 +1,6 @@
 # Telemetry — Setup and Reference
 
-Telemetry is **on by default in scaffolded projects**. `/scaffold` bakes the OTEL/Pushgateway env vars into the new project's `.claude/settings.json` and `.claude/settings.auto.json`, so Claude Code exports metrics and the `record-run.js` hook pushes harness metrics from the first run. Nothing in the build loop depends on it: the push has a 2s timeout and swallows connection errors, so until you start the stack it simply no-ops. To actually see dashboards you start the stack (below) and restart the session. (The harness's *own* repo stays telemetry-off; only the projects it scaffolds default on.) To turn it **off** for a project, remove the `CLAUDE_CODE_ENABLE_TELEMETRY` / `OTEL_*` / `HARNESS_PUSHGATEWAY_URL` keys from its `settings.json`. (The quick version is in the README's "Telemetry" section.)
+Telemetry is **on by default in scaffolded projects**. `/scaffold` bakes the OTEL/Pushgateway env vars into the new project's `.opencode/settings.json` and `.opencode/settings.auto.json`, so Claude Code exports metrics and the `record-run.js` hook pushes harness metrics from the first run. Nothing in the build loop depends on it: the push has a 2s timeout and swallows connection errors, so until you start the stack it simply no-ops. To actually see dashboards you start the stack (below) and restart the session. (The harness's *own* repo stays telemetry-off; only the projects it scaffolds default on.) To turn it **off** for a project, remove the `HARNESS_ENABLE_TELEMETRY` / `OTEL_*` / `HARNESS_PUSHGATEWAY_URL` keys from its `settings.json`. (The quick version is in the README's "Telemetry" section.)
 
 ## Start the telemetry stack (one per team)
 
@@ -33,19 +33,19 @@ Developer C ──push──▶                                    │
 
 **Grafana login:** `http://localhost:3001` — user: `admin`, password: `harness`. Pre-built dashboards load automatically: **Team Productivity**, **Prompt Cache Health**, and **SDLC Pipeline Progress** (`telemetry/grafana/dashboards/pipeline-progress.json`) — wave/feature/coverage/iteration/pending-review progress plus build velocity.
 
-The pipeline dashboard reads the same `harness_*` metrics the build already pushes, plus two gauges (`harness_features_passing`/`harness_features_total` and `harness_coverage`/`harness_coverage_baseline`) emitted from the pipeline snapshot on every push (see `.claude/scripts/telemetry-pipeline-gauges.js`). For the same view without Grafana, run the CLI: `node .claude/scripts/pipeline-status.js status` (or `/status`).
+The pipeline dashboard reads the same `harness_*` metrics the build already pushes, plus two gauges (`harness_features_passing`/`harness_features_total` and `harness_coverage`/`harness_coverage_baseline`) emitted from the pipeline snapshot on every push (see `.opencode/scripts/telemetry-pipeline-gauges.js`). For the same view without Grafana, run the CLI: `node .opencode/scripts/pipeline-status.js status` (or `/status`).
 
 Anonymous read access is enabled — team members can view dashboards without logging in.
 
 ## The telemetry env vars in `settings.json`
 
-Claude Code reads env vars from `.claude/settings.json`, not from `.env` files. A fresh scaffold **writes these for you** (into both `settings.json` and `settings.auto.json`) — this section is for confirming them, or re-adding them if you turned telemetry off and want it back.
+Claude Code reads env vars from `.opencode/settings.json`, not from `.env` files. A fresh scaffold **writes these for you** (into both `settings.json` and `settings.auto.json`) — this section is for confirming them, or re-adding them if you turned telemetry off and want it back.
 
-Open `.claude/settings.json` and confirm the `env` block contains:
+Open `.opencode/settings.json` and confirm the `env` block contains:
 
 ```json
 "env": {
-  "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+  "HARNESS_ENABLE_TELEMETRY": "1",
   "OTEL_METRICS_EXPORTER": "otlp",
   "OTEL_LOGS_EXPORTER": "otlp",
   "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc",
@@ -60,15 +60,15 @@ Open `.claude/settings.json` and confirm the `env` block contains:
 
 **Every team member must have their own `HARNESS_USER`** in their `settings.json`. If `HARNESS_USER` is not set, the hook falls back to `git config user.name`, then OS username.
 
-After changing `.claude/settings.json`, restart the active Claude Code session before expecting new hook telemetry. Claude Code may keep the previous hook configuration for an already-running session, so newly added `UserPromptSubmit` / `PostToolUse` telemetry hooks may not fire until the session is restarted.
+After changing `.opencode/settings.json`, restart the active Claude Code session before expecting new hook telemetry. Claude Code may keep the previous hook configuration for an already-running session, so newly added `UserPromptSubmit` / `PostToolUse` telemetry hooks may not fire until the session is restarted.
 
 **What flows where:**
 
 | Metric source | Activated by | Pushed to |
 |---|---|---|
-| Native OTEL (tokens, cost, LOC, commits, PRs) | `CLAUDE_CODE_ENABLE_TELEMETRY=1` in `settings.json` | OTEL Collector → Prometheus |
+| Native OTEL (tokens, cost, LOC, commits, PRs) | `HARNESS_ENABLE_TELEMETRY=1` in `settings.json` | OTEL Collector → Prometheus |
 | Harness-custom (lanes, agents, turns, reviews) | `record-run.js` hook (pushes only when `HARNESS_PUSHGATEWAY_URL` is set) | Pushgateway → Prometheus |
-| JSONL run receipts | `record-run.js` hook (always active) | `.claude/runs/YYYY-MM-DD.jsonl` (local) |
+| JSONL run receipts | `record-run.js` hook (always active) | `.opencode/runs/YYYY-MM-DD.jsonl` (local) |
 | Commit trailers | `prepare-commit-msg` git hook (always active) | Git commit messages |
 
 For a remote shared telemetry server, change the URLs in `settings.json`:
@@ -248,7 +248,7 @@ sum by (agent) (harness_agent_runs_total)
 sum by (agent) (harness_agent_runs_total{exit="error"})
 ```
 
-If `evaluator` or `security-reviewer` fail often, it means generated code isn't meeting quality gates — the ratchet is doing its job, but the generator may need steering via `.claude/program.md`.
+If `evaluator` or `security-reviewer` fail often, it means generated code isn't meeting quality gates — the ratchet is doing its job, but the generator may need steering via `.opencode/program.md`.
 
 **3. "Which lanes are getting used? Is work landing in the right place?"**
 
@@ -395,7 +395,7 @@ for r in json.load(sys.stdin)['data']['result']:
 | `docker compose -f telemetry_docker_compose.yml up` fails | Ensure Docker is running. Check image pulls with `docker pull prom/prometheus:v3.2.1` |
 | No metrics in Prometheus | Verify OTEL env vars are set. Check `http://localhost:9090/targets` — both jobs should show UP |
 | Pushgateway metrics missing | `record-run.js` pushes fire-and-forget. Verify Pushgateway is reachable: `curl http://localhost:9091/metrics` |
-| Stories/files are being written but dashboard metrics are not moving | Restart the active Claude Code session after updating `.claude/settings.json`; hook configuration may not reload mid-session |
+| Stories/files are being written but dashboard metrics are not moving | Restart the active Claude Code session after updating `.opencode/settings.json`; hook configuration may not reload mid-session |
 | Grafana shows no data | Open `http://localhost:3001`, go to a dashboard panel, click Edit, verify the datasource is "Prometheus" and the query returns data |
 | Metrics have no `user` label | Set `HARNESS_USER` in `.env` or verify `git config user.name` returns your name |
 

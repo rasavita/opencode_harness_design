@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { test } = require('node:test');
 
-const script = path.join(__dirname, '..', '.claude', 'scripts', 'pipeline-status.js');
+const script = path.join(__dirname, '..', '.opencode', 'scripts', 'pipeline-status.js');
 const {
   buildSnapshot,
   renderStatus,
@@ -14,7 +14,7 @@ const {
   readRunReceipts,
   findProjectDir,
 } = require(script);
-const { storeContext } = require('../.claude/scripts/context-store');
+const { storeContext } = require('../.opencode/scripts/context-store');
 const { NOW, FEATURES_FOUR, makeProject, midBuildProject } = require('./helpers/pipeline-status-fixtures');
 
 test('buildSnapshot reads the latest session block and core state', () => {
@@ -80,7 +80,7 @@ test('health is failing when coverage dropped below baseline', () => {
       'next_action: build group B',
     ].join('\n'),
     'features.json': FEATURES_FOUR,
-    '.claude/state/coverage-baseline.txt': '80\n',
+    '.opencode/state/coverage-baseline.txt': '80\n',
   });
   const snap = buildSnapshot(dir, { now: NOW });
   assert.strictEqual(snap.health, 'failing');
@@ -124,7 +124,7 @@ test('renderStatus surfaces the headline fields in plain text', () => {
 
 test('buildSnapshot and renderStatus surface living navigation freshness and token savings', () => {
   const dir = midBuildProject();
-  fs.writeFileSync(path.join(dir, '.claude', 'state', 'navigation-status.json'), JSON.stringify({
+  fs.writeFileSync(path.join(dir, '.opencode', 'state', 'navigation-status.json'), JSON.stringify({
     status: 'fresh',
     graph: 'fresh',
     wiki: 'fresh',
@@ -149,12 +149,12 @@ test('buildSnapshot and renderStatus surface CCR context-cache savings', () => {
   const dir = midBuildProject();
   const first = storeContext({ projectDir: dir, kind: 'test-log', raw: Array.from({ length: 40 }, () => 'PASS repeated output').join('\n'), label: 'npm test' });
   const second = storeContext({ projectDir: dir, kind: 'search-results', raw: 'src/auth.js:1:function validateSession() {}\n', label: 'validateSession' });
-  fs.writeFileSync(path.join(dir, '.claude', 'state', 'context-cache', `${first.hash}.json`), JSON.stringify({
+  fs.writeFileSync(path.join(dir, '.opencode', 'state', 'context-cache', `${first.hash}.json`), JSON.stringify({
     ...first,
     estimated_pack_tokens: 12,
     estimated_saved_tokens: 180,
   }));
-  fs.writeFileSync(path.join(dir, '.claude', 'state', 'context-cache', `${second.hash}.json`), JSON.stringify({
+  fs.writeFileSync(path.join(dir, '.opencode', 'state', 'context-cache', `${second.hash}.json`), JSON.stringify({
     ...second,
     estimated_pack_tokens: 8,
     estimated_saved_tokens: 3,
@@ -172,8 +172,8 @@ test('buildSnapshot and renderStatus surface CCR context-cache savings', () => {
 
 test('buildSnapshot and renderStatus surface token advisor warning counts', () => {
   const dir = midBuildProject();
-  fs.appendFileSync(path.join(dir, '.claude', 'state', 'token-advisor.jsonl'), `${JSON.stringify({ kind: 'broad_source_read', path: 'src/auth.js' })}\n`);
-  fs.appendFileSync(path.join(dir, '.claude', 'state', 'token-advisor.jsonl'), `${JSON.stringify({ kind: 'verbose_command', command: 'npm test' })}\n`);
+  fs.appendFileSync(path.join(dir, '.opencode', 'state', 'token-advisor.jsonl'), `${JSON.stringify({ kind: 'broad_source_read', path: 'src/auth.js' })}\n`);
+  fs.appendFileSync(path.join(dir, '.opencode', 'state', 'token-advisor.jsonl'), `${JSON.stringify({ kind: 'verbose_command', command: 'npm test' })}\n`);
 
   const snap = buildSnapshot(dir, { now: NOW });
   assert.strictEqual(snap.token_advisor.warnings, 2);
@@ -242,7 +242,7 @@ test('watchFrame --json emits a parseable snapshot after the clear', () => {
   assert.strictEqual(JSON.parse(body).schema_version, 1);
 });
 
-test('findProjectDir walks up to the directory containing .claude', () => {
+test('findProjectDir walks up to the directory containing .opencode', () => {
   const dir = makeProject();
   const nested = path.join(dir, 'a', 'b', 'c');
   fs.mkdirSync(nested, { recursive: true });

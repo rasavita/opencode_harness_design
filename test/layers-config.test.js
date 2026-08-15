@@ -10,7 +10,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { loadLayerConfig, getLayer, getHigherLayers, checkContentViolations } = require(
-  path.join(__dirname, '..', '.claude', 'hooks', 'lib', 'layers')
+  path.join(__dirname, '..', '.opencode', 'hooks', 'lib', 'layers')
 );
 
 const DEFAULT_LAYERS = ['types', 'config', 'repository', 'service', 'api', 'ui'];

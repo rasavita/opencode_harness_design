@@ -9,10 +9,10 @@ const fs = require('fs');
 const path = require('path');
 const { test } = require('node:test');
 
-const { validate } = require(path.join(__dirname, '..', '.claude', 'hooks', 'lib', 'contract-schema'));
+const { validate } = require(path.join(__dirname, '..', '.opencode', 'hooks', 'lib', 'contract-schema'));
 
 const SCHEMA = JSON.parse(fs.readFileSync(
-  path.join(__dirname, '..', '.claude', 'skills', 'evaluate', 'references', 'contract-schema.json'), 'utf8'
+  path.join(__dirname, '..', '.opencode', 'skills', 'evaluate', 'references', 'contract-schema.json'), 'utf8'
 ));
 
 function validContract() {
@@ -165,7 +165,7 @@ test('contract schema accepts optional matrix_ids on verification checks', () =>
 
 test('the shipped sprint-contract template validates against the shipped schema (drift guard)', () => {
   const template = JSON.parse(fs.readFileSync(
-    path.join(__dirname, '..', '.claude', 'templates', 'sprint-contract.json'), 'utf8'
+    path.join(__dirname, '..', '.opencode', 'templates', 'sprint-contract.json'), 'utf8'
   ));
   assert.deepStrictEqual(validate(SCHEMA, template), []);
 });

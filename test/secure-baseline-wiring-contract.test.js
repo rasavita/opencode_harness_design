@@ -12,9 +12,9 @@ const path = require('path');
 const { readSkillCorpus } = require('./helpers/skill-corpus');
 
 const ROOT = path.resolve(__dirname, '..');
-const { GATE_CATALOG, selectGates } = require('../.claude/hooks/lib/gate-registry');
-const { GATE_TIERS } = require('../.claude/hooks/lib/sensor-tier');
-const strict = require('../.claude/hooks/lib/gates-strict');
+const { GATE_CATALOG, selectGates } = require('../.opencode/hooks/lib/gate-registry');
+const { GATE_TIERS } = require('../.opencode/hooks/lib/sensor-tier');
+const strict = require('../.opencode/hooks/lib/gates-strict');
 
 test('security-baseline is registered at order 160, strict, runsWithoutSource, dispatching to the real gate', () => {
   const e = GATE_CATALOG.find((g) => g.id === 'security-baseline');
@@ -62,13 +62,13 @@ test('both controls are registered as active behaviour sensors wired to gates-st
     assert.strictEqual(s.type, 'computational');
     assert.strictEqual(s.cadence, 'commit');
     assert.strictEqual(s.status, 'active');
-    assert.strictEqual(s.wired_at, '.claude/hooks/lib/gates-strict.js');
+    assert.strictEqual(s.wired_at, '.opencode/hooks/lib/gates-strict.js');
     assert.ok(fs.existsSync(path.join(ROOT, s.wired_at)));
   }
 });
 
 test('control-budget baseline accounts for both new controls', () => {
-  const b = JSON.parse(fs.readFileSync(path.join(ROOT, '.claude', 'state', 'control-budget-baseline.json'), 'utf8'));
+  const b = JSON.parse(fs.readFileSync(path.join(ROOT, '.opencode', 'state', 'control-budget-baseline.json'), 'utf8'));
   assert.ok(b.ids.includes('security-baseline'));
   assert.ok(b.ids.includes('secure-baseline-wiring'));
 });

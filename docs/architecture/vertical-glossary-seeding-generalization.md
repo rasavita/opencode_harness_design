@@ -6,11 +6,11 @@
 
 ## Context & Problem Statement
 
-The 2026-07-05 ubiquitous-language work gave the harness a domain-agnostic glossary mechanism: `CONTEXT.md` (`## Terms`, `### <Term>`) is written by BRD Step 2.8 from `brd-analysis.json#domain_concepts` and read by `/spec`, `/design`, `/implement`, and `generator.md`; `.claude/scripts/vocabulary-check.js` is the deterministic sensor that catches an entity/model name with no matching glossary term. This path is already the correct, unmodified default for general/pure-tech projects with no vertical plugin installed.
+The 2026-07-05 ubiquitous-language work gave the harness a domain-agnostic glossary mechanism: `CONTEXT.md` (`## Terms`, `### <Term>`) is written by BRD Step 2.8 from `brd-analysis.json#domain_concepts` and read by `/spec`, `/design`, `/implement`, and `generator.md`; `.opencode/scripts/vocabulary-check.js` is the deterministic sensor that catches an entity/model name with no matching glossary term. This path is already the correct, unmodified default for general/pure-tech projects with no vertical plugin installed.
 
 On top of that, 2026-07-06 shipped `pe-glossary-pack.js` + BRD Step 2.7: when the `private-equity` vertical plugin (from the `claude-for-financial-services` marketplace) is enabled, a script reads the plugin's own `skills/*/SKILL.md` frontmatter, groups the skills under a fixed 3-entry bounded-context table (`Deal Lifecycle`, `Investment Decision & Returns`, `Portfolio Operations & Value Creation`), and writes `specs/brd/pe-glossary-pack.json`; Step 2.7 then distills that into `CONTEXT.md` before Step 2.8 layers project-specific concepts on top. That design's own "Out of Scope" section explicitly deferred generalizing beyond private-equity: *"Extending this pattern to other vertical plugins ... is a future amendment if a second vertical customer needs it."*
 
-That future amendment is now in scope. The installed `claude-for-financial-services` marketplace ships six more vertical plugins beyond private-equity — `financial-analysis`, `investment-banking`, `equity-research`, `wealth-management`, `fund-admin`, `operations` (confirmed via `~/.claude/plugins/marketplaces/claude-for-financial-services/.claude-plugin/marketplace.json`) — each with its own `skills/*/SKILL.md` inventory that encodes real domain vocabulary (e.g. `fund-admin`'s `nav-tieout`, `gl-recon`, `roll-forward`; `investment-banking`'s `cim-builder`, `merger-model`, `teaser`). Repeating `pe-glossary-pack.js`'s pattern as six more near-duplicate ~140-line scripts (plus six ~175-line test files) is exactly the kind of unrequested, speculative duplication CLAUDE.md's Simplicity-First principle warns against, and it does not extend to plugins from any other marketplace (e.g. a not-yet-existing insurance vertical).
+That future amendment is now in scope. The installed `claude-for-financial-services` marketplace ships six more vertical plugins beyond private-equity — `financial-analysis`, `investment-banking`, `equity-research`, `wealth-management`, `fund-admin`, `operations` (confirmed via `~/.opencode/plugins/marketplaces/claude-for-financial-services/.opencode-plugin/marketplace.json`) — each with its own `skills/*/SKILL.md` inventory that encodes real domain vocabulary (e.g. `fund-admin`'s `nav-tieout`, `gl-recon`, `roll-forward`; `investment-banking`'s `cim-builder`, `merger-model`, `teaser`). Repeating `pe-glossary-pack.js`'s pattern as six more near-duplicate ~140-line scripts (plus six ~175-line test files) is exactly the kind of unrequested, speculative duplication AGENTS.md's Simplicity-First principle warns against, and it does not extend to plugins from any other marketplace (e.g. a not-yet-existing insurance vertical).
 
 **Goal of this proposal:** design one domain-agnostic seeding *mechanism*, parameterized by a small declarative registry, so adding a vertical is a config entry (human-reviewed data), not a new script. Confirm explicitly that projects with no vertical plugin keep today's exact behavior.
 
@@ -18,15 +18,15 @@ That future amendment is now in scope. The installed `claude-for-financial-servi
 
 ### Components
 
-1. **`.claude/config/vertical-glossary-packs.json`** (new) — declarative registry. One entry per vertical plugin: plugin id, `enabledPlugins` match prefix, marketplace/cache skills subpaths, and its bounded-context table (name → skill-id list).
-2. **`.claude/scripts/vertical-glossary-pack.js`** (new) — generic engine replacing `pe-glossary-pack.js`'s hardcoded constants with config-driven lookups. Same pure-core/CLI-wrapper shape (`isPluginEnabled`, `findSkillsDir`, `readSkillDescriptions`, `buildPack`), each function now takes a pack-config argument instead of reading module-level constants.
-3. **`.claude/skills/brd/SKILL.md` Step 2.7** — reworded from "private-equity projects only" to "any enabled vertical plugin with a registered pack config," iterating over every registry entry whose plugin key is present and truthy in `.claude/settings.json#enabledPlugins`.
+1. **`.opencode/config/vertical-glossary-packs.json`** (new) — declarative registry. One entry per vertical plugin: plugin id, `enabledPlugins` match prefix, marketplace/cache skills subpaths, and its bounded-context table (name → skill-id list).
+2. **`.opencode/scripts/vertical-glossary-pack.js`** (new) — generic engine replacing `pe-glossary-pack.js`'s hardcoded constants with config-driven lookups. Same pure-core/CLI-wrapper shape (`isPluginEnabled`, `findSkillsDir`, `readSkillDescriptions`, `buildPack`), each function now takes a pack-config argument instead of reading module-level constants.
+3. **`.opencode/skills/brd/SKILL.md` Step 2.7** — reworded from "private-equity projects only" to "any enabled vertical plugin with a registered pack config," iterating over every registry entry whose plugin key is present and truthy in `.opencode/settings.json#enabledPlugins`.
 4. **`harness-manifest.json`'s `vocabulary-check` sensor entry** — description reworded from "or, for private-equity projects, from pe-glossary-pack.js (Step 2.7)" to "or, for any enabled vertical plugin, from vertical-glossary-pack.js (Step 2.7)".
 5. **Unchanged:** `vocabulary-check.js`, the `CONTEXT.md` template, and the `design/SKILL.md` / `implement/SKILL.md` / `generator.md` reads of `CONTEXT.md` — all already domain-agnostic (confirmed by the 2026-07-06 design's own "No Changes Required" section and by `vocabulary-check.js`'s implementation, which treats `CONTEXT.md` as a single glossary regardless of a term's origin).
 
 ### Data flow (per BRD run)
 
-1. BRD Step 2.7 runs `node .claude/scripts/vertical-glossary-pack.js`.
+1. BRD Step 2.7 runs `node .opencode/scripts/vertical-glossary-pack.js`.
 2. The script loads `enabledPlugins` and `vertical-glossary-packs.json`.
 3. For each registry entry, test its `enabled_plugin_prefix` against the enabled-plugins keys (a table-driven generalization of today's `isPrivateEquityEnabled`).
 4. **No entries match** → exit 0, nothing written, message "no vertical glossary packs enabled." This is the plain/pure-tech path — externally identical to today's no-op, and identical if the registry file itself is absent (treated as zero entries, not an error, so older scaffold checkouts degrade gracefully).
@@ -43,8 +43,8 @@ Registry entry shape:
 {
   "plugin": "fund-admin",
   "enabled_plugin_prefix": "fund-admin@",
-  "marketplace_skills_subpath": ".claude/plugins/marketplaces/claude-for-financial-services/plugins/vertical-plugins/fund-admin/skills",
-  "cache_skills_subpath": ".claude/plugins/cache/claude-for-financial-services/fund-admin/skills",
+  "marketplace_skills_subpath": ".opencode/plugins/marketplaces/claude-for-financial-services/plugins/vertical-plugins/fund-admin/skills",
+  "cache_skills_subpath": ".opencode/plugins/cache/claude-for-financial-services/fund-admin/skills",
   "bounded_contexts": [
     { "name": "Books & Close", "skills": ["gl-recon", "break-trace", "roll-forward", "accrual-schedule"] },
     { "name": "Investor Reporting", "skills": ["nav-tieout", "variance-commentary"] }
@@ -66,7 +66,7 @@ Output (unchanged shape from today's `pe-glossary-pack.json`, one file per match
 
 5. **Backward compatibility with the shipped private-equity pack.** Chosen: migrate `pe-glossary-pack.js`'s constants (`ENABLED_PLUGIN_RE`, both skills subpaths, `BOUNDED_CONTEXTS`) verbatim into the registry's first entry (`plugin: "private-equity"`). `test/pe-glossary-pack.test.js` is re-targeted at the generic engine parameterized with that entry, preserving every existing assertion (bounded-context assignment, exit codes, no-op path) rather than discarding test intent. The output filename changes from `pe-glossary-pack.json` to `private-equity-glossary-pack.json` for consistency across all verticals — a deliberate one-time breaking rename, called out explicitly in rollout, updating the BRD Step 2.7 prose accordingly. `pe-ic-memo` needs no change: it already reads `CONTEXT.md`, never the pack file directly.
 
-6. **Insurance / other adjacent, not-yet-installed domains.** Chosen: no special-casing. The registry + generic-engine design is marketplace-agnostic — the two subpath fields are arbitrary paths, so any future vertical plugin (insurance or otherwise, from any marketplace) is addable with one new registry entry, zero script changes. Explicitly **not** built now: no insurance vertical plugin is installed on this machine or listed in the `claude-for-financial-services` marketplace today (`marketplace.json` lists `financial-analysis`, `investment-banking`, `equity-research`, `private-equity`, `wealth-management`, `fund-admin`, `operations`, plus several agent-plugins — no insurance entry). Adding a registry entry with nothing real to seed it from would violate CLAUDE.md's "no unrequested features" principle; this proposal only guarantees the mechanism won't block that addition later.
+6. **Insurance / other adjacent, not-yet-installed domains.** Chosen: no special-casing. The registry + generic-engine design is marketplace-agnostic — the two subpath fields are arbitrary paths, so any future vertical plugin (insurance or otherwise, from any marketplace) is addable with one new registry entry, zero script changes. Explicitly **not** built now: no insurance vertical plugin is installed on this machine or listed in the `claude-for-financial-services` marketplace today (`marketplace.json` lists `financial-analysis`, `investment-banking`, `equity-research`, `private-equity`, `wealth-management`, `fund-admin`, `operations`, plus several agent-plugins — no insurance entry). Adding a registry entry with nothing real to seed it from would violate AGENTS.md's "no unrequested features" principle; this proposal only guarantees the mechanism won't block that addition later.
 
 ## Bounded-context tables to author per FSI vertical (data, not code — pending human review)
 
@@ -84,8 +84,8 @@ Note: `financial-analysis`'s skills directory also contains `skill-creator` — 
 ## Rollout Path
 
 **Phase 1 — Generalize the mechanism, migrate private-equity only (no new verticals yet).**
-- Add `.claude/config/vertical-glossary-packs.json` with a single `private-equity` entry, values copied verbatim from `pe-glossary-pack.js`.
-- Add `.claude/scripts/vertical-glossary-pack.js` (generic engine); delete `pe-glossary-pack.js` only after the migrated tests are green.
+- Add `.opencode/config/vertical-glossary-packs.json` with a single `private-equity` entry, values copied verbatim from `pe-glossary-pack.js`.
+- Add `.opencode/scripts/vertical-glossary-pack.js` (generic engine); delete `pe-glossary-pack.js` only after the migrated tests are green.
 - Re-target `test/pe-glossary-pack.test.js` (or rename to `test/vertical-glossary-pack.test.js`) at the generic engine + private-equity entry, keeping every current assertion.
 - Update BRD `SKILL.md` Step 2.7 wording and the `harness-manifest.json` `vocabulary-check` description.
 - Gate on full `npm test` green, including the no-op-when-nothing-enabled and exit-2-on-broken-install cases, now expressed per registry entry.
@@ -109,7 +109,7 @@ Note: `financial-analysis`'s skills directory also contains `skill-creator` — 
 
 **Dependencies**
 - Requires the 2026-07-05 ubiquitous-language mechanism (`CONTEXT.md`, `vocabulary-check.js`) unchanged — confirmed domain-agnostic.
-- Requires `.claude/settings.json#enabledPlugins` to remain the single source of truth for plugin state, per CLAUDE.md's Prompt Caching rule 1 (don't churn tools/plugins mid-session; settle `enabledPlugins` before long runs).
+- Requires `.opencode/settings.json#enabledPlugins` to remain the single source of truth for plugin state, per AGENTS.md's Prompt Caching rule 1 (don't churn tools/plugins mid-session; settle `enabledPlugins` before long runs).
 
 **Open questions for the human approving this before it becomes a real implementation plan**
 - Should Phase 2's six vertical entries ship together or independently, gated by actual customer demand? Recommend independently — this is planning for optionality, not a commitment to build all six now.
@@ -119,8 +119,8 @@ Note: `financial-analysis`'s skills directory also contains `skill-creator` — 
 
 ```mermaid
 flowchart LR
-  A[".claude/settings.json#enabledPlugins"] --> B["vertical-glossary-pack.js"]
-  C[".claude/config/vertical-glossary-packs.json"] --> B
+  A[".opencode/settings.json#enabledPlugins"] --> B["vertical-glossary-pack.js"]
+  C[".opencode/config/vertical-glossary-packs.json"] --> B
   B -->|"per matched entry"| D["specs/brd/&lt;plugin&gt;-glossary-pack.json"]
   D --> E["BRD Step 2.7 (LLM distillation)"]
   F["brd-analysis.json#domain_concepts"] --> G["BRD Step 2.8 (existing, unchanged)"]

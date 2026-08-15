@@ -7,7 +7,7 @@ to the exact task-envelope hash.
 
 ## Root of trust
 
-Provision `.claude/trust/issuers.json` before the agent starts. Each issuer has
+Provision `.opencode/trust/issuers.json` before the agent starts. Each issuer has
 an explicit receipt role:
 
 ```json
@@ -25,7 +25,7 @@ an explicit receipt role:
 Never place the corresponding private key in the repository, agent container,
 environment, secret mount, shell history, or Claude context. In production, an
 approval service should read the task envelope, authenticate the human, apply
-policy, sign the receipt, and inject it into `.claude/authority/`.
+policy, sign the receipt, and inject it into `.opencode/authority/`.
 
 The bundled `authority-receipt.js` command implements the wire protocol for
 local operator testing. Its `--private-key` must point outside the agent's
@@ -37,10 +37,10 @@ filesystem boundary.
 2. A human reviews the intent, exact task hash, risk tier, scope, and evidence
    requirements.
 3. The external service emits one signed `human_approval` receipt per distinct
-   approver under `.claude/authority/approvals/`.
+   approver under `.opencode/authority/approvals/`.
 4. For a privileged command, the service emits a signed `capability` naming the
    permitted action and approval receipt IDs under
-   `.claude/authority/capabilities/`.
+   `.opencode/authority/capabilities/`.
 5. The pre-Bash gate verifies issuer role, signature, task hash, action, expiry,
    and approval threshold. It atomically consumes the capability before use.
 6. `/gate` runs `finalize-task-evidence.js`; PR creation requires its passing,
@@ -57,21 +57,21 @@ Hooks alone are not an operating-system security boundary: an unrestricted
 shell process can attempt indirect writes that command parsing cannot see.
 Unattended execution must mount the following paths read-only:
 
-- `.claude/hooks`
-- `.claude/settings.json`
-- `.claude/settings.auto.json`
-- `.claude/trust`
-- `.claude/authority`
-- `.claude/certification`
+- `.opencode/hooks`
+- `.opencode/settings.json`
+- `.opencode/settings.auto.json`
+- `.opencode/trust`
+- `.opencode/authority`
+- `.opencode/certification`
 
-The isolation controller writes `.claude/state/isolation-evidence.json` with
+The isolation controller writes `.opencode/state/isolation-evidence.json` with
 `policy_files_read_only: true` and `authority_receipts_read_only: true`.
 `unattended-preflight.js` fails closed without both attestations. Egress remains
 deny-by-default and signing credentials must never enter the agent boundary.
 
 The controller must also sign a short-lived `runtime_attestation` receipt under
-`.claude/authority/runtime/`. The receipt binds the current task and the exact
-hash of `.claude/unattended-policy.json`, and confirms network enforcement,
+`.opencode/authority/runtime/`. The receipt binds the current task and the exact
+hash of `.opencode/unattended-policy.json`, and confirms network enforcement,
 credential brokering, and the read-only paths. Changing policy invalidates the
 runtime proof immediately.
 
@@ -99,7 +99,7 @@ wrong-task receipts, replay, autonomy-policy weakening, and autonomy-state
 forgery.
 
 The result is written to
-`.claude/certification/security-boundary.json`. It expires after 24 hours and
+`.opencode/certification/security-boundary.json`. It expires after 24 hours and
 binds the exact unattended policy and enforcement-source hashes. Verification
 also reruns the attack probes, so a copied but stale result does not satisfy
 preflight. The certification directory is read-only inside the runtime.
@@ -149,6 +149,6 @@ divergence, budget stop, or a fail-closed contract/checkpoint error.
 ## Service integration
 
 An external broker only needs to produce JSON matching
-`.claude/templates/authority-receipt.schema.json`. Replace the local issuer CLI
+`.opencode/templates/authority-receipt.schema.json`. Replace the local issuer CLI
 with a GitHub App, CI environment approval, cloud KMS signer, or internal policy
 service without changing the hook or evidence-finalization consumers.

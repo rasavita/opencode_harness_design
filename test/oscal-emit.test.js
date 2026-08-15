@@ -15,7 +15,7 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { emitComponentDefinition, mapControl } = require('../.claude/scripts/oscal-emit');
+const { emitComponentDefinition, mapControl } = require('../.opencode/scripts/oscal-emit');
 
 const MANIFEST = {
   guides: [{ id: 'code-gen', axis: 'maintainability' }],

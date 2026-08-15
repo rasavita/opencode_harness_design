@@ -12,7 +12,7 @@ const { test } = require('node:test');
 
 const ROOT = path.join(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
-const { buildManifest } = require('../.claude/scripts/scaffold-render.js');
+const { buildManifest } = require('../.opencode/scripts/scaffold-render.js');
 
 test('G9: buildManifest defaults observability on for a server shape', () => {
   const m = buildManifest({
@@ -33,8 +33,8 @@ test('G9: buildManifest defaults observability off for a lite (CLI/library) shap
   assert.strictEqual(m.observability.enabled, false);
 });
 
-const CONV = '.claude/skills/code-gen/references/observability-conventions.md';
-const FASTAPI = '.claude/skills/code-gen/references/observability-python-fastapi.md';
+const CONV = '.opencode/skills/code-gen/references/observability-conventions.md';
+const FASTAPI = '.opencode/skills/code-gen/references/observability-python-fastapi.md';
 
 test('G9: stack-neutral observability conventions reference documents the contract', () => {
   const c = read(CONV);
@@ -61,13 +61,13 @@ test('G9: FastAPI observability reference carries a concrete implementation', ()
 });
 
 test('G9: generator is triggered to read the observability references', () => {
-  const g = read('.claude/agents/generator.md');
+  const g = read('.opencode/agents/generator.md');
   assert.ok(/observability-conventions\.md/.test(g), 'generator must point at the conventions reference');
   assert.ok(/observability\.enabled/.test(g), 'trigger must be gated on observability.enabled');
 });
 
 test('G9: deploy wires Prometheus scrape discovery when observability is enabled', () => {
-  const d = read('.claude/skills/deploy/SKILL.md');
+  const d = read('.opencode/skills/deploy/SKILL.md');
   assert.ok(/prometheus\.io\/scrape/.test(d), 'must document the scrape annotation');
   assert.ok(/observability\.enabled/.test(d), 'scrape wiring must be gated on observability.enabled');
   assert.ok(/metrics_path/.test(d), 'must point the scrape at the configured metrics_path');

@@ -41,12 +41,12 @@ When `specs/brownfield/code-graph.json` is a real (non-placeholder) graph,
 change-family skills (`/feature`, `/change`, `/refactor`, `/vibe`) must run:
 
 ```bash
-node .claude/scripts/context-pack.js --diff --budget 1600 "<request>"
+node .opencode/scripts/context-pack.js --diff --budget 1600 "<request>"
 ```
 
 before broad production source reads or unconstrained repo-wide search. The pack
 returns schema v2 JSON: citations, `task_map`, `confidence`, and writes a session
-receipt to `.claude/state/context-pack-last.json`.
+receipt to `.opencode/state/context-pack-last.json`.
 
 Low confidence / multi-cluster packs should clarify or re-pack after one narrow
 `rg` — not open a multi-file exploration loop. See
@@ -101,9 +101,9 @@ rewrite).
 Build a bounded source context pack:
 
 ```bash
-node .claude/scripts/context-pack.js --diff --budget 1600 "where is session validation handled?"
+node .opencode/scripts/context-pack.js --diff --budget 1600 "where is session validation handled?"
 # unified facade:
-node .claude/scripts/nav-query.js pack --budget 1600 "where is session validation handled?"
+node .opencode/scripts/nav-query.js pack --budget 1600 "where is session validation handled?"
 ```
 
 or in Claude Code:
@@ -115,10 +115,10 @@ or in Claude Code:
 Refresh secondary navigation (semantic TF-IDF index, co-change edges, concept pages):
 
 ```bash
-node .claude/scripts/nav-query.js refresh
+node .opencode/scripts/nav-query.js refresh
 ```
 
-Optional MCP (same tools as nav-query) — merge `.claude/templates/mcp-nav.snippet.json`
+Optional MCP (same tools as nav-query) — merge `.opencode/templates/mcp-nav.snippet.json`
 into project `.mcp.json` **before** long agent runs (do not churn MCP mid-session).
 The harness monorepo dogfoods this at the repo-root `.mcp.json` (`harness-nav`).
 
@@ -128,45 +128,45 @@ Wiki steering (DeepWiki-style): `.harness/wiki.json` (`repo_notes`, `priority_pa
 Lean brownfield maps (no LLM):
 
 ```bash
-node .claude/scripts/nav-brownfield-maps.js --goal "add invites"
-node .claude/scripts/nav-query.js lean-maps --goal "add invites"
+node .opencode/scripts/nav-brownfield-maps.js --goal "add invites"
+node .opencode/scripts/nav-query.js lean-maps --goal "add invites"
 ```
 
 Golden navigation benchmark:
 
 ```bash
-node .claude/scripts/nav-query.js bench
-# or: node .claude/scripts/nav-bench.js --golden test/fixtures/nav-bench/golden-queries.json
+node .opencode/scripts/nav-query.js bench
+# or: node .opencode/scripts/nav-bench.js --golden test/fixtures/nav-bench/golden-queries.json
 ```
 
 Ambiguity clarify helper:
 
 ```bash
-node .claude/scripts/nav-query.js clarify "fix token handling"
+node .opencode/scripts/nav-query.js clarify "fix token handling"
 ```
 
 Compact a verbose command log while preserving the raw output:
 
 ```bash
-node .claude/scripts/tool-output-pack.js --kind test --command "npm test" --in raw-test.log
+node .opencode/scripts/tool-output-pack.js --kind test --command "npm test" --in raw-test.log
 ```
 
 Run a command through the local Compress-Cache-Retrieve layer:
 
 ```bash
-node .claude/scripts/run-compact.js --kind test -- npm test
+node .opencode/scripts/run-compact.js --kind test -- npm test
 ```
 
 Search with compact grouped results and a retrievable raw result cache:
 
 ```bash
-node .claude/scripts/search-compact.js --pattern "validateSession" --glob "src/*.ts"
+node .opencode/scripts/search-compact.js --pattern "validateSession" --glob "src/*.ts"
 ```
 
 Retrieve cached raw context by hash:
 
 ```bash
-node .claude/scripts/context-retrieve.js <hash> --query "auth token"
+node .opencode/scripts/context-retrieve.js <hash> --query "auth token"
 ```
 
 Tool-output packing and CCR wrappers are explicit commands. The advisory hook

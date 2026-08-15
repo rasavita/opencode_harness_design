@@ -13,7 +13,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { oversizedFunctions } = require('../.claude/hooks/lib/length');
+const { oversizedFunctions } = require('../.opencode/hooks/lib/length');
 
 const short = (name, body) => `function ${name}() {\n${body}\n}\n`;
 

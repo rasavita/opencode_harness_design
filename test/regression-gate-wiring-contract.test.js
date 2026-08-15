@@ -22,29 +22,29 @@ const ROOT = path.resolve(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 test('regression-gate CLI exists and reuses the hooks/lib machinery', () => {
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude/scripts/regression-gate.js')));
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude/hooks/lib/regression-gate.js')));
-  const cli = read('.claude/scripts/regression-gate.js');
+  assert.ok(fs.existsSync(path.join(ROOT, '.opencode/scripts/regression-gate.js')));
+  assert.ok(fs.existsSync(path.join(ROOT, '.opencode/hooks/lib/regression-gate.js')));
+  const cli = read('.opencode/scripts/regression-gate.js');
   assert.match(cli, /require\('\.\.\/hooks\/lib\/regression-gate'\)/, 'CLI must reuse the tested lib');
   assert.match(cli, /require\('\.\.\/hooks\/lib\/contract-schema'\)/, 'CLI must reuse validate-contract.js\'s schema machinery');
 });
 
 test('package.json exposes the regression-gate script', () => {
   const pkg = JSON.parse(read('package.json'));
-  assert.strictEqual(pkg.scripts['regression-gate'], 'node .claude/scripts/regression-gate.js');
+  assert.strictEqual(pkg.scripts['regression-gate'], 'node .opencode/scripts/regression-gate.js');
 });
 
 test('/gate runs regression-gate.js as a pre-merge hard block', () => {
   // Registry membership, not skill prose: /gate runs the pack-contributed check set.
-  const { loadRegistry } = require('../.claude/scripts/run-gate-checks.js');
+  const { loadRegistry } = require('../.opencode/scripts/run-gate-checks.js');
   const entry = loadRegistry(process.cwd()).find((c) => c.script === 'regression-gate.js');
-  assert.ok(entry, '/gate must run the regression-suite-full gate (via .claude/config/gate-checks.json)');
+  assert.ok(entry, '/gate must run the regression-suite-full gate (via .opencode/config/gate-checks.json)');
   assert.strictEqual(entry.blocking, true, 'the full regression sweep must be a hard block');
   assert.ok((entry.args || []).includes('--replay'), 'the sweep must run under forced replay');
 });
 
 test('/change Step S5 no longer requires the full regression-gate.js sweep (moved to G16 for local iteration)', () => {
-  const skill = read('.claude/skills/change/SKILL.md');
+  const skill = read('.opencode/skills/change/SKILL.md');
   const s5Start = skill.indexOf('### Step S5');
   const s5End = skill.indexOf('### Step S6');
   assert.ok(s5Start !== -1 && s5End !== -1 && s5End > s5Start, 'Step S5/S6 headings must exist');
@@ -70,7 +70,7 @@ test('manifest registers regression-suite-full active, behaviour axis, runtime s
   assert.strictEqual(s.status, 'active');
   assert.strictEqual(s.scope, 'runtime');
   assert.strictEqual(s.gap_ref, 'G15');
-  assert.strictEqual(s.wired_at, '.claude/scripts/regression-gate.js');
+  assert.strictEqual(s.wired_at, '.opencode/scripts/regression-gate.js');
   assert.ok(fs.existsSync(path.join(ROOT, s.wired_at)), 'wired_at must resolve');
   assert.ok(s.signal && s.description, 'signal/description must be populated per the existing style');
 });
@@ -88,7 +88,7 @@ test('sensor-arbitration.md classifies regression-suite-full as hard-block with 
 });
 
 test('harness-manifest.json itself remains internally valid (honesty invariant)', () => {
-  const { validate } = require('../.claude/scripts/validate-harness-manifest.js');
+  const { validate } = require('../.opencode/scripts/validate-harness-manifest.js');
   const manifest = JSON.parse(read('harness-manifest.json'));
   const { errors } = validate(manifest);
   assert.deepStrictEqual(errors, []);

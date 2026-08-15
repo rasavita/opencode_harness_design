@@ -6,12 +6,12 @@ const path = require('path');
 
 const {
   checkPromotionEligible, findRecommendation,
-} = require(path.resolve(__dirname, '..', '.claude', 'scripts', 'promote-recommendation.js'));
+} = require(path.resolve(__dirname, '..', '.opencode', 'scripts', 'promote-recommendation.js'));
 
 function rec(overrides) {
   return {
     id: 'REC-20260714-001',
-    target: '.claude/hooks/lib/loop-health.js',
+    target: '.opencode/hooks/lib/loop-health.js',
     change: 'Tighten the tool-error-rate attention line.',
     class: 'sensor-tune',
     risk: 'low',
@@ -127,7 +127,7 @@ const { spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const os = require('node:os');
 
-const SCRIPT = path.resolve(__dirname, '..', '.claude', 'scripts', 'promote-recommendation.js');
+const SCRIPT = path.resolve(__dirname, '..', '.opencode', 'scripts', 'promote-recommendation.js');
 
 function tmpRecommendationsFile(entries) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'promote-cli-'));

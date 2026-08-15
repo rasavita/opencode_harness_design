@@ -7,18 +7,18 @@ const assert = require('node:assert');
 const { execFileSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
-const CLI = path.join(ROOT, '.claude/scripts/reuse-scout.js');
+const CLI = path.join(ROOT, '.opencode/scripts/reuse-scout.js');
 const read = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
 
 test('CLI exists, reuses the lib, is require-safe', () => {
   assert.ok(fs.existsSync(CLI));
-  const src = read('.claude/scripts/reuse-scout.js');
+  const src = read('.opencode/scripts/reuse-scout.js');
   assert.match(src, /require\('\.\.\/hooks\/lib\/reuse-scout'\)/);
   assert.match(src, /require\.main === module/);
 });
 
 test('package.json exposes the reuse-scout script', () => {
-  assert.strictEqual(JSON.parse(read('package.json')).scripts['reuse-scout'], 'node .claude/scripts/reuse-scout.js');
+  assert.strictEqual(JSON.parse(read('package.json')).scripts['reuse-scout'], 'node .opencode/scripts/reuse-scout.js');
 });
 
 test('CLI emits JSON with a fire decision for a real graph fixture', () => {

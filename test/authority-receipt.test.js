@@ -6,10 +6,10 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
-const { stampEnvelope } = require('../.claude/hooks/lib/task-envelope');
+const { stampEnvelope } = require('../.opencode/hooks/lib/task-envelope');
 const {
   consumeCapability, detectSensitiveAction, findCapability, signReceipt, verifyReceipt,
-} = require('../.claude/hooks/lib/authority-receipt');
+} = require('../.opencode/hooks/lib/authority-receipt');
 
 function fixture() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'authority-'));
@@ -22,10 +22,10 @@ function fixture() {
     budgets: { warn_at_pct: 80, dimensions: [{ unit: 'agents', limit: 2 }] },
     stopping_conditions: ['gate_pass'], created_at: '2026-07-26T12:00:00.000Z',
   });
-  fs.mkdirSync(path.join(root, '.claude', 'state'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.claude', 'state', 'task-envelope.json'), JSON.stringify(envelope));
-  fs.mkdirSync(path.join(root, '.claude', 'trust'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.claude', 'trust', 'issuers.json'), JSON.stringify({
+  fs.mkdirSync(path.join(root, '.opencode', 'state'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.opencode', 'state', 'task-envelope.json'), JSON.stringify(envelope));
+  fs.mkdirSync(path.join(root, '.opencode', 'trust'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.opencode', 'trust', 'issuers.json'), JSON.stringify({
     schema_version: 1,
     issuers: [{
       issuer: 'security-office', key_id: 'key-1',
@@ -70,7 +70,7 @@ test('capability requires referenced signed approvals from distinct trusted huma
     actions: ['deploy'], approval_receipt_ids: [approval.receipt_id],
   }), pair.privateKey);
   for (const [kind, receipt] of [['approvals', approval], ['capabilities', capability]]) {
-    const dir = path.join(root, '.claude', 'authority', kind);
+    const dir = path.join(root, '.opencode', 'authority', kind);
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, `${receipt.receipt_id}.json`), JSON.stringify(receipt));
   }

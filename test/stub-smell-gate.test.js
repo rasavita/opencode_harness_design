@@ -6,7 +6,7 @@ const {
   classifyStubSmells,
   isProductionSource,
   findingLine,
-} = require('../.claude/hooks/lib/stub-smell');
+} = require('../.opencode/hooks/lib/stub-smell');
 
 test('isProductionSource excludes tests and docs', () => {
   assert.equal(isProductionSource('src/orders/service.ts'), true);

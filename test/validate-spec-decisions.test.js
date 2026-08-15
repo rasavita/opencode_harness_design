@@ -12,7 +12,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { validateDecisions } = require('../.claude/scripts/validate-spec-decisions.js');
+const { validateDecisions } = require('../.opencode/scripts/validate-spec-decisions.js');
 
 const decision = (over = {}) => ({
   id: 'D1',
@@ -114,7 +114,7 @@ test('headless lanes waive the human requirement but the verdict records it', ()
 
 test('a self-declared headless lane is refused when the session says otherwise', () => {
   // --lane is passed by the same agent the gate constrains, one line below the
-  // gated form in spec-render's own code block. .claude/state/current-lane is
+  // gated form in spec-render's own code block. .opencode/state/current-lane is
   // written by record-run.js from the actual invocation, so it arbitrates.
   const res = validateDecisions(
     doc({ decisions: [decision({ basis: 'headless-default', load_bearing: true })] }),
@@ -151,7 +151,7 @@ const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'validate-spec-decisions.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'validate-spec-decisions.js');
 
 /** A project whose decisions file is valid, with `sessionId` as the live session. */
 function decisionsRoot(sessionId, docOver = {}) {
@@ -159,8 +159,8 @@ function decisionsRoot(sessionId, docOver = {}) {
   fs.mkdirSync(path.join(dir, 'specs/decisions'), { recursive: true });
   fs.writeFileSync(path.join(dir, 'specs/decisions/spec-decisions.json'),
     JSON.stringify(doc(docOver), null, 2));
-  fs.mkdirSync(path.join(dir, '.claude/runs'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.claude/runs/2026-08-09.jsonl'),
+  fs.mkdirSync(path.join(dir, '.opencode/runs'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.opencode/runs/2026-08-09.jsonl'),
     `${JSON.stringify({ kind: 'tool', session_id: sessionId })}\n`);
   return dir;
 }
@@ -232,7 +232,7 @@ test('re-running the gate on unchanged decisions preserves the shaping session',
   assert.strictEqual(verdictOf(dir).session_id, 'SESSION-SHAPING');
 
   // The human clears; the renderer re-runs the gate from the fresh session.
-  fs.appendFileSync(path.join(dir, '.claude/runs/2026-08-09.jsonl'),
+  fs.appendFileSync(path.join(dir, '.opencode/runs/2026-08-09.jsonl'),
     `${JSON.stringify({ kind: 'tool', session_id: 'SESSION-FRESH' })}\n`);
   gate(dir);
   assert.strictEqual(verdictOf(dir).session_id, 'SESSION-SHAPING',
@@ -243,7 +243,7 @@ test('changed decisions re-stamp — a new shaping dialogue happened', () => {
   const dir = decisionsRoot('SESSION-SHAPING');
   gate(dir);
 
-  fs.appendFileSync(path.join(dir, '.claude/runs/2026-08-09.jsonl'),
+  fs.appendFileSync(path.join(dir, '.opencode/runs/2026-08-09.jsonl'),
     `${JSON.stringify({ kind: 'tool', session_id: 'SESSION-SECOND' })}\n`);
   const file = path.join(dir, 'specs/decisions/spec-decisions.json');
   const d = JSON.parse(fs.readFileSync(file, 'utf8'));

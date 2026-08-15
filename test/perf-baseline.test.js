@@ -12,7 +12,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 const { test } = require('node:test');
 
-const script = path.join(__dirname, '..', '.claude', 'scripts', 'perf-baseline.js');
+const script = path.join(__dirname, '..', '.opencode', 'scripts', 'perf-baseline.js');
 const { percentile, compareEndpoint, endpointKey } = require(script);
 
 // IMPORTANT: async spawn, never spawnSync — the test server lives in THIS

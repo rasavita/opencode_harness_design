@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { describe, test, before, after } = require('node:test');
 
-const { runClaude, HARNESS_ROOT } = require('./helpers/claude-runner');
+const { runClaude, HARNESS_ROOT } = require('./helpers/opencode-runner');
 const { assertMetricExists, isPrometheusUp, pollMetric } = require('./helpers/prometheus-checker');
 const { isGrafanaUp, getDashboard, listDashboards } = require('./helpers/grafana-checker');
 
@@ -71,7 +71,7 @@ describe('Harness E2E Pipeline — Build + Observability', { timeout: 900000 }, 
     });
 
     const allSourceFiles = findFiles(PROJECT_DIR, /\.(js|ts)$/)
-      .filter((f) => !f.includes('node_modules') && !f.includes('.claude'));
+      .filter((f) => !f.includes('node_modules') && !f.includes('.opencode'));
     const sourceFileCount = allSourceFiles.length;
 
     let featuresPassing = 0; let featuresTotal = 0;
@@ -86,7 +86,7 @@ describe('Harness E2E Pipeline — Build + Observability', { timeout: 900000 }, 
       } catch (_) {}
     }
 
-    const runsDir = path.join(PROJECT_DIR, '.claude/runs');
+    const runsDir = path.join(PROJECT_DIR, '.opencode/runs');
     const runFiles = fs.existsSync(runsDir) ? fs.readdirSync(runsDir).filter((f) => f.endsWith('.jsonl')) : [];
 
     logResult('stage-5-auto', {
@@ -115,7 +115,7 @@ describe('Harness E2E Pipeline — Build + Observability', { timeout: 900000 }, 
     console.log(`[e2e] harness_phase_eval_score: FOUND (${scoreCheck.resultCount})`);
 
     // The build's OWN receipts must reach the dashboard too. The record-run hook
-    // pushes them live during Stage 4 now that claude-runner sets
+    // pushes them live during Stage 4 now that opencode-runner sets
     // HARNESS_PUSHGATEWAY_URL — every prompt/turn produces this metric, so its
     // presence proves real e2e build activity lands in Prometheus, not just the
     // synthetic phase_eval push. (Part B of the pipeline-progress proposal.)

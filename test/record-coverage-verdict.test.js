@@ -7,7 +7,7 @@ const path = require('path');
 const { spawnSync, execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'record-coverage-verdict.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'record-coverage-verdict.js');
 const { receiptRows, run } = require(SCRIPT);
 
 const REPORT = {
@@ -110,8 +110,8 @@ test('run tolerates empty stdin without creating the receipts file', () => {
 // ---------------------------------------------------------------------------
 
 const REPO_ROOT = path.join(__dirname, '..');
-const INDEXER = path.join(REPO_ROOT, '.claude', 'skills', 'code-map', 'scripts', 'code_index', 'code_index.py');
-const COVERAGE_MAP = path.join(REPO_ROOT, '.claude', 'skills', 'code-map', 'scripts', 'code_index', 'coverage_map.py');
+const INDEXER = path.join(REPO_ROOT, '.opencode', 'skills', 'code-map', 'scripts', 'code_index', 'code_index.py');
+const COVERAGE_MAP = path.join(REPO_ROOT, '.opencode', 'skills', 'code-map', 'scripts', 'code_index', 'coverage_map.py');
 const FIXTURE = path.join(__dirname, 'fixtures', 'code-index', 'sample');
 
 const BUILD_COVERAGE_DB = `

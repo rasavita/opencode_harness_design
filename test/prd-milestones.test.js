@@ -15,7 +15,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { parseMilestones } = require('../.claude/hooks/lib/prd-milestones.js');
+const { parseMilestones } = require('../.opencode/hooks/lib/prd-milestones.js');
 
 const BULLETS = `# PRD: Triage
 
@@ -86,21 +86,21 @@ const path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 
 test('brd-adopt emits the plan, /spec reads it, /build writes the log', () => {
-  assert.match(read('.claude', 'scripts', 'brd-adopt.js'), /brd-milestones\.json/,
+  assert.match(read('.opencode', 'scripts', 'brd-adopt.js'), /brd-milestones\.json/,
     'adoption must emit the plan');
-  assert.match(read('.claude', 'skills', 'spec', 'SKILL.md'), /brd-milestones\.json/,
+  assert.match(read('.opencode', 'skills', 'spec', 'SKILL.md'), /brd-milestones\.json/,
     '/spec must read the plan rather than re-deriving scope from memory');
-  assert.match(read('.claude', 'skills', 'build', 'references', 'section-04-pipeline-phases.md'),
+  assert.match(read('.opencode', 'skills', 'build', 'references', 'section-04-pipeline-phases.md'),
     /milestone-log\.template\.md/, '/build must write the log at the end of a milestone');
 });
 
 test('/spec reads prior milestone logs, closing the cross-session loop', () => {
-  assert.match(read('.claude', 'skills', 'spec', 'SKILL.md'), /specs\/milestones\/\*-log\.md/,
+  assert.match(read('.opencode', 'skills', 'spec', 'SKILL.md'), /specs\/milestones\/\*-log\.md/,
     'the next milestone must start from what exists, not from what was intended');
 });
 
 test('the log template demands the two sections that carry the weight', () => {
-  const tpl = read('.claude', 'templates', 'milestone-log.template.md');
+  const tpl = read('.opencode', 'templates', 'milestone-log.template.md');
   assert.match(tpl, /Decisions taken that the PRD did not specify/);
   assert.match(tpl, /Deviations from the PRD, and why/);
   assert.match(tpl, /write "none" explicitly/i,

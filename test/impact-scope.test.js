@@ -23,7 +23,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const ROOT = path.join(__dirname, '..');
-const SCRIPT = path.join(ROOT, '.claude', 'scripts', 'impact-scope.js');
+const SCRIPT = path.join(ROOT, '.opencode', 'scripts', 'impact-scope.js');
 const {
   resolveDefaultBranch,
   resolveBaseRef,

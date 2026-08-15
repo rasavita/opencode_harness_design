@@ -7,27 +7,27 @@ const { shipsIn } = require('./helpers/pack-membership');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
-const { formatReviewSubject } = require('../.claude/scripts/review-commit-msg');
+const { formatReviewSubject } = require('../.opencode/scripts/review-commit-msg');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const exists = (rel) => fs.existsSync(path.join(ROOT, rel));
 
 test('semantic-divergence checklist exists with Bun-class hazards', () => {
-  const doc = read('.claude/skills/code-gen/references/semantic-divergence.md');
+  const doc = read('.opencode/skills/code-gen/references/semantic-divergence.md');
   assert.match(doc, /debug_assert|Assert \/ debug/i);
   assert.match(doc, /Drop|defer/i);
   assert.match(doc, /odd-length|Slice/i);
 });
 
 test('code-reviewer has semantic-divergence lens for mechanical ports', () => {
-  const agent = read('.claude/agents/code-reviewer.md');
+  const agent = read('.opencode/agents/code-reviewer.md');
   assert.match(agent, /Semantic-divergence lens/);
   assert.match(agent, /semantic-divergence\.md/);
 });
 
 test('/refactor --mechanical requires semantic divergence review', () => {
-  const skill = read('.claude/skills/refactor/SKILL.md');
+  const skill = read('.opencode/skills/refactor/SKILL.md');
   assert.match(skill, /Semantic divergence/);
   assert.match(skill, /semantic-divergence\.md/);
   assert.match(skill, /review-commit-msg\.js/);
@@ -50,12 +50,12 @@ test('formatReviewSubject attributes review metadata', () => {
 test('review-commit-msg ships to a scaffolded project', () => {
   assert.ok(shipsIn('review-commit-msg', 'script').includes('core'),
     'review-commit-msg must ship in the core profile');
-  assert.match(read('.claude/scripts/scaffold-copy.js'), /workflows/,
+  assert.match(read('.opencode/scripts/scaffold-copy.js'), /workflows/,
     'core scaffold must copy workflows for fix-diagnostics');
 });
 
 test('fix-diagnostics workflow exists and is not a /gate clone', () => {
-  const wf = read('.claude/workflows/fix-diagnostics.js');
+  const wf = read('.opencode/workflows/fix-diagnostics.js');
   assert.match(wf, /export const meta/);
   assert.match(wf, /name: 'fix-diagnostics'/);
   assert.match(wf, /diagnostics-shard/);
@@ -65,7 +65,7 @@ test('fix-diagnostics workflow exists and is not a /gate clone', () => {
 });
 
 test('workflows README documents the exemplar and process-edit lesson', () => {
-  const readme = read('.claude/workflows/README.md');
+  const readme = read('.opencode/workflows/README.md');
   assert.match(readme, /fix-diagnostics/);
   assert.match(readme, /Monitor the loop|edit the workflow/i);
 });
@@ -78,6 +78,6 @@ test('out-of-core Phase C notes exist for fuzz and cgroup', () => {
 });
 
 test('/implement mentions review-commit-msg after dual review', () => {
-  const skill = read('.claude/skills/implement/SKILL.md');
+  const skill = read('.opencode/skills/implement/SKILL.md');
   assert.match(skill, /review-commit-msg\.js/);
 });

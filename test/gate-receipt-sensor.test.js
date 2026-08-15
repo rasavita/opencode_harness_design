@@ -20,7 +20,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { EXPECTED_PHASES, detectSkippedGates } = require('../.claude/hooks/lib/gate-receipt-sensor.js');
+const { EXPECTED_PHASES, detectSkippedGates } = require('../.opencode/hooks/lib/gate-receipt-sensor.js');
 
 // Injected so the rules are testable without a filesystem.
 const world = ({ artifacts = [], receipts = {} }) => ({
@@ -108,8 +108,8 @@ test('a lane string with stray whitespace still resolves', () => {
 // written. Keying on "build" made the sensor inert for every real /build run —
 // the exact incident its own header cites — and every test hand-injected the
 // lane, so nothing exercised the real value and it shipped green.
-const { parseBuildInvocation } = require('../.claude/scripts/build-lane.js');
-const { appliesTo } = require('../.claude/hooks/lib/gate-receipt-sensor.js');
+const { parseBuildInvocation } = require('../.opencode/scripts/build-lane.js');
+const { appliesTo } = require('../.opencode/hooks/lib/gate-receipt-sensor.js');
 
 test('the sensor applies to every lane /build actually writes', () => {
   const invocations = [

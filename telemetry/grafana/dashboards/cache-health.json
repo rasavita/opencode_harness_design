@@ -1,5 +1,5 @@
 {
-  "title": "Claude Harness — Prompt Cache Health",
+  "title": "OpenCode Harness — Prompt Cache Health",
   "tags": ["claude-code", "prompt-cache", "harness"],
   "refresh": "30s",
   "panels": [

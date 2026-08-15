@@ -7,7 +7,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'coverage-diff.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'coverage-diff.js');
 const { normalizeCoverage, computeDiffCoverage } = require(SCRIPT);
 
 // The repo-wide ratchet (/auto Gate 3) can rise while a group ships dark code, as

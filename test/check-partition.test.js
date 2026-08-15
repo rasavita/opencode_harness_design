@@ -13,7 +13,7 @@ test('hardRefs finds a require() of a lib', () => {
 });
 
 test('hardRefs finds a node invocation of a script', () => {
-  const refs = hardRefs('run `node .claude/scripts/context-pack.js --diff`', { script: ['context-pack'] });
+  const refs = hardRefs('run `node .opencode/scripts/context-pack.js --diff`', { script: ['context-pack'] });
   assert.deepStrictEqual(refs, ['script:context-pack']);
 });
 
@@ -42,7 +42,7 @@ test('hardRefs ignores a bare agent name in prose', () => {
 // cross-references, prose descriptions. Those go stale, they do not crash.
 test('a code unit naming a script inside a remediation string is soft', () => {
   const refs = hardRefs(
-    'fix: `re-negotiate the contract (node .claude/scripts/validate-contract.js x).`',
+    'fix: `re-negotiate the contract (node .opencode/scripts/validate-contract.js x).`',
     { script: ['validate-contract'] }, new Set(), 'lib'
   );
   assert.deepStrictEqual(refs, [], 'a path in a message is inert if the pack is gone');
@@ -55,19 +55,19 @@ test('a code unit requiring the same script IS hard', () => {
 });
 
 test('a prose unit invoking a script with node IS hard', () => {
-  const refs = hardRefs('2. **Quality card:** `node .claude/scripts/quality-card.js --range <r>`',
+  const refs = hardRefs('2. **Quality card:** `node .opencode/scripts/quality-card.js --range <r>`',
     { script: ['quality-card'] }, new Set(), 'skill');
   assert.deepStrictEqual(refs, ['script:quality-card'], 'for a skill, a command line is the invocation');
 });
 
 test('a doc cross-reference to another skill is soft', () => {
-  const refs = hardRefs('see `.claude/skills/test/references/test-design.md` for the boundary triples',
+  const refs = hardRefs('see `.opencode/skills/test/references/test-design.md` for the boundary triples',
     { skill: ['test'] }, new Set(), 'skill');
   assert.deepStrictEqual(refs, [], 'a link to SKILL.md/references is documentation, not execution');
 });
 
 test('executing a script inside another skill IS hard', () => {
-  const refs = hardRefs('node .claude/skills/code-map/scripts/code_wiki.js query --callers x',
+  const refs = hardRefs('node .opencode/skills/code-map/scripts/code_wiki.js query --callers x',
     { skill: ['code-map'] }, new Set(), 'skill');
   assert.deepStrictEqual(refs, ['skill:code-map']);
 });
@@ -136,7 +136,7 @@ test('a guard elsewhere in the file does not exempt an unguarded require', () =>
 // A justified exception must be a decision on the record, not an erosion of the rule.
 const ACCEPT_FIXTURE = {
   assign: { 'skill:refactor': 'kernel', 'skill:code-map': 'brownfield' },
-  texts: { 'skill:refactor': 'node .claude/skills/code-map/scripts/code_wiki.js query --callers x' },
+  texts: { 'skill:refactor': 'node .opencode/skills/code-map/scripts/code_wiki.js query --callers x' },
   names: { skill: ['code-map'] },
 };
 
@@ -177,7 +177,7 @@ test('an accepted CROSS-PACK edge (non-kernel caller) is exempted, not just a ke
   // kernel edge — there is no try/catch to add to a markdown step.
   const res = checkPartition({
     assign: { 'skill:design': 'planning', 'script:modularity-pack': 'brownfield' },
-    texts: { 'skill:design': 'node .claude/scripts/modularity-pack.js' },
+    texts: { 'skill:design': 'node .opencode/scripts/modularity-pack.js' },
     names: { script: ['modularity-pack'] },
     accepted: [{ from: 'skill:design', to: 'script:modularity-pack', why: 'delta-only, conditional on the code graph' }],
   });
@@ -189,7 +189,7 @@ test('an accepted CROSS-PACK edge (non-kernel caller) is exempted, not just a ke
 test('an UNaccepted cross-pack edge is still reported as a coupling', () => {
   const res = checkPartition({
     assign: { 'skill:design': 'planning', 'script:modularity-pack': 'brownfield' },
-    texts: { 'skill:design': 'node .claude/scripts/modularity-pack.js' },
+    texts: { 'skill:design': 'node .opencode/scripts/modularity-pack.js' },
     names: { script: ['modularity-pack'] },
   });
   assert.strictEqual(res.crossPack.length, 1, 'without an exception the edge remains visible');
@@ -209,7 +209,7 @@ test('an accepted edge does not exempt a DIFFERENT edge', () => {
 test('checkPartition reports a kernel -> pack edge as a violation', () => {
   const res = checkPartition({
     assign: { 'skill:change': 'kernel', 'script:context-pack': 'brownfield' },
-    texts: { 'skill:change': 'node .claude/scripts/context-pack.js' },
+    texts: { 'skill:change': 'node .opencode/scripts/context-pack.js' },
     names: { script: ['context-pack'] },
   });
   assert.strictEqual(res.violations.length, 1);
@@ -228,7 +228,7 @@ test('checkPartition allows a pack -> kernel edge', () => {
 test('checkPartition reports a pack -> other-pack edge separately', () => {
   const res = checkPartition({
     assign: { 'skill:design': 'planning', 'script:nav-query': 'brownfield' },
-    texts: { 'skill:design': 'node .claude/scripts/nav-query.js pack' },
+    texts: { 'skill:design': 'node .opencode/scripts/nav-query.js pack' },
     names: { script: ['nav-query'] },
   });
   assert.deepStrictEqual(res.violations, [], 'cross-pack is not a kernel violation');

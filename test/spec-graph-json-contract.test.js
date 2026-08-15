@@ -15,10 +15,10 @@ test('/spec documents the machine-readable dependency-graph.json', () => {
 
 test('/spec requires deterministic story point estimation metadata', () => {
   const storyTemplate = fs.readFileSync(
-    path.join(__dirname, '..', '.claude', 'templates', 'story.template.md'), 'utf8',
+    path.join(__dirname, '..', '.opencode', 'templates', 'story.template.md'), 'utf8',
   );
   const phaseRubrics = JSON.parse(fs.readFileSync(
-    path.join(__dirname, '..', '.claude', 'templates', 'phase-eval-rubrics.json'), 'utf8',
+    path.join(__dirname, '..', '.opencode', 'templates', 'phase-eval-rubrics.json'), 'utf8',
   ));
 
   assert.match(SPEC_SKILL, /Story Points/i, 'SKILL.md must require a Story Points field');

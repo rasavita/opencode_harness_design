@@ -37,7 +37,7 @@ const MANIFEST = path.join(ROOT, 'harness-manifest.json');
 // Marker for the staleness backstop: which controls the last FULL audit (agents
 // reading source, not just this pre-pass) adjudicated. Same "wrap the real run's
 // completion into a state file" shape as record-modularity-review.js (gap G19).
-const MARKER = path.join(ROOT, '.claude', 'state', 'dedup-audit-marker.json');
+const MARKER = path.join(ROOT, '.opencode', 'state', 'dedup-audit-marker.json');
 
 // Signal weights. A shared gap id is the strongest tell — two controls filed under
 // the same gap are the classic double-registration (the canary pair, the merged

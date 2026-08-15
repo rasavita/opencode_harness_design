@@ -14,7 +14,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { classifySprout } = require(
-  path.join(__dirname, '..', '.claude', 'hooks', 'lib', 'sprout-classify')
+  path.join(__dirname, '..', '.opencode', 'hooks', 'lib', 'sprout-classify')
 );
 
 test('no added production files at all -> not a sprout (pin-down territory)', () => {

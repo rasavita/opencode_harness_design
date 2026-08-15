@@ -9,7 +9,7 @@ const assert = require('node:assert');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { run, readVerdict } = require('../.claude/scripts/evidence-integrity-gate');
+const { run, readVerdict } = require('../.opencode/scripts/evidence-integrity-gate');
 
 function tmp() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'evid-'));

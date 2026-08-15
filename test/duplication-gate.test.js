@@ -4,7 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 
 const { cloneKeys, gateDecision } = require(
-  path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'duplication-gate.js')
+  path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'duplication-gate.js')
 );
 
 // A minimal jscpd-report shape: { duplicates: [{ fragment, firstFile:{name}, secondFile:{name} }] }

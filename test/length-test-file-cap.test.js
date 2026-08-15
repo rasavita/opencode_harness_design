@@ -10,7 +10,7 @@ const { test } = require('node:test');
 
 const {
   FILE_HARD_LIMIT, TEST_FILE_LIMIT, isTestPath, fileLimitFor, newlyOverFileLimit,
-} = require('../.claude/hooks/lib/length.js');
+} = require('../.opencode/hooks/lib/length.js');
 
 test('the source cap is unchanged at 300 and the test cap is higher', () => {
   assert.strictEqual(FILE_HARD_LIMIT, 300);

@@ -6,8 +6,8 @@
 
 ```mermaid
 flowchart LR
-  n_js_symphony_clone_src_orchestrator_claude_runner_js["claude-runner.js"]
-  n_js_symphony_clone_src_orchestrator_claude_runner_test_js["claude-runner.test.js"]
+  n_js_symphony_clone_src_orchestrator_claude_runner_js["opencode-runner.js"]
+  n_js_symphony_clone_src_orchestrator_claude_runner_test_js["opencode-runner.test.js"]
   n_js_symphony_clone_src_orchestrator_eligibility_js["eligibility.js"]
   n_js_symphony_clone_src_orchestrator_eligibility_test_js["eligibility.test.js"]
   n_js_symphony_clone_src_orchestrator_outcomes_js["outcomes.js"]
@@ -39,24 +39,24 @@ flowchart LR
   n_js_symphony_clone_src_orchestrator_scheduler_test_js -->|imports| n_js_symphony_clone_src_orchestrator_scheduler_js
 ```
 
-## `js:symphony_clone/src/orchestrator/claude-runner.js`
+## `js:symphony_clone/src/orchestrator/opencode-runner.js`
 
 - fan-in: 3, fan-out: 1
 
 ### Symbols
-  - `ClaudeRunner` (class) → js:symphony_clone/src/orchestrator/claude-runner.js:5 — `class ClaudeRunner`
-  - `spawnDetachedShell` (function) → js:symphony_clone/src/orchestrator/claude-runner.js:24 — `function spawnDetachedShell(commandWithPrompt, cwd)`
-  - `killProcessGroup` (function) → js:symphony_clone/src/orchestrator/claude-runner.js:34 — `function killProcessGroup(child)`
-  - `wireStreams` (function) → js:symphony_clone/src/orchestrator/claude-runner.js:42 — `function wireStreams(child)`
-  - `runShellCommand` (function) → js:symphony_clone/src/orchestrator/claude-runner.js:55 — `function runShellCommand(command, options)`
-  - `shellQuote` (function) → js:symphony_clone/src/orchestrator/claude-runner.js:85 — `function shellQuote(value)`
+  - `ClaudeRunner` (class) → js:symphony_clone/src/orchestrator/opencode-runner.js:5 — `class ClaudeRunner`
+  - `spawnDetachedShell` (function) → js:symphony_clone/src/orchestrator/opencode-runner.js:24 — `function spawnDetachedShell(commandWithPrompt, cwd)`
+  - `killProcessGroup` (function) → js:symphony_clone/src/orchestrator/opencode-runner.js:34 — `function killProcessGroup(child)`
+  - `wireStreams` (function) → js:symphony_clone/src/orchestrator/opencode-runner.js:42 — `function wireStreams(child)`
+  - `runShellCommand` (function) → js:symphony_clone/src/orchestrator/opencode-runner.js:55 — `function runShellCommand(command, options)`
+  - `shellQuote` (function) → js:symphony_clone/src/orchestrator/opencode-runner.js:85 — `function shellQuote(value)`
 
-## `js:symphony_clone/src/orchestrator/claude-runner.test.js`
+## `js:symphony_clone/src/orchestrator/opencode-runner.test.js`
 
 - fan-in: 0, fan-out: 6
 
 ### Symbols
-  - `processAlive` (function) → js:symphony_clone/src/orchestrator/claude-runner.test.js:10 — `function processAlive(pid)`
+  - `processAlive` (function) → js:symphony_clone/src/orchestrator/opencode-runner.test.js:10 — `function processAlive(pid)`
 
 ## `js:symphony_clone/src/orchestrator/eligibility.js`
 

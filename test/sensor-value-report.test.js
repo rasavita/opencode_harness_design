@@ -6,7 +6,7 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { tally, classify, render } = require('../.claude/scripts/sensor-value-report');
+const { tally, classify, render } = require('../.opencode/scripts/sensor-value-report');
 
 const row = (sensor, over) => ({ sensor, ran: true, blocked: false, ts: 1, ...over });
 

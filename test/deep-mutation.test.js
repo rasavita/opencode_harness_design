@@ -8,7 +8,7 @@ const path = require('path');
 const cp = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
-const SCRIPT = path.join(ROOT, '.claude/scripts/deep-mutation.js');
+const SCRIPT = path.join(ROOT, '.opencode/scripts/deep-mutation.js');
 
 function tmpProject() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'deep-mutation-'));

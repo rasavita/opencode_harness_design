@@ -10,7 +10,7 @@ const {
   makeProject,
 } = require('./helpers/record-run-fixture');
 const { stableProjectInstance } = require(
-  path.join(__dirname, '..', '.claude', 'scripts', 'telemetry-memory')
+  path.join(__dirname, '..', '.opencode', 'scripts', 'telemetry-memory')
 );
 
 // Extracted from record-run-hook.test.js (SRP: replay-telemetry.js is a
@@ -32,7 +32,7 @@ test('replay-telemetry rebuilds cumulative memory from the local ledger', async 
     assert.equal(first.status, 0, first.stderr);
     const second = await runHook(projectDir, input, env);
     assert.equal(second.status, 0, second.stderr);
-    const replay = spawn(process.execPath, [path.join(projectDir, '.claude', 'scripts', 'replay-telemetry.js')], {
+    const replay = spawn(process.execPath, [path.join(projectDir, '.opencode', 'scripts', 'replay-telemetry.js')], {
       cwd: projectDir,
       env,
       stdio: ['ignore', 'pipe', 'pipe'],
@@ -52,7 +52,7 @@ test('replay-telemetry rebuilds cumulative memory from the local ledger', async 
 test('replay-telemetry publishes installed skill inventory without prior events', async () => {
   const projectDir = makeProject();
   const gateway = await withGateway((port) => {
-    const replay = spawn(process.execPath, [path.join(projectDir, '.claude', 'scripts', 'replay-telemetry.js')], {
+    const replay = spawn(process.execPath, [path.join(projectDir, '.opencode', 'scripts', 'replay-telemetry.js')], {
       cwd: projectDir,
       env: {
         ...process.env,
@@ -65,14 +65,14 @@ test('replay-telemetry publishes installed skill inventory without prior events'
 
   gateway.server.close();
 
-  assert.match(gateway.body, /harness_skill_info\{[^}]*skill="brd"[^}]*path="\.claude\/skills\/brd\/SKILL\.md"/);
-  assert.match(gateway.body, /harness_skill_info\{[^}]*skill="spec"[^}]*path="\.claude\/skills\/spec\/SKILL\.md"/);
-  assert.match(gateway.body, /harness_skill_info\{[^}]*skill="brownfield"[^}]*path="\.claude\/skills\/brownfield\/SKILL\.md"/);
+  assert.match(gateway.body, /harness_skill_info\{[^}]*skill="brd"[^}]*path="\.opencode\/skills\/brd\/SKILL\.md"/);
+  assert.match(gateway.body, /harness_skill_info\{[^}]*skill="spec"[^}]*path="\.opencode\/skills\/spec\/SKILL\.md"/);
+  assert.match(gateway.body, /harness_skill_info\{[^}]*skill="brownfield"[^}]*path="\.opencode\/skills\/brownfield\/SKILL\.md"/);
 });
 
 test('replay-telemetry seeds the ledger from existing run receipts', async () => {
   const projectDir = makeProject();
-  const runsDir = path.join(projectDir, '.claude', 'runs');
+  const runsDir = path.join(projectDir, '.opencode', 'runs');
   fs.mkdirSync(runsDir, { recursive: true });
   fs.writeFileSync(path.join(runsDir, '2026-05-24.jsonl'), JSON.stringify({
     kind: 'tool',
@@ -89,7 +89,7 @@ test('replay-telemetry seeds the ledger from existing run receipts', async () =>
   }) + '\n');
 
   const gateway = await withGateway((port) => {
-    const replay = spawn(process.execPath, [path.join(projectDir, '.claude', 'scripts', 'replay-telemetry.js')], {
+    const replay = spawn(process.execPath, [path.join(projectDir, '.opencode', 'scripts', 'replay-telemetry.js')], {
       cwd: projectDir,
       env: {
         ...process.env,
@@ -104,5 +104,5 @@ test('replay-telemetry seeds the ledger from existing run receipts', async () =>
 
   assert.match(gateway.body, /harness_tool_events_total\{[^}]*tool="Write"[^}]*\} 1/);
   assert.match(gateway.body, /harness_skill_usage_total\{[^}]*skill="spec"[^}]*source="lane"[^}]*\} 1/);
-  assert.equal(fs.existsSync(path.join(projectDir, '.claude', 'state', 'telemetry-ledger.jsonl')), true);
+  assert.equal(fs.existsSync(path.join(projectDir, '.opencode', 'state', 'telemetry-ledger.jsonl')), true);
 });

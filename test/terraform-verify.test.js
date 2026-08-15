@@ -14,7 +14,7 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { verifyWithTerraform, parseDriftResources } = require('../.claude/scripts/terraform-verify');
+const { verifyWithTerraform, parseDriftResources } = require('../.opencode/scripts/terraform-verify');
 
 const PLAN_WITH_DRIFT = `
 Terraform will perform the following actions:

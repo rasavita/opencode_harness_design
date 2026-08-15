@@ -15,7 +15,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const ROOT = path.join(__dirname, '..');
-const SCRIPT = path.join(ROOT, '.claude', 'scripts', 'local-regression-gate.js');
+const SCRIPT = path.join(ROOT, '.opencode', 'scripts', 'local-regression-gate.js');
 const { run } = require(SCRIPT);
 
 function tmpDir() {

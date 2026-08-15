@@ -1,4 +1,4 @@
-# Claude Harness Engine v6
+# OpenCode Harness Engine v6
 
 A Claude Code plugin for building and changing software with a generator/evaluator loop, ratcheting quality gates, and explicit human review before merge.
 
@@ -21,17 +21,17 @@ Current version: `3.0.0`
 
 ### Recommended: install as a local plugin
 
-This repo ships a **local marketplace** (`.claude-plugin/marketplace.json`), so you can install the harness as a persistent Claude Code plugin — it stays loaded across sessions with no `--plugin-dir` flag to retype:
+This repo ships a **local marketplace** (`.opencode-plugin/marketplace.json`), so you can install the harness as a persistent Claude Code plugin — it stays loaded across sessions with no `--plugin-dir` flag to retype:
 
 ```bash
 git clone https://github.com/cwijayasundara/claude_harness_eng_v6.git ~/claude_harness_eng_v6
 
 # Register the local marketplace (points at your clone), then install the plugin
 claude plugin marketplace add ~/claude_harness_eng_v6
-claude plugin install claude_harness_eng_v6@claude-harness-local
+claude plugin install claude_harness_eng_v6@opencode-harness-local
 ```
 
-`claude plugin install` defaults to `--scope user` (available in every project). Use `--scope project` to write it into a specific project's `.claude/settings.json` (shared with everyone who clones that project), or `--scope local` for a gitignored per-project install. After pulling new commits, refresh with `claude plugin marketplace update claude-harness-local`.
+`claude plugin install` defaults to `--scope user` (available in every project). Use `--scope project` to write it into a specific project's `.opencode/settings.json` (shared with everyone who clones that project), or `--scope local` for a gitignored per-project install. After pulling new commits, refresh with `claude plugin marketplace update opencode-harness-local`.
 
 Then inside Claude Code:
 
@@ -41,14 +41,14 @@ Then inside Claude Code:
 
 If your Claude Code UI shows a namespaced command, use `/claude_harness_eng_v6:scaffold`.
 
-Installing gives you every harness *command*; `/scaffold` still installs the lean `core` surface into your project by default (`/scaffold --full` for the full set). The deterministic gate hooks wire up when `/scaffold` copies `.claude/` into a target project.
+Installing gives you every harness *command*; `/scaffold` still installs the lean `core` surface into your project by default (`/scaffold --full` for the full set). The deterministic gate hooks wire up when `/scaffold` copies `.opencode/` into a target project.
 
 #### Quick one-session load (no install)
 
-To try it without installing, point `--plugin-dir` at the checked-in `.claude/` directory — the plugin root that holds `.claude-plugin/plugin.json`. Per the [plugins reference](https://code.claude.com/docs/en/plugins-reference#plugin-caching-and-file-resolution), this loads the plugin for the current session only:
+To try it without installing, point `--plugin-dir` at the checked-in `.opencode/` directory — the plugin root that holds `.opencode-plugin/plugin.json`. Per the [plugins reference](https://code.opencode.com/docs/en/plugins-reference#plugin-caching-and-file-resolution), this loads the plugin for the current session only:
 
 ```bash
-claude --plugin-dir ~/claude_harness_eng_v6/.claude
+claude --plugin-dir ~/claude_harness_eng_v6/.opencode
 ```
 
 #### Optional: start in auto mode
@@ -59,28 +59,28 @@ Add `--permission-mode auto` to launch a mostly-hands-off session (auto-runs act
 claude --permission-mode auto
 ```
 
-To make it the default so you don't pass the flag each time, set it in your **user-level** `~/.claude/settings.json`:
+To make it the default so you don't pass the flag each time, set it in your **user-level** `~/.opencode/settings.json`:
 
 ```json
 { "permissions": { "defaultMode": "auto" } }
 ```
 
-> **Not the project's `.claude/settings.json`.** Claude Code (v2.1.142+) *silently ignores* `defaultMode: "auto"` from a repo's `.claude/settings.json` or `.claude/settings.local.json` — a checked-in config is not allowed to escalate itself to auto mode (it just starts in `default`, with no error). So `auto` **cannot be scoped to a single repo** via committed settings: user-level `~/.claude/settings.json` turns it on for *every* project, so to keep auto scoped to one repo pass the `--permission-mode auto` flag (or a shell alias) at launch instead.
+> **Not the project's `.opencode/settings.json`.** Claude Code (v2.1.142+) *silently ignores* `defaultMode: "auto"` from a repo's `.opencode/settings.json` or `.opencode/settings.local.json` — a checked-in config is not allowed to escalate itself to auto mode (it just starts in `default`, with no error). So `auto` **cannot be scoped to a single repo** via committed settings: user-level `~/.opencode/settings.json` turns it on for *every* project, so to keep auto scoped to one repo pass the `--permission-mode auto` flag (or a shell alias) at launch instead.
 
 Modes, least → most permissive: `plan`, `default`, `acceptEdits`, `auto`, `bypassPermissions`. Prefer `auto`; reserve `bypassPermissions` (skips *all* checks) for isolated, offline containers only. Auto mode skips per-action prompts but does **not** bypass the harness's own pipeline gates (`/build` phases 1–3, `/gate` before merge).
 
 ### Optional: build a pruned SKU (core / full / lite)
 
-`--plugin-dir <clone>/.claude` loads the **full** harness surface. To load a lean/pruned loadout instead — or to produce a distributable tree/tarball — build a SKU first. **`dist/` is a generated build artifact: it is gitignored and absent from a fresh clone** until you run `npm run package:skus`:
+`--plugin-dir <clone>/.opencode` loads the **full** harness surface. To load a lean/pruned loadout instead — or to produce a distributable tree/tarball — build a SKU first. **`dist/` is a generated build artifact: it is gitignored and absent from a fresh clone** until you run `npm run package:skus`:
 
 ```bash
 npm run package:skus
 # → dist/skus/harness-core , dist/skus/harness-lite , dist/skus/harness-full
 
 cd ~/my-project
-# Point at the packaged SKU root itself — NOT a .claude/ subfolder.
-# package:skus flattens .claude/* up to the package root (plugin.json lives at
-# harness-core/.claude-plugin/), so do NOT append /.claude here.
+# Point at the packaged SKU root itself — NOT a .opencode/ subfolder.
+# package:skus flattens .opencode/* up to the package root (plugin.json lives at
+# harness-core/.opencode-plugin/), so do NOT append /.opencode here.
 claude --plugin-dir /path/to/claude_harness_eng_v6/dist/skus/harness-core
 ```
 
@@ -101,7 +101,7 @@ node tools/pack-install.js --out ~/lean                    # kernel only: 51 uni
 node tools/pack-install.js --out ~/bf --packs brownfield   # kernel + one pack
 ```
 
-Both paths read the same `.claude/config/packs.json`, so a SKU and a composed install can
+Both paths read the same `.opencode/config/packs.json`, so a SKU and a composed install can
 never disagree about what a profile contains.
 
 ## Kernel and packs
@@ -125,7 +125,7 @@ install (profile-closure).* Both are enforced; declared exceptions live in `acce
 node tools/check-partition.js --strict     # exit 1 on a kernel violation OR a profile break
 ```
 
-"Hard" means it would break if the target were gone — `require()`, `node .claude/scripts/x.js`,
+"Hard" means it would break if the target were gone — `require()`, `node .opencode/scripts/x.js`,
 a `subagent_type` dispatch. A remediation string that names a script, or a doc link to another
 skill, is **soft**: uninstalling the pack makes it a stale message, not a crash. Guarded loads
 (`packRun(...)`, `try { require(...) } catch`) are reported as optional edges rather than
@@ -172,13 +172,13 @@ Inside Claude Code (scaffolded projects with the skill installed):
 /scaffold-upgrade --apply
 ```
 
-Or from a shell — refresh hooks/scripts/git-hooks/agents without wiping `project-manifest.json` or `.claude/state/`:
+Or from a shell — refresh hooks/scripts/git-hooks/agents without wiping `project-manifest.json` or `.opencode/state/`:
 
 ```bash
 # dry-run (default)
-node /path/to/claude_harness_eng_v6/.claude/scripts/scaffold-upgrade.js --target ~/my-project
+node /path/to/claude_harness_eng_v6/.opencode/scripts/scaffold-upgrade.js --target ~/my-project
 # apply
-node /path/to/claude_harness_eng_v6/.claude/scripts/scaffold-upgrade.js --target ~/my-project --apply
+node /path/to/claude_harness_eng_v6/.opencode/scripts/scaffold-upgrade.js --target ~/my-project --apply
 # also refresh skills (larger prompt surface change)
 node …/scaffold-upgrade.js --target ~/my-project --apply --include-skills
 ```
@@ -279,13 +279,13 @@ The `--auto` / `--autonomous` flags above control **approval gates** (BRD/story/
 
 | File | Role | Loaded when |
 |---|---|---|
-| `.claude/settings.json` | Curated interactive allowlist — prompts for risky ops | Always (default) |
-| `.claude/settings.auto.json` | **Unattended full-auto profile** — no permission prompts (`Bash(*)`, `Write(*)`, `Edit(*)`, … + `CLAUDE_AUTO_CONTINUE=1`, agent teams) | Only when passed explicitly |
+| `.opencode/settings.json` | Curated interactive allowlist — prompts for risky ops | Always (default) |
+| `.opencode/settings.auto.json` | **Unattended full-auto profile** — no permission prompts (`Bash(*)`, `Write(*)`, `Edit(*)`, … + `HARNESS_AUTO_CONTINUE=1`, agent teams) | Only when passed explicitly |
 
 Both files are copied into every scaffolded project (`scaffold-apply.js`). Claude Code does **not** auto-load `settings.auto.json` — you opt in per run:
 
 ```bash
-claude -p "/build docs/prd.md --auto" --settings .claude/settings.auto.json
+claude -p "/build docs/prd.md --auto" --settings .opencode/settings.auto.json
 ```
 
 It **merges over** `settings.json`, so the deterministic gate hooks (`pre-write-gate`, `pre-bash-gate`), git hooks, the `/auto` ratchet, security review, and pre-PR verify all still fire, and no PR opens over a red build.
@@ -298,12 +298,12 @@ For long unattended PRD-to-PR runs, prefer the resilient chain launcher — see 
 
 `/auto` runs are resumable by design — a killed session, closed laptop, or budget stop loses nothing that was committed:
 
-- **Just re-invoke `/auto`.** It resumes from `claude-progress.txt` (the append-only progress log every iteration writes), re-reads `features.json` and git state, and runs a startup smoke check before building on prior work. Nothing needs exporting from the dead session. (Wall-clock is metered from `.claude/state/budget-start`, which survives the dead session — a long gap counts as spend.)
-- **See where it stopped** with `/status` (or `node .claude/scripts/pipeline-status.js status`), which reads the same state files.
-- **Budget stops are clean stops.** Every run is metered (wall-clock, agent spawns, estimated cost via `node .claude/scripts/budget-state.js`) and stops at an iteration boundary when a cap is hit, setting `next_action: "BUDGET — …"` in `claude-progress.txt`. Raise the cap via `project-manifest.json#execution.budget` (or relaunch through `/build … --budget <spec>` / `--budget off`), then re-invoke `/auto` to resume.
-- **For long unattended PRD-to-PR runs**, prefer `node .claude/scripts/build-chain.js docs/prd.md` — it starts a fresh `claude -p` process per build wave through the same progress file, so a killed process resumes at the next wave.
+- **Just re-invoke `/auto`.** It resumes from `claude-progress.txt` (the append-only progress log every iteration writes), re-reads `features.json` and git state, and runs a startup smoke check before building on prior work. Nothing needs exporting from the dead session. (Wall-clock is metered from `.opencode/state/budget-start`, which survives the dead session — a long gap counts as spend.)
+- **See where it stopped** with `/status` (or `node .opencode/scripts/pipeline-status.js status`), which reads the same state files.
+- **Budget stops are clean stops.** Every run is metered (wall-clock, agent spawns, estimated cost via `node .opencode/scripts/budget-state.js`) and stops at an iteration boundary when a cap is hit, setting `next_action: "BUDGET — …"` in `claude-progress.txt`. Raise the cap via `project-manifest.json#execution.budget` (or relaunch through `/build … --budget <spec>` / `--budget off`), then re-invoke `/auto` to resume.
+- **For long unattended PRD-to-PR runs**, prefer `node .opencode/scripts/build-chain.js docs/prd.md` — it starts a fresh `claude -p` process per build wave through the same progress file, so a killed process resumes at the next wave.
 
-Default budget caps by model tier (`.claude/scripts/budget-state.js`):
+Default budget caps by model tier (`.opencode/scripts/budget-state.js`):
 
 | Tier | Wall-clock | Agent spawns | Est. cost |
 |------|-----------|--------------|-----------|
@@ -315,7 +315,7 @@ Cost figures are surfaced estimates (Σ per-spawn receipts × tier rate), not bi
 
 ## Cost per outcome (model tiers & the `fusion` preset)
 
-Model choice is a **measured** decision, not a vibe: a per-token-cheaper worker can be *dearer per shipped story* if it needs more evaluator/self-heal cycles. Model-tier presets (`node .claude/scripts/model-tier.js <preset>`) pin one model per agent role — generation is high-volume, judgment (evaluator + reviewers + planner) stays on Opus 5 across every posture:
+Model choice is a **measured** decision, not a vibe: a per-token-cheaper worker can be *dearer per shipped story* if it needs more evaluator/self-heal cycles. Model-tier presets (`node .opencode/scripts/model-tier.js <preset>`) pin one model per agent role — generation is high-volume, judgment (evaluator + reviewers + planner) stays on Opus 5 across every posture:
 
 | Preset | Generator (lead) | `implementer` (worker) | Explorer | Judgment |
 |---|---|---|---|---|
@@ -344,7 +344,7 @@ Use `/brownfield` directly only when you want discovery without implementation. 
 | Run blocking pre-merge quality checks | - | `/gate` |
 | Eyeball/run the app | `/run`, `/verify` | `/evaluate` when you need scored verification |
 | Mechanical cleanup | `/simplify` | `/refactor` wraps `/simplify` with behavior-preservation gates |
-| Generate only CLAUDE.md | `/init` | `/scaffold` for full harness bootstrap |
+| Generate only AGENTS.md | `/init` | `/scaffold` for full harness bootstrap |
 
 Rule: native commands own atomic actions; the harness owns orchestration, ratcheting, and writer/grader separation.
 
@@ -358,7 +358,7 @@ Rule: native commands own atomic actions; the harness owns orchestration, ratche
 - **No stub-to-green** (code-gen + reviewer Iron Laws + commit-time `stub-smell-gate`)
 - **No deleted/skipped tests** to green a suite (G31) and **canary-first** mechanical rollouts (G32 + implement/feature)
 - **Multi-agent git safety** (no stash / reset --hard / force-push while parallel implement is active)
-- **Process rules** (`.claude/state/process-rules.md`) — fix the workflow when agents misbehave, not only the tree
+- **Process rules** (`.opencode/state/process-rules.md`) — fix the workflow when agents misbehave, not only the tree
 - **Diagnostics work queue** for large type/lint walls (`diagnostics-shard.js` + `fix-from-diagnostics` / `/fix-diagnostics`)
 - Brownfield discipline: architecture claims cite `code-graph.json`
 - Token waste discipline: living DeepWiki/code-map navigation, compact command/search output, and advisory warnings for broad reads or noisy raw commands
@@ -378,7 +378,7 @@ Harness JS is linted and secrets-scanned in GitHub Actions:
 
 ```bash
 npm ci
-npm run lint                 # eslint on .claude hooks/scripts + tests
+npm run lint                 # eslint on .opencode hooks/scripts + tests
 npm test
 npm run agent-readiness      # regenerate readiness report
 npm run agent-readiness:assert   # hard ratchet: min active pillars + no regression vs baseline
@@ -390,14 +390,14 @@ After a deliberate readiness improvement (new pillar becomes active), refresh th
 
 ```bash
 npm run agent-readiness:baseline
-# then commit .claude/state/agent-readiness-baseline.json
+# then commit .opencode/state/agent-readiness-baseline.json
 ```
 
 Runtime churn hygiene (local; `*.jsonl` is gitignored):
 
 ```bash
 npm run retention:dry   # preview
-npm run retention       # prune .claude/runs (>14d) and state/archive (>30d)
+npm run retention       # prune .opencode/runs (>14d) and state/archive (>30d)
 ```
 
 ## Human trust surfaces (review without drowning in diffs)
@@ -428,7 +428,7 @@ default** in `project-manifest.json#token_governor` (`mode: "enforced"`):
 - `/context "<question>"`: returns bounded file/line citations before broad
   source reads.
 - Compress-Cache-Retrieve (CCR): raw command/search output is stored locally by
-  hash under `.claude/state/context-cache/`, while the agent receives compact
+  hash under `.opencode/state/context-cache/`, while the agent receives compact
   failure/search evidence first.
 - `run-compact.js`: runs noisy commands and preserves raw output plus compact
   failure evidence.
@@ -442,11 +442,11 @@ default** in `project-manifest.json#token_governor` (`mode: "enforced"`):
 Useful commands:
 
 ```bash
-node .claude/scripts/context-pack.js "where is session validation handled?"
-node .claude/scripts/run-compact.js --kind test -- npm test
-node .claude/scripts/search-compact.js --pattern "validateSession" --glob "src/*.ts"
-node .claude/scripts/context-retrieve.js <hash> --query "auth token"
-node .claude/scripts/pipeline-status.js status
+node .opencode/scripts/context-pack.js "where is session validation handled?"
+node .opencode/scripts/run-compact.js --kind test -- npm test
+node .opencode/scripts/search-compact.js --pattern "validateSession" --glob "src/*.ts"
+node .opencode/scripts/context-retrieve.js <hash> --query "auth token"
+node .opencode/scripts/pipeline-status.js status
 ```
 
 The optimizer is **enforced by default**: a broad repo search or source read
@@ -465,10 +465,10 @@ Dial back to advisory with `token_governor.mode: "advisory"` in
 | Token Usage Optimizer / living DeepWiki / CCR | On by default | [docs/token-governor.md](docs/token-governor.md) |
 | Framework skill packs | Select during scaffold, then install manually | [docs/extras.md](docs/extras.md) |
 | Tracker orchestration | Configure Linear/Jira/Azure DevOps | [docs/extras.md](docs/extras.md) |
-| Drift cadence workflow | Copy `.claude/templates/github-workflows/harness-drift.yml` to `.github/workflows/` | Runs drift, harness coverage, flakes, fixtures, contract drift, and optional SLO checks |
+| Drift cadence workflow | Copy `.opencode/templates/github-workflows/harness-drift.yml` to `.github/workflows/` | Runs drift, harness coverage, flakes, fixtures, contract drift, and optional SLO checks |
 | PR-time E2E re-runs | Copied automatically by /test as .github/workflows/e2e.yml | Re-runs the generated Playwright suite on every PR |
 | Unattended backlog-to-merge | Run `symphony_clone/` separately | `symphony_clone/README.md` |
-| Artifact-only docs/mockups/research | Use `harness-lite` (not the same as `/build --lite` — see CLAUDE.md's Disposable Artifacts table for which one applies) | `harness-lite/README.md` |
+| Artifact-only docs/mockups/research | Use `harness-lite` (not the same as `/build --lite` — see AGENTS.md's Disposable Artifacts table for which one applies) | `harness-lite/README.md` |
 
 ## Testing This Harness
 
@@ -503,4 +503,4 @@ E2E logs land in `test/e2e/results/logs/`; summary JSON lands at `test/e2e/resul
 | Native command boundaries | [docs/native-command-integration.md](docs/native-command-integration.md) |
 | Prompt standards | [docs/prompting-standards.md](docs/prompting-standards.md) |
 | Harness architecture | [design.md](design.md) |
-| Full skill instructions | `.claude/skills/<name>/SKILL.md` |
+| Full skill instructions | `.opencode/skills/<name>/SKILL.md` |

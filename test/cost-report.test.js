@@ -6,16 +6,16 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const { buildReport, fmtReport } = require('../.claude/scripts/cost-report');
+const { buildReport, fmtReport } = require('../.opencode/scripts/cost-report');
 
 function makeProject(receipts) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cost-report-'));
-  fs.mkdirSync(path.join(dir, '.claude', 'runs'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'runs'), { recursive: true });
   fs.writeFileSync(path.join(dir, 'project-manifest.json'), JSON.stringify({
     execution: { model_tier: 'cost' },
   }));
   fs.writeFileSync(
-    path.join(dir, '.claude', 'runs', '2026-07-11.jsonl'),
+    path.join(dir, '.opencode', 'runs', '2026-07-11.jsonl'),
     receipts.map((r) => JSON.stringify(r)).join('\n') + '\n',
   );
   return dir;

@@ -1,7 +1,7 @@
 # Project Zero secret scan allowlist.
 # Baseline regex still runs in pre-commit; gitleaks is the enhanced CI tier.
 
-title = "claude-harness-eng-v5"
+title = "opencode-harness-design"
 
 [extend]
 useDefault = true
@@ -12,7 +12,7 @@ paths = [
   '''test/evals/fixtures/''',
   '''test/fixtures/''',
   '''test/e2e/fixtures/''',
-  '''\.claude/templates/''',
+  '''\.opencode/templates/''',
   '''docs/internal/''',
   # Local secrets must never be committed; git-mode CI already ignores them.
   # Allowlist keeps filesystem-mode local scans from failing on a developer's .env.

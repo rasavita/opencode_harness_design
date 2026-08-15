@@ -8,15 +8,15 @@ const path = require('path');
 const cp = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
-const SCRIPT = path.join(ROOT, '.claude/scripts/validate-sensor-waivers.js');
+const SCRIPT = path.join(ROOT, '.opencode/scripts/validate-sensor-waivers.js');
 
 function tmpProject() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'sensor-waivers-'));
   fs.mkdirSync(path.join(root, 'specs/reviews'), { recursive: true });
-  fs.mkdirSync(path.join(root, '.claude/templates'), { recursive: true });
+  fs.mkdirSync(path.join(root, '.opencode/templates'), { recursive: true });
   fs.copyFileSync(
-    path.join(ROOT, '.claude/templates/sensor-waivers.schema.json'),
-    path.join(root, '.claude/templates/sensor-waivers.schema.json'),
+    path.join(ROOT, '.opencode/templates/sensor-waivers.schema.json'),
+    path.join(root, '.opencode/templates/sensor-waivers.schema.json'),
   );
   return root;
 }

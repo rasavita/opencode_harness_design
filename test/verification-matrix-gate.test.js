@@ -7,7 +7,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'verification-matrix-gate.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'verification-matrix-gate.js');
 const gate = require(SCRIPT);
 
 function tmpProject() {

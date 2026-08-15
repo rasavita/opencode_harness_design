@@ -5,11 +5,11 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { test } = require('node:test');
 
-const script = path.join(__dirname, '..', '.claude', 'scripts', 'archive-state.js');
+const script = path.join(__dirname, '..', '.opencode', 'scripts', 'archive-state.js');
 
 function makeProject() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'archive-state-'));
-  fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
   return dir;
 }
 
@@ -21,7 +21,7 @@ function run(cwd) {
 
 test('reports no archival needed when files are within limits', () => {
   const dir = makeProject();
-  const stateDir = path.join(dir, '.claude', 'state');
+  const stateDir = path.join(dir, '.opencode', 'state');
   fs.writeFileSync(path.join(stateDir, 'iteration-log.md'), 'line\n'.repeat(10));
   const out = run(dir);
   assert.match(out, /within limits/);
@@ -30,7 +30,7 @@ test('reports no archival needed when files are within limits', () => {
 
 test('archives iteration-log.md over the line limit, keeping the tail', () => {
   const dir = makeProject();
-  const stateDir = path.join(dir, '.claude', 'state');
+  const stateDir = path.join(dir, '.opencode', 'state');
   const lines = Array.from({ length: 600 }, (_, i) => `entry ${i}`);
   fs.writeFileSync(path.join(stateDir, 'iteration-log.md'), lines.join('\n'));
   const out = run(dir);
@@ -47,7 +47,7 @@ test('archives iteration-log.md over the line limit, keeping the tail', () => {
 
 test('archives an oversized telemetry ledger by size and truncates in place', () => {
   const dir = makeProject();
-  const stateDir = path.join(dir, '.claude', 'state');
+  const stateDir = path.join(dir, '.opencode', 'state');
   const ledger = path.join(stateDir, 'telemetry-ledger.jsonl');
   fs.writeFileSync(ledger, 'x'.repeat(11 * 1024 * 1024));
   const out = run(dir);
@@ -100,10 +100,10 @@ test('archives the oldest resolved recommendations over the cap, keeping every p
   assert.ok(kept.some((e) => e.id === 'resolved-149'), 'newest resolved entries survive');
   assert.ok(!kept.some((e) => e.id === 'resolved-0'), 'oldest resolved entries are archived away');
 
-  const archiveFiles = fs.readdirSync(path.join(dir, '.claude', 'state', 'archive'))
+  const archiveFiles = fs.readdirSync(path.join(dir, '.opencode', 'state', 'archive'))
     .filter((f) => f.startsWith('recommendations-'));
   assert.strictEqual(archiveFiles.length, 1);
-  const archived = fs.readFileSync(path.join(dir, '.claude', 'state', 'archive', archiveFiles[0]), 'utf8')
+  const archived = fs.readFileSync(path.join(dir, '.opencode', 'state', 'archive', archiveFiles[0]), 'utf8')
     .trim().split('\n').map((l) => JSON.parse(l));
   assert.strictEqual(archived.length, 50);
   assert.ok(archived.every((e) => e.status !== 'proposed'), 'archive never contains a proposed entry');
@@ -134,12 +134,12 @@ test('leaves recommendations.jsonl untouched when any entry is missing an id, ev
   fs.writeFileSync(file, original);
   run(dir);
   assert.strictEqual(fs.readFileSync(file, 'utf8'), original, 'file must be untouched when any entry lacks a stable id');
-  assert.ok(!fs.existsSync(path.join(dir, '.claude', 'state', 'archive')), 'no archive dir should be created');
+  assert.ok(!fs.existsSync(path.join(dir, '.opencode', 'state', 'archive')), 'no archive dir should be created');
 });
 
-test('exits 1 outside a project (no .claude directory found)', () => {
+test('exits 1 outside a project (no .opencode directory found)', () => {
   const bare = fs.mkdtempSync(path.join(os.tmpdir(), 'no-claude-'));
   const res = spawnSync('node', [script], { encoding: 'utf8', cwd: bare });
   assert.strictEqual(res.status, 1);
-  assert.match(res.stdout, /No \.claude\/ directory found/);
+  assert.match(res.stdout, /No \.opencode\/ directory found/);
 });

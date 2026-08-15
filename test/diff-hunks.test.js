@@ -10,7 +10,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { parseUnifiedDiffRanges } = require(
-  path.join(__dirname, '..', '.claude', 'hooks', 'lib', 'diff-hunks')
+  path.join(__dirname, '..', '.opencode', 'hooks', 'lib', 'diff-hunks')
 );
 
 test('a single-hunk addition reports the new-side [start,end] range', () => {

@@ -10,7 +10,7 @@ const {
   parseFailures, countRules, summarizeTelemetry, readFlakeCount,
   readBaselineNum, deriveNotes, buildScorecard, renderMd,
   leadTurnNotes, leadTurnRatioCell,
-} = require(path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'loop-health.js'));
+} = require(path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'loop-health.js'));
 
 function tmpRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'loop-health-'));
@@ -121,28 +121,28 @@ test('readFlakeCount: counts jsonl lines, 0 when missing or empty', () => {
 
 test('readBaselineNum: parses numeric baseline, null when absent or non-numeric', () => {
   const root = tmpRoot();
-  assert.strictEqual(readBaselineNum(root, '.claude/state/cycle-baseline.txt'), null);
-  writeFile(root, '.claude/state/cycle-baseline.txt', '0\n');
-  assert.strictEqual(readBaselineNum(root, '.claude/state/cycle-baseline.txt'), 0);
-  writeFile(root, '.claude/state/coverage-baseline.txt', '80');
-  assert.strictEqual(readBaselineNum(root, '.claude/state/coverage-baseline.txt'), 80);
+  assert.strictEqual(readBaselineNum(root, '.opencode/state/cycle-baseline.txt'), null);
+  writeFile(root, '.opencode/state/cycle-baseline.txt', '0\n');
+  assert.strictEqual(readBaselineNum(root, '.opencode/state/cycle-baseline.txt'), 0);
+  writeFile(root, '.opencode/state/coverage-baseline.txt', '80');
+  assert.strictEqual(readBaselineNum(root, '.opencode/state/coverage-baseline.txt'), 80);
 });
 
 // --- buildScorecard (integration over a tmp root) --------------------------
 
 test('buildScorecard: assembles signals from real on-disk state shapes', () => {
   const root = tmpRoot();
-  writeFile(root, '.claude/state/failures.md',
+  writeFile(root, '.opencode/state/failures.md',
     '# Failure Log\n## Group G1 — Failure #1\n- **Category:** test_failure\n'
     + '## Group G1 — Failure #2\n- **Category:** test_failure\n');
-  writeFile(root, '.claude/state/learned-rules.md', '# Learned Rules\n## Rule A\n');
+  writeFile(root, '.opencode/state/learned-rules.md', '# Learned Rules\n## Rule A\n');
   // Real process-rules.md format is h3, not h2 — this is the shape REC-20260713-001 fixed.
-  writeFile(root, '.claude/state/process-rules.md', '# Process\n### PR-default-01 — foo\n### PR-default-02 — bar\n');
-  writeFile(root, '.claude/state/telemetry-ledger.jsonl',
+  writeFile(root, '.opencode/state/process-rules.md', '# Process\n### PR-default-01 — foo\n### PR-default-02 — bar\n');
+  writeFile(root, '.opencode/state/telemetry-ledger.jsonl',
     [JSON.stringify({ kind: 'tool', exit: 'ok', lane: 'auto' }),
      JSON.stringify({ kind: 'tool', exit: 'error', lane: 'auto' })].join('\n'));
-  writeFile(root, '.claude/state/cycle-baseline.txt', '0');
-  writeFile(root, '.claude/state/coverage-baseline.txt', '80');
+  writeFile(root, '.opencode/state/cycle-baseline.txt', '0');
+  writeFile(root, '.opencode/state/coverage-baseline.txt', '80');
 
   const s = buildScorecard(root);
   assert.strictEqual(s.signals.failures.total, 2);
@@ -271,7 +271,7 @@ test('leadTurnRatioCell: renders a ratio, n/a for empty, and the zero-dispatch s
 
 test('renderMd: shows the lead-turn ratio row and the not-in-loop-observable caveat', () => {
   const root = tmpRoot();
-  writeFile(root, '.claude/state/telemetry-ledger.jsonl', [
+  writeFile(root, '.opencode/state/telemetry-ledger.jsonl', [
     ...Array(20).fill(JSON.stringify({ kind: 'turn', lane: 'auto' })),
     ...Array(2).fill(JSON.stringify({ kind: 'subagent_stop', lane: 'auto' })),
   ].join('\n'));
@@ -283,7 +283,7 @@ test('renderMd: shows the lead-turn ratio row and the not-in-loop-observable cav
 
 test('renderMd: surfaces the byLane breakdown sorted by count desc', () => {
   const root = tmpRoot();
-  writeFile(root, '.claude/state/telemetry-ledger.jsonl', [
+  writeFile(root, '.opencode/state/telemetry-ledger.jsonl', [
     JSON.stringify({ kind: 'turn', lane: 'claude-api' }),
     JSON.stringify({ kind: 'turn', lane: 'loop' }),
     JSON.stringify({ kind: 'turn', lane: 'loop' }),

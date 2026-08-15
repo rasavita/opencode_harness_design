@@ -8,12 +8,12 @@ const path = require('path');
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { runClaude } = require('./helpers/claude-runner');
+const { runClaude } = require('./helpers/opencode-runner');
 const { runProjectSuite } = require('./helpers/project-suite');
 const { freshProject } = require('./helpers/fresh-project');
 
 const PROJECT_DIR = path.join(__dirname, 'full-auto-output');
-const PLUGIN_DIR = path.join(__dirname, '..', '..', '.claude');
+const PLUGIN_DIR = path.join(__dirname, '..', '..', '.opencode');
 const PRD = path.join(__dirname, 'fixtures', 'counter-prd.md');
 const { randomUUID } = require('crypto');
 // Fresh id per run — hardcoded session ids fail with "already in use" on re-run.
@@ -31,7 +31,7 @@ test('full-auto: /build --auto prd.md runs the non-lite route and leaves a green
   console.log('[full-auto] scaffold exit:', scaffold.exitCode);
   assert.ok(
     fs.existsSync(path.join(PROJECT_DIR, 'project-manifest.json'))
-      || fs.existsSync(path.join(PROJECT_DIR, 'CLAUDE.md')),
+      || fs.existsSync(path.join(PROJECT_DIR, 'AGENTS.md')),
     'scaffold must install harness before /build',
   );
 

@@ -5,7 +5,7 @@
 //
 //   A kernel unit may not hard-reference a pack unit.
 //
-// "Hard" means executable coupling — require(), `node .claude/scripts/x.js`,
+// "Hard" means executable coupling — require(), `node .opencode/scripts/x.js`,
 // `npm run x`, or a subagent_type dispatch. Breaking a hard edge breaks the unit.
 // Prose routing ("escalate to /design") is a SOFT edge: breaking it degrades to
 // "that lane isn't installed", which is exactly what an uninstalled pack should do.
@@ -22,7 +22,7 @@ const path = require('path');
 const { printReport, computeProfileBreaks } = require('./partition-report');
 
 const ROOT = path.resolve(__dirname, '..');
-const PARTITION = path.join(ROOT, '.claude', 'config', 'packs.json');
+const PARTITION = path.join(ROOT, '.opencode', 'config', 'packs.json');
 
 const KINDS = ['skill', 'agent', 'hook', 'lib', 'script', 'githook'];
 
@@ -31,8 +31,8 @@ const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 // The test for a HARD reference is: would this break if the target were absent?
 //
 // That distinction matters because the harness is full of references that merely
-// MENTION a pack unit — a remediation string ("Check: node .claude/scripts/x.js"),
-// a doc cross-reference ("see .claude/skills/x/SKILL.md"), a description in prose.
+// MENTION a pack unit — a remediation string ("Check: node .opencode/scripts/x.js"),
+// a doc cross-reference ("see .opencode/skills/x/SKILL.md"), a description in prose.
 // If the pack is uninstalled those become a stale message, not a crash, so they are
 // soft. Counting them would force rewriting correct code to satisfy the checker.
 //
@@ -244,7 +244,7 @@ function loadAssignment(partition) {
 }
 
 function loadUnitTexts() {
-  const c = (...p) => path.join(ROOT, '.claude', ...p);
+  const c = (...p) => path.join(ROOT, '.opencode', ...p);
   const texts = {}, names = {};
   const put = (kind, name, files) => {
     (names[kind] = names[kind] || []).push(name);

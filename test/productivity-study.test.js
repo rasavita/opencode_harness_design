@@ -9,7 +9,7 @@ const { test } = require('node:test');
 const {
   analyze, evidenceMatches, pairObservations, taskObservations, validateConfig,
   verifyReport, writeReport,
-} = require('../.claude/scripts/productivity-study');
+} = require('../.opencode/scripts/productivity-study');
 
 const CONFIG = {
   minimum_pairs: 3,
@@ -128,11 +128,11 @@ test('invalid statistical configuration fails closed', () => {
 
 test('stored reports are live-recomputed and tampering is rejected', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'productivity-report-'));
-  fs.mkdirSync(path.join(root, '.claude', 'config'), { recursive: true });
-  fs.mkdirSync(path.join(root, '.claude', 'runs'), { recursive: true });
+  fs.mkdirSync(path.join(root, '.opencode', 'config'), { recursive: true });
+  fs.mkdirSync(path.join(root, '.opencode', 'runs'), { recursive: true });
   const config = { ...CONFIG, minimum_pairs: 2 };
   fs.writeFileSync(
-    path.join(root, '.claude', 'config', 'productivity-study.json'),
+    path.join(root, '.opencode', 'config', 'productivity-study.json'),
     JSON.stringify(config)
   );
   const receipt = path.join(root, 'receipt.json');
@@ -148,12 +148,12 @@ test('stored reports are live-recomputed and tampering is rejected', () => {
     event.metadata.evidence_hash = receiptHash;
   }
   fs.writeFileSync(
-    path.join(root, '.claude', 'runs', '2026-07-26.jsonl'),
+    path.join(root, '.opencode', 'runs', '2026-07-26.jsonl'),
     `${records.map(JSON.stringify).join('\n')}\n`
   );
   writeReport(root, analyze(records, 'STUDY-1', config, { root }));
   assert.strictEqual(verifyReport(root).pass, true);
-  const reportFile = path.join(root, '.claude', 'evidence', 'productivity-study.json');
+  const reportFile = path.join(root, '.opencode', 'evidence', 'productivity-study.json');
   const report = JSON.parse(fs.readFileSync(reportFile, 'utf8'));
   report.summary.median_attention_speedup = 80;
   fs.writeFileSync(reportFile, JSON.stringify(report));

@@ -5,7 +5,7 @@
 // didn't silently regress PRODUCTION code; nothing caught a refactor or
 // dependency bump making its own suite pass by deleting, or newly skipping,
 // an inconvenient test. Pure content-classification logic only — git
-// plumbing lives in .claude/scripts/test-deletion-gate.js (same split
+// plumbing lives in .opencode/scripts/test-deletion-gate.js (same split
 // cycle-gate.js / legacy-discipline-gate.js use).
 
 const { test } = require('node:test');
@@ -15,7 +15,7 @@ const {
   countSkipMarkers,
   classifyTestFileChange,
   classifyTestFileChanges,
-} = require('../.claude/hooks/lib/test-deletion-gate');
+} = require('../.opencode/hooks/lib/test-deletion-gate');
 
 test('countTestMarkers counts JS it()/test() and Python def test_ cases', () => {
   const js = "it('a', () => {});\ntest('b', () => {});\nit.each([1])('c', () => {});\n";

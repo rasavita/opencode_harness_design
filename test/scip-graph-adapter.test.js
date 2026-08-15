@@ -6,7 +6,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { buildScipGraph, displayNameOf } = require(
-  path.join(__dirname, '..', '.claude', 'skills', 'code-map', 'scripts', 'import_scip_graph')
+  path.join(__dirname, '..', '.opencode', 'skills', 'code-map', 'scripts', 'import_scip_graph')
 );
 
 const FIXTURE = path.join(__dirname, 'fixtures', 'scip', 'sample-index.json');

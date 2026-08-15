@@ -10,8 +10,8 @@ const os = require('os');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const LIB = path.join(ROOT, '.claude', 'hooks', 'lib', 'canvas-sync.js');
-const SCRIPT = path.join(ROOT, '.claude', 'scripts', 'canvas-sync-check.js');
+const LIB = path.join(ROOT, '.opencode', 'hooks', 'lib', 'canvas-sync.js');
+const SCRIPT = path.join(ROOT, '.opencode', 'scripts', 'canvas-sync-check.js');
 const { checkCanvasSync, proposeCanvasSync, applyCanvasProposal } = require(LIB);
 const { run } = require(SCRIPT);
 

@@ -7,7 +7,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'cr-index.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'cr-index.js');
 const { extractAcceptance } = require(SCRIPT);
 
 // A change request is the brownfield analogue of a story's acceptance criteria.
@@ -89,7 +89,7 @@ test('CLI: exit 2 when the CR file is missing or no input is given', () => {
 // --- integration: the index grounds delta traces via trace-check --------------
 
 test('CR index is a valid upstream for trace-check (delta tests trace to CR lines)', () => {
-  const { checkTraces } = require(path.join(__dirname, '..', '.claude', 'scripts', 'trace-check.js'));
+  const { checkTraces } = require(path.join(__dirname, '..', '.opencode', 'scripts', 'trace-check.js'));
   const required = extractAcceptance(CR);
   const downstream = [
     { id: 'TC-1', text: 'confidence in [0,1] per field', traces: ['CR-AC1'] },

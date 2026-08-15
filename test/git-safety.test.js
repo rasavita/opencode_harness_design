@@ -7,7 +7,7 @@ const {
   findForbiddenGit,
   isGitSafetyActive,
   checkGitSafety,
-} = require('../.claude/hooks/lib/git-safety');
+} = require('../.opencode/hooks/lib/git-safety');
 
 test('findForbiddenGit catches stash, reset --hard, clean -fd, force push', () => {
   assert.equal(findForbiddenGit('git stash').id, 'git-stash');
@@ -35,7 +35,7 @@ test('isGitSafetyActive respects HARNESS_PARALLEL_AGENTS and escape', () => {
 test('isGitSafetyActive detects parallel-implement.lock', () => {
   const projectDir = path.join(__dirname, 'fixtures', 'git-safety-lock');
   // use existsSync stub
-  const lockPath = path.join(projectDir, '.claude', 'state', 'parallel-implement.lock');
+  const lockPath = path.join(projectDir, '.opencode', 'state', 'parallel-implement.lock');
   assert.equal(
     isGitSafetyActive({
       projectDir,

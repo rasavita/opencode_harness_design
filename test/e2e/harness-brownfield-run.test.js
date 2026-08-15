@@ -24,10 +24,10 @@ const assert = require('assert');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const { runClaude } = require('./helpers/claude-runner');
+const { runClaude } = require('./helpers/opencode-runner');
 
 const PROJECT_DIR = path.join(__dirname, 'brownfield-run-output');
-const PLUGIN_DIR = path.join(__dirname, '..', '..', '.claude');
+const PLUGIN_DIR = path.join(__dirname, '..', '..', '.opencode');
 const { randomUUID } = require('crypto');
 // Fresh id per run — hardcoded session ids fail with "already in use" on re-run.
 const SESSION = randomUUID();

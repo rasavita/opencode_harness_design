@@ -6,7 +6,7 @@ const path = require('path');
 const { describe, test, before, after } = require('node:test');
 const { execFileSync } = require('child_process');
 
-const { runClaude, HARNESS_ROOT } = require('./helpers/claude-runner');
+const { runClaude, HARNESS_ROOT } = require('./helpers/opencode-runner');
 const { runProjectSuite } = require('./helpers/project-suite');
 
 const RESULTS_DIR = path.join(__dirname, 'results');
@@ -49,7 +49,7 @@ describe('Harness E2E — Real Workflow Certification', { timeout: 1800000 }, ()
   });
 
   test('scaffold, planning, design, and lite build run through harness commands', { timeout: 1500000 }, () => {
-    const pluginDir = path.join(HARNESS_ROOT, '..', '.claude');
+    const pluginDir = path.join(HARNESS_ROOT, '..', '.opencode');
     const sessionId = require('crypto').randomUUID();
 
     runClaude('/scaffold', {
@@ -76,8 +76,8 @@ describe('Harness E2E — Real Workflow Certification', { timeout: 1800000 }, ()
     );
 
     assert.ok(!scaffold.error, `scaffold must start Claude: ${scaffold.error || ''}`);
-    assert.ok(exists('.claude'), 'scaffold must install .claude/');
-    assertArtifact('CLAUDE.md', 'scaffolded CLAUDE.md');
+    assert.ok(exists('.opencode'), 'scaffold must install .opencode/');
+    assertArtifact('AGENTS.md', 'scaffolded AGENTS.md');
     assertArtifact('project-manifest.json', 'project manifest');
 
     const brd = runClaude('/brd', {

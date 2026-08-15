@@ -17,7 +17,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const ROOT = path.join(__dirname, '..');
-const SCRIPT = path.join(ROOT, '.claude', 'scripts', 'regression-gate.js');
+const SCRIPT = path.join(ROOT, '.opencode', 'scripts', 'regression-gate.js');
 const {
   bodyMatches,
   evaluateApiCheck,
@@ -29,7 +29,7 @@ const {
   discoverPriorContracts,
   run,
 } = require(SCRIPT);
-const { runE2eSuite } = require(path.join(ROOT, '.claude', 'hooks', 'lib', 'regression-gate'));
+const { runE2eSuite } = require(path.join(ROOT, '.opencode', 'hooks', 'lib', 'regression-gate'));
 
 function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'regression-gate-'));

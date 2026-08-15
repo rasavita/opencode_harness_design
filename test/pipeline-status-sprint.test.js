@@ -6,7 +6,7 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const script = path.join(__dirname, '..', '.claude', 'scripts', 'pipeline-status.js');
+const script = path.join(__dirname, '..', '.opencode', 'scripts', 'pipeline-status.js');
 const { buildSnapshot, renderStatus } = require(script);
 
 const NOW = '2026-06-21T12:00:00.000Z';
@@ -28,8 +28,8 @@ const FEATURES_MINIMAL = JSON.stringify([]);
 
 function makeProject(files = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sprint-status-'));
-  fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
-  fs.mkdirSync(path.join(dir, '.claude', 'runs'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'runs'), { recursive: true });
   for (const [rel, content] of Object.entries(files)) {
     const target = path.join(dir, rel);
     fs.mkdirSync(path.dirname(target), { recursive: true });
@@ -42,8 +42,8 @@ test('buildSnapshot surfaces sprint number and phase when /sprint has written st
   const dir = makeProject({
     'claude-progress.txt': PROGRESS_MINIMAL,
     'features.json': FEATURES_MINIMAL,
-    '.claude/state/current-sprint': '2',
-    '.claude/state/sprint-phase': 'design-delta',
+    '.opencode/state/current-sprint': '2',
+    '.opencode/state/sprint-phase': 'design-delta',
   });
   try {
     const snapshot = buildSnapshot(dir, { now: NOW });

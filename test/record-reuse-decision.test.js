@@ -4,7 +4,7 @@ const os = require('os');
 const path = require('path');
 const test = require('node:test');
 const assert = require('node:assert');
-const { run } = require(path.resolve(__dirname, '..', '.claude', 'scripts', 'record-reuse-decision.js'));
+const { run } = require(path.resolve(__dirname, '..', '.opencode', 'scripts', 'record-reuse-decision.js'));
 
 function tmpRoot() { return fs.mkdtempSync(path.join(os.tmpdir(), 'rrd-')); }
 const OUT = path.join('specs', 'reviews', 'reuse-decisions.jsonl');

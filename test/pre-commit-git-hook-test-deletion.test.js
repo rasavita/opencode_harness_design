@@ -3,7 +3,7 @@
 // Real git-hook integration for gap G31 (test-deletion-guard). Mirrors
 // test/pre-commit-git-hook-sprout-diff.test.js's fixture shape: a fixture
 // project must install the sensor script explicitly (makeGitProject does not
-// copy .claude/scripts), but DOES copy the full .claude/hooks/lib tree, so
+// copy .opencode/scripts), but DOES copy the full .opencode/hooks/lib tree, so
 // tdd.js / test-deletion-gate.js's own hooks/lib dependency is already
 // present.
 
@@ -23,10 +23,10 @@ function commitSeed(projectDir) {
 }
 
 function installScript(projectDir) {
-  const dir = path.join(projectDir, '.claude', 'scripts');
+  const dir = path.join(projectDir, '.opencode', 'scripts');
   fs.mkdirSync(dir, { recursive: true });
   fs.copyFileSync(
-    path.join(__dirname, '..', '.claude', 'scripts', 'test-deletion-gate.js'),
+    path.join(__dirname, '..', '.opencode', 'scripts', 'test-deletion-gate.js'),
     path.join(dir, 'test-deletion-gate.js')
   );
 }

@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { parseFeatureInvocation } = require('../.claude/scripts/feature-lane.js');
+const { parseFeatureInvocation } = require('../.opencode/scripts/feature-lane.js');
 
 test('default lane has the three interactive gates', () => {
   const r = parseFeatureInvocation('/feature "add confidence scores"');

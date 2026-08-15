@@ -18,11 +18,11 @@ const path = require('path');
 const { test } = require('node:test');
 
 const ROOT = path.join(__dirname, '..');
-const RUBRICS = require('../.claude/templates/phase-eval-rubrics.json');
-const EVALUATOR = fs.readFileSync(path.join(ROOT, '.claude', 'agents', 'evaluator.md'), 'utf8');
+const RUBRICS = require('../.opencode/templates/phase-eval-rubrics.json');
+const EVALUATOR = fs.readFileSync(path.join(ROOT, '.opencode', 'agents', 'evaluator.md'), 'utf8');
 
 function skillCorpora() {
-  const dir = path.join(ROOT, '.claude', 'skills');
+  const dir = path.join(ROOT, '.opencode', 'skills');
   const out = {};
   for (const skill of fs.readdirSync(dir)) {
     const entry = path.join(dir, skill, 'SKILL.md');

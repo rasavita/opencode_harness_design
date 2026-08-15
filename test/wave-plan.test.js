@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { planWaves } = require('../.claude/scripts/wave-plan.js');
+const { planWaves } = require('../.opencode/scripts/wave-plan.js');
 
 // helpers: every group has at least one failing feature unless noted
 const g = (groups) => ({ groups });

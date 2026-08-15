@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { test } = require('node:test');
 
-const REGISTRY_PATH = path.join(__dirname, '..', '.claude', 'config', 'scaffold-packs.json');
+const REGISTRY_PATH = path.join(__dirname, '..', '.opencode', 'config', 'scaffold-packs.json');
 
 test('scaffold-packs.json registers the local python-ai-agents pack and both existing external packs', () => {
   const registry = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf8'));
@@ -33,20 +33,20 @@ test('scaffold-packs.json registers the local python-ai-agents pack and both exi
 
 test('install-framework-packs/SKILL.md references the registry file instead of a hardcoded table', () => {
   const skill = fs.readFileSync(
-    path.join(__dirname, '..', '.claude', 'skills', 'install-framework-packs', 'SKILL.md'), 'utf8'
+    path.join(__dirname, '..', '.opencode', 'skills', 'install-framework-packs', 'SKILL.md'), 'utf8'
   );
   assert.match(skill, /scaffold-packs\.json/);
 });
 
 const os = require('os');
 const { copyFrameworkPackSkills } = require(
-  path.join(__dirname, '..', '.claude', 'scripts', 'scaffold-copy.js')
+  path.join(__dirname, '..', '.opencode', 'scripts', 'scaffold-copy.js')
 );
 
 // The fixture is built at the pluginSource root itself (src/config/..., src/skills/...),
 // matching how scaffold-apply.js actually calls copyFrameworkPackSkills: pluginSource
-// is already the harness `.claude` root (verified via .claude-plugin/plugin.json
-// directly inside it), not a directory that itself contains a nested `.claude/`.
+// is already the harness `.opencode` root (verified via .opencode-plugin/plugin.json
+// directly inside it), not a directory that itself contains a nested `.opencode/`.
 function mkHarnessFixture() {
   const src = fs.mkdtempSync(path.join(os.tmpdir(), 'harness-src-'));
   fs.mkdirSync(path.join(src, 'config'), { recursive: true });
@@ -71,15 +71,15 @@ test('copyFrameworkPackSkills copies a local pack\'s skill directories when sele
   const src = mkHarnessFixture();
   const target = fs.mkdtempSync(path.join(os.tmpdir(), 'target-'));
   copyFrameworkPackSkills(src, target, ['python-ai-agents']);
-  assert.strictEqual(fs.existsSync(path.join(target, '.claude', 'skills', 'langgraph-code', 'SKILL.md')), true);
-  assert.strictEqual(fs.existsSync(path.join(target, '.claude', 'skills', 'langchain-code', 'SKILL.md')), true);
+  assert.strictEqual(fs.existsSync(path.join(target, '.opencode', 'skills', 'langgraph-code', 'SKILL.md')), true);
+  assert.strictEqual(fs.existsSync(path.join(target, '.opencode', 'skills', 'langchain-code', 'SKILL.md')), true);
 });
 
 test('copyFrameworkPackSkills does nothing for a github-source pack (external, manual install)', () => {
   const src = mkHarnessFixture();
   const target = fs.mkdtempSync(path.join(os.tmpdir(), 'target-'));
   copyFrameworkPackSkills(src, target, ['langchain']);
-  assert.strictEqual(fs.existsSync(path.join(target, '.claude', 'skills', 'langgraph-code')), false);
+  assert.strictEqual(fs.existsSync(path.join(target, '.opencode', 'skills', 'langgraph-code')), false);
 });
 
 test('copyFrameworkPackSkills does nothing when frameworkSkillPacks is empty or undefined', () => {
@@ -87,22 +87,22 @@ test('copyFrameworkPackSkills does nothing when frameworkSkillPacks is empty or 
   const target = fs.mkdtempSync(path.join(os.tmpdir(), 'target-'));
   copyFrameworkPackSkills(src, target, []);
   copyFrameworkPackSkills(src, target, undefined);
-  assert.strictEqual(fs.existsSync(path.join(target, '.claude', 'skills')), false);
+  assert.strictEqual(fs.existsSync(path.join(target, '.opencode', 'skills')), false);
 });
 
 // Regression test for the pluginSource double-nesting bug: copyFrameworkPackSkills
-// used to join('.claude', ...) onto a pluginSource that scaffold-apply.js's
-// resolveOpts already requires to BE the harness `.claude` root, producing a
-// nonexistent .claude/.claude/... path and silently no-op'ing for every real
+// used to join('.opencode', ...) onto a pluginSource that scaffold-apply.js's
+// resolveOpts already requires to BE the harness `.opencode` root, producing a
+// nonexistent .opencode/.opencode/... path and silently no-op'ing for every real
 // core/brownfield-profile invocation. The unit tests above build their fixture
 // directly at the pluginSource root, so they can't catch that mismatch — only
-// running the real CLI against the real harness `.claude` tree with a
+// running the real CLI against the real harness `.opencode` tree with a
 // core-profile + selected pack can. This is the exact scenario that shipped broken.
 const { execFileSync } = require('child_process');
 
 test('CLI: scaffold-apply.js --scaffold-profile core with frameworkPacks copies the local pack into the target', () => {
-  const SCAFFOLD_APPLY = path.join(__dirname, '..', '.claude', 'scripts', 'scaffold-apply.js');
-  const PLUGIN_SOURCE = path.join(__dirname, '..', '.claude');
+  const SCAFFOLD_APPLY = path.join(__dirname, '..', '.opencode', 'scripts', 'scaffold-apply.js');
+  const PLUGIN_SOURCE = path.join(__dirname, '..', '.opencode');
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'scaffold-apply-fwpack-'));
   const target = path.join(workDir, 'project');
   try {
@@ -123,15 +123,15 @@ test('CLI: scaffold-apply.js --scaffold-profile core with frameworkPacks copies 
     ], { encoding: 'utf8' });
 
     assert.strictEqual(
-      fs.existsSync(path.join(target, '.claude', 'skills', 'langgraph-code', 'SKILL.md')), true,
+      fs.existsSync(path.join(target, '.opencode', 'skills', 'langgraph-code', 'SKILL.md')), true,
       'core-profile scaffold-apply with frameworkPacks:["python-ai-agents"] must copy langgraph-code'
     );
     assert.strictEqual(
-      fs.existsSync(path.join(target, '.claude', 'skills', 'langchain-code', 'SKILL.md')), true,
+      fs.existsSync(path.join(target, '.opencode', 'skills', 'langchain-code', 'SKILL.md')), true,
       'core-profile scaffold-apply with frameworkPacks:["python-ai-agents"] must copy langchain-code'
     );
     assert.strictEqual(
-      fs.existsSync(path.join(target, '.claude', 'skills', 'deepagents-code', 'SKILL.md')), true,
+      fs.existsSync(path.join(target, '.opencode', 'skills', 'deepagents-code', 'SKILL.md')), true,
       'core-profile scaffold-apply with frameworkPacks:["python-ai-agents"] must copy deepagents-code'
     );
   } finally {
@@ -140,7 +140,7 @@ test('CLI: scaffold-apply.js --scaffold-profile core with frameworkPacks copies 
 });
 
 test('langgraph-code skill exists with correct frontmatter and reference files', () => {
-  const skillDir = path.join(__dirname, '..', '.claude', 'skills', 'langgraph-code');
+  const skillDir = path.join(__dirname, '..', '.opencode', 'skills', 'langgraph-code');
   const skill = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
   assert.match(skill, /^---\nname: langgraph-code\n/);
   assert.match(skill, /LangGraph/);
@@ -153,7 +153,7 @@ test('langgraph-code skill exists with correct frontmatter and reference files',
 });
 
 test('langchain-code skill exists with correct frontmatter and reference files', () => {
-  const skillDir = path.join(__dirname, '..', '.claude', 'skills', 'langchain-code');
+  const skillDir = path.join(__dirname, '..', '.opencode', 'skills', 'langchain-code');
   const skill = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
   assert.match(skill, /^---\nname: langchain-code\n/);
   assert.match(skill, /create_agent/);
@@ -166,7 +166,7 @@ test('langchain-code skill exists with correct frontmatter and reference files',
 });
 
 test('deepagents-code skill exists with correct frontmatter and reference file', () => {
-  const skillDir = path.join(__dirname, '..', '.claude', 'skills', 'deepagents-code');
+  const skillDir = path.join(__dirname, '..', '.opencode', 'skills', 'deepagents-code');
   const skill = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
   assert.match(skill, /^---\nname: deepagents-code\n/);
   assert.match(skill, /create_deep_agent/);
@@ -178,14 +178,14 @@ test('deepagents-code skill exists with correct frontmatter and reference file',
 
 test('python-ai-agents pack registers exactly the three skills this plan built', () => {
   const registry = JSON.parse(fs.readFileSync(
-    path.join(__dirname, '..', '.claude', 'config', 'scaffold-packs.json'), 'utf8'
+    path.join(__dirname, '..', '.opencode', 'config', 'scaffold-packs.json'), 'utf8'
   ));
   const local = registry.frameworkPacks.find((p) => p.key === 'python-ai-agents');
   for (const skillName of local.skills) {
     assert.strictEqual(
-      fs.existsSync(path.join(__dirname, '..', '.claude', 'skills', skillName, 'SKILL.md')),
+      fs.existsSync(path.join(__dirname, '..', '.opencode', 'skills', skillName, 'SKILL.md')),
       true,
-      `expected .claude/skills/${skillName}/SKILL.md to exist`
+      `expected .opencode/skills/${skillName}/SKILL.md to exist`
     );
   }
 });
@@ -209,7 +209,7 @@ test('scaffold-packs.json registers fastapi-code and react-code as local, single
 });
 
 test('fastapi-code skill exists with correct frontmatter and reference files', () => {
-  const skillDir = path.join(__dirname, '..', '.claude', 'skills', 'fastapi-code');
+  const skillDir = path.join(__dirname, '..', '.opencode', 'skills', 'fastapi-code');
   const skill = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
   assert.match(skill, /^---\nname: fastapi-code\n/);
   assert.match(skill, /Depends/);
@@ -224,7 +224,7 @@ test('fastapi-code skill exists with correct frontmatter and reference files', (
 });
 
 test('react-code skill exists with correct frontmatter and reference files', () => {
-  const skillDir = path.join(__dirname, '..', '.claude', 'skills', 'react-code');
+  const skillDir = path.join(__dirname, '..', '.opencode', 'skills', 'react-code');
   const skill = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
   assert.match(skill, /^---\nname: react-code\n/);
   assert.match(skill, /useEffect/);
@@ -242,9 +242,9 @@ test('python-ai-agents, fastapi-code, and react-code packs all register skills t
     const entry = registry.frameworkPacks.find((p) => p.key === key);
     for (const skillName of entry.skills) {
       assert.strictEqual(
-        fs.existsSync(path.join(__dirname, '..', '.claude', 'skills', skillName, 'SKILL.md')),
+        fs.existsSync(path.join(__dirname, '..', '.opencode', 'skills', skillName, 'SKILL.md')),
         true,
-        `expected .claude/skills/${skillName}/SKILL.md to exist`
+        `expected .opencode/skills/${skillName}/SKILL.md to exist`
       );
     }
   }

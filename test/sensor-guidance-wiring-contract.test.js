@@ -13,7 +13,7 @@ const ROOT = path.resolve(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 test('verify-on-save imports and applies the guidance enricher', () => {
-  const src = read('.claude/hooks/verify-on-save.js');
+  const src = read('.opencode/hooks/verify-on-save.js');
   assert.match(src, /require\('\.\/lib\/sensor-guidance'\)/, 'must import sensor-guidance');
   // Enrichment is centralized in emit(); the invariant is that emit enriches the
   // message AND that all three lint/type failure branches (ruff, mypy, eslint)
@@ -24,7 +24,7 @@ test('verify-on-save imports and applies the guidance enricher', () => {
 });
 
 test('the guidance lib is require-safe and covers high-signal rules', () => {
-  const { GUIDANCE, enrich } = require(path.join(ROOT, '.claude/hooks/lib/sensor-guidance.js'));
+  const { GUIDANCE, enrich } = require(path.join(ROOT, '.opencode/hooks/lib/sensor-guidance.js'));
   for (const rule of ['F401', 'E501', '@typescript-eslint/no-explicit-any', 'complexity']) {
     assert.ok(rule in GUIDANCE, `missing guidance for ${rule}`);
   }

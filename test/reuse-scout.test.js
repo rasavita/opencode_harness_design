@@ -3,7 +3,7 @@ const path = require('path');
 const test = require('node:test');
 const assert = require('node:assert');
 const { scoutReuse } = require(
-  path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'reuse-scout.js')
+  path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'reuse-scout.js')
 );
 
 // Minimal code-graph fixture: an upload service used by two call sites.

@@ -21,10 +21,10 @@ function read(rel) {
 }
 
 test('/status SKILL routes to the unit-tested pipeline-status.js script', () => {
-  const skill = read('.claude/skills/status/SKILL.md');
-  assert.match(skill, /pipeline-status\.js/, '/status must invoke .claude/scripts/pipeline-status.js');
+  const skill = read('.opencode/skills/status/SKILL.md');
+  assert.match(skill, /pipeline-status\.js/, '/status must invoke .opencode/scripts/pipeline-status.js');
   assert.ok(
-    fs.existsSync(path.join(ROOT, '.claude', 'scripts', 'pipeline-status.js')),
+    fs.existsSync(path.join(ROOT, '.opencode', 'scripts', 'pipeline-status.js')),
     'the pipeline-status.js the skill names must exist',
   );
 });

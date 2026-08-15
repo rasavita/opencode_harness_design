@@ -6,13 +6,13 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const { adviseTokenUsage } = require('../.claude/hooks/token-advisor');
+const { adviseTokenUsage } = require('../.opencode/hooks/token-advisor');
 
 const ROOT = path.join(__dirname, '..');
 
 function tempProject() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'token-advisor-'));
-  fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
   fs.mkdirSync(path.join(dir, 'specs', 'brownfield'), { recursive: true });
   fs.writeFileSync(path.join(dir, 'project-manifest.json'), JSON.stringify({
     token_governor: {
@@ -52,7 +52,7 @@ test('token advisor warns on broad source reads when symbol ranges exist', () =>
     assert.match(result.message, /broad source read/i);
     assert.match(result.message, /\/context/);
     assert.match(result.message, /src\/auth\.js/);
-    const log = fs.readFileSync(path.join(dir, '.claude', 'state', 'token-advisor.jsonl'), 'utf8');
+    const log = fs.readFileSync(path.join(dir, '.opencode', 'state', 'token-advisor.jsonl'), 'utf8');
     assert.match(log, /broad_source_read/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
@@ -72,7 +72,7 @@ test('token advisor stays quiet for small source reads', () => {
     });
 
     assert.strictEqual(result.decision, 'ok');
-    assert.strictEqual(fs.existsSync(path.join(dir, '.claude', 'state', 'token-advisor.jsonl')), false);
+    assert.strictEqual(fs.existsSync(path.join(dir, '.opencode', 'state', 'token-advisor.jsonl')), false);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -88,7 +88,7 @@ test('token advisor suggests run-compact for likely verbose commands', () => {
 
     assert.strictEqual(result.decision, 'warn');
     assert.match(result.message, /run-compact\.js --kind test -- npm test/);
-    const log = fs.readFileSync(path.join(dir, '.claude', 'state', 'token-advisor.jsonl'), 'utf8');
+    const log = fs.readFileSync(path.join(dir, '.opencode', 'state', 'token-advisor.jsonl'), 'utf8');
     assert.match(log, /verbose_command/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
@@ -96,7 +96,7 @@ test('token advisor suggests run-compact for likely verbose commands', () => {
 });
 
 test('token advisor hook is wired for Read and Bash in settings', () => {
-  const settings = JSON.parse(fs.readFileSync(path.join(ROOT, '.claude', 'settings.json'), 'utf8'));
+  const settings = JSON.parse(fs.readFileSync(path.join(ROOT, '.opencode', 'settings.json'), 'utf8'));
   const commands = (settings.hooks.PreToolUse || [])
     .filter((entry) => /Read/.test(entry.matcher || '') && /Bash/.test(entry.matcher || ''))
     .flatMap((entry) => (entry.hooks || []).map((h) => h.command || ''));
@@ -165,7 +165,7 @@ test('enforced mode does not block already-compact commands', () => {
       projectDir: dir,
       input: {
         tool_name: 'Bash',
-        tool_input: { command: 'node .claude/scripts/run-compact.js --kind test -- npm test' },
+        tool_input: { command: 'node .opencode/scripts/run-compact.js --kind test -- npm test' },
       },
     });
     assert.strictEqual(result.decision, 'ok');
@@ -217,7 +217,7 @@ test('context_search_required warns on source read without a fresh context-pack 
     assert.strictEqual(result.decision, 'warn');
     assert.match(result.message, /context pack/i);
     assert.strictEqual(result.warning.kind, 'context_search_skipped');
-    const log = fs.readFileSync(path.join(dir, '.claude', 'state', 'token-advisor.jsonl'), 'utf8');
+    const log = fs.readFileSync(path.join(dir, '.opencode', 'state', 'token-advisor.jsonl'), 'utf8');
     assert.match(log, /context_search_skipped/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
@@ -238,7 +238,7 @@ test('context_search_required stays quiet when a fresh receipt exists', () => {
     fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
     fs.writeFileSync(path.join(dir, 'src', 'auth.js'), 'function validateSession() { return true; }\n');
     writeGraph(dir, 'src/auth.js');
-    fs.writeFileSync(path.join(dir, '.claude', 'state', 'context-pack-last.json'), JSON.stringify({
+    fs.writeFileSync(path.join(dir, '.opencode', 'state', 'context-pack-last.json'), JSON.stringify({
       ts: new Date().toISOString(),
       status: 'ok',
       confidence: 'high',

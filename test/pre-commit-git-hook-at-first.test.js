@@ -4,7 +4,7 @@
 // test/pre-commit-git-hook-legacy-discipline.test.js: the sensor script is
 // lazy-required and no-ops without its prerequisite artifact, so a fixture
 // project must install the script explicitly (makeGitProject() does not copy
-// .claude/scripts).
+// .opencode/scripts).
 
 const assert = require('assert');
 const fs = require('fs');
@@ -17,10 +17,10 @@ const HOOK = 'pre-commit';
 const MAP = '# Component Map\n\n| Story | Files |\n|---|---|\n| E1-S1 | `src/legacy.py` |\n';
 
 function installAtFirstScripts(projectDir) {
-  const dir = path.join(projectDir, '.claude', 'scripts');
+  const dir = path.join(projectDir, '.opencode', 'scripts');
   fs.mkdirSync(dir, { recursive: true });
   for (const name of ['at-first-gate.js', 'ownership-check.js']) {
-    fs.copyFileSync(path.join(__dirname, '..', '.claude', 'scripts', name), path.join(dir, name));
+    fs.copyFileSync(path.join(__dirname, '..', '.opencode', 'scripts', name), path.join(dir, name));
   }
 }
 

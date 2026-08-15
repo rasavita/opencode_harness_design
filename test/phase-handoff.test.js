@@ -16,9 +16,9 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const { NEXT_PHASE, handoffOn, handoffBlock } = require(
-  path.join(ROOT, '.claude/hooks/lib/phase-handoff.js'),
+  path.join(ROOT, '.opencode/hooks/lib/phase-handoff.js'),
 );
-const { run, PHASES } = require(path.join(ROOT, '.claude/scripts/plan-approval.js'));
+const { run, PHASES } = require(path.join(ROOT, '.opencode/scripts/plan-approval.js'));
 
 function sandbox(phase) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'handoff-'));
@@ -76,7 +76,7 @@ test('a changes-requested round prints no handoff — nothing has been approved 
 
 test('/build passes --in-session at the gates it conducts', () => {
   const phases = fs.readFileSync(
-    path.join(ROOT, '.claude/skills/build/references/section-04-pipeline-phases.md'), 'utf8',
+    path.join(ROOT, '.opencode/skills/build/references/section-04-pipeline-phases.md'), 'utf8',
   );
   assert.match(phases, /record --phase brd --in-session/);
   assert.match(phases, /record --phase spec --in-session/);
@@ -96,7 +96,7 @@ test('/build passes --in-session at the gates it conducts', () => {
 // write. Same id => the approving conversation is still resident.
 
 const { PREV_PHASE, staleContext } = require(
-  path.join(ROOT, '.claude/hooks/lib/phase-handoff.js'),
+  path.join(ROOT, '.opencode/hooks/lib/phase-handoff.js'),
 );
 
 test('every hop the handoff advertises has an inverse the successor can check', () => {
@@ -166,17 +166,17 @@ test('/build conducts every phase from one session and is exempt', () => {
 
 // --- the control end to end ---------------------------------------------------
 
-const { run: handoffCheck } = require(path.join(ROOT, '.claude/scripts/handoff-check.js'));
-const { run: approval } = require(path.join(ROOT, '.claude/scripts/plan-approval.js'));
+const { run: handoffCheck } = require(path.join(ROOT, '.opencode/scripts/handoff-check.js'));
+const { run: approval } = require(path.join(ROOT, '.opencode/scripts/plan-approval.js'));
 
 /** A project whose /brd was approved by `sessionId`. */
 function approvedBrd(sessionId) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'handoff-e2e-'));
   fs.mkdirSync(path.join(dir, 'specs/brd'), { recursive: true });
   fs.writeFileSync(path.join(dir, 'specs/brd/brd.md'), '# BRD\n');
-  fs.mkdirSync(path.join(dir, '.claude/runs'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode/runs'), { recursive: true });
   fs.writeFileSync(
-    path.join(dir, '.claude/runs/2026-08-09.jsonl'),
+    path.join(dir, '.opencode/runs/2026-08-09.jsonl'),
     `${JSON.stringify({ kind: 'tool', session_id: sessionId })}\n`,
   );
   const code = approval([
@@ -202,7 +202,7 @@ test('/spec is blocked in the session that approved /brd, and cleared in a fresh
 });
 
 test('the block reads the live session from the run receipts, with nothing injected', () => {
-  // The real path: no dependency override, the id resolved from .claude/runs.
+  // The real path: no dependency override, the id resolved from .opencode/runs.
   const dir = approvedBrd('SESSION-A');
   assert.strictEqual(handoffCheck(['--phase', 'spec', '--root', dir], dir), 1,
     'the fixture writes SESSION-A as the newest receipt, so this IS the approving session');
@@ -267,7 +267,7 @@ test('the --in-session fact is recorded on the receipt', () => {
 // already-existing `/spec --render-only` would cost ~$2.20.
 
 const { staleRenderContext, renderHandoffBlock } = require(
-  path.join(ROOT, '.claude/hooks/lib/phase-handoff.js'),
+  path.join(ROOT, '.opencode/hooks/lib/phase-handoff.js'),
 );
 
 test('the render handoff names the clear and the re-entry command', () => {
@@ -336,11 +336,11 @@ function gatedDecisions(sessionId, extra = []) {
       load_bearing: true,
     }],
   }, null, 2));
-  fs.mkdirSync(path.join(dir, '.claude/runs'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.claude/runs/2026-08-09.jsonl'),
+  fs.mkdirSync(path.join(dir, '.opencode/runs'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.opencode/runs/2026-08-09.jsonl'),
     `${JSON.stringify({ kind: 'tool', session_id: sessionId })}\n`);
   execFileSync('node', [
-    path.join(ROOT, '.claude/scripts/validate-spec-decisions.js'), '--root', dir, ...extra,
+    path.join(ROOT, '.opencode/scripts/validate-spec-decisions.js'), '--root', dir, ...extra,
   ], { encoding: 'utf8' });
   return dir;
 }

@@ -7,7 +7,7 @@ const path = require('path');
 const { describe, test, before, after } = require('node:test');
 const { execFileSync } = require('child_process');
 
-const { runClaude, HARNESS_ROOT } = require('./helpers/claude-runner');
+const { runClaude, HARNESS_ROOT } = require('./helpers/opencode-runner');
 const { assertMetricExists, isPrometheusUp, pollMetric } = require('./helpers/prometheus-checker');
 const { isGrafanaUp, getDashboard, listDashboards } = require('./helpers/grafana-checker');
 
@@ -87,7 +87,7 @@ describe('Harness E2E Pipeline', { timeout: 1500000 }, () => {
   // /scaffold mandates Q1 + a confirmation card, so one -p turn only prints the
   // question. Two turns: invoke /scaffold, then answer Q1 + consent (Step 1.D).
   test('Stage 0 - Scaffold: /scaffold initializes the harness project', { timeout: 600000 }, () => {
-    const pluginDir = path.join(HARNESS_ROOT, '..', '.claude');
+    const pluginDir = path.join(HARNESS_ROOT, '..', '.opencode');
     const sessionId = require('crypto').randomUUID();
     runClaude('/scaffold', {
       cwd: PROJECT_DIR, model: 'sonnet', budgetUsd: '1.00', timeoutMs: 90000, pluginDir, sessionId,
@@ -100,8 +100,8 @@ describe('Harness E2E Pipeline', { timeout: 1500000 }, () => {
       { cwd: PROJECT_DIR, model: 'sonnet', budgetUsd: '3.00', timeoutMs: 480000, continueSession: true, pluginDir, sessionId }
     );
 
-    const hasClaudeDir = fs.existsSync(path.join(PROJECT_DIR, '.claude'));
-    const hasClaudeMd = fs.existsSync(path.join(PROJECT_DIR, 'CLAUDE.md'));
+    const hasClaudeDir = fs.existsSync(path.join(PROJECT_DIR, '.opencode'));
+    const hasClaudeMd = fs.existsSync(path.join(PROJECT_DIR, 'AGENTS.md'));
     const hasManifest = fs.existsSync(path.join(PROJECT_DIR, 'project-manifest.json'));
     const topFiles = fs.readdirSync(PROJECT_DIR);
 
@@ -109,11 +109,11 @@ describe('Harness E2E Pipeline', { timeout: 1500000 }, () => {
       exitCode: result.exitCode, hasClaudeDir, hasClaudeMd, hasManifest, topFiles,
     });
 
-    assert.ok(hasClaudeDir, '.claude/ directory must exist after scaffold');
-    assert.ok(hasClaudeMd || hasManifest, 'CLAUDE.md or project-manifest.json must exist after scaffold');
+    assert.ok(hasClaudeDir, '.opencode/ directory must exist after scaffold');
+    assert.ok(hasClaudeMd || hasManifest, 'AGENTS.md or project-manifest.json must exist after scaffold');
 
     // Append suppression directive so downstream stages skip pipeline overhead.
-    const claudeMdPath = path.join(PROJECT_DIR, 'CLAUDE.md');
+    const claudeMdPath = path.join(PROJECT_DIR, 'AGENTS.md');
     fs.appendFileSync(claudeMdPath,
       '\n\n## E2E override\n' +
       'Write code and files directly. Do not use skills, planning workflows, or brainstorming. ' +
@@ -252,8 +252,8 @@ describe('Harness E2E Pipeline', { timeout: 1500000 }, () => {
         verdict: p.verdict, score_history: [{ iteration: 1, ...p }],
       }, null, 2));
     }
-    const telemetryMem = require(path.join(HARNESS_ROOT, '..', '.claude', 'scripts', 'telemetry-memory'));
-    const stateDir = path.join(PROJECT_DIR, '.claude', 'state');
+    const telemetryMem = require(path.join(HARNESS_ROOT, '..', '.opencode', 'scripts', 'telemetry-memory'));
+    const stateDir = path.join(PROJECT_DIR, '.opencode', 'state');
     fs.mkdirSync(stateDir, { recursive: true });
     for (const p of phases) {
       telemetryMem.appendLedger(stateDir, {

@@ -5,7 +5,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { buildManifest, deriveFrameworkPacks } = require(
-  path.join(__dirname, '..', '.claude', 'scripts', 'scaffold-render.js')
+  path.join(__dirname, '..', '.opencode', 'scripts', 'scaffold-render.js')
 );
 
 test('buildManifest includes domain_vertical_packs when profile.domainVerticalPacks is a non-empty array', () => {
@@ -34,7 +34,7 @@ const fs = require('fs');
 const os = require('os');
 const { execFileSync } = require('child_process');
 
-const STATUS_SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'scaffold-vertical-status.js');
+const STATUS_SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'scaffold-vertical-status.js');
 const { checkVerticalStatus } = require(STATUS_SCRIPT);
 
 function testRegistryEntry(plugin) {
@@ -74,13 +74,13 @@ test('checkVerticalStatus reports every registry entry independently', () => {
 
 test('CLI: prints INSTALLED for an enabled vertical and a manual-install block for a pending one', () => {
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'scaffold-vertical-status-'));
-  fs.mkdirSync(path.join(repo, '.claude', 'config'), { recursive: true });
+  fs.mkdirSync(path.join(repo, '.opencode', 'config'), { recursive: true });
   fs.writeFileSync(
-    path.join(repo, '.claude', 'config', 'scaffold-packs.json'),
+    path.join(repo, '.opencode', 'config', 'scaffold-packs.json'),
     JSON.stringify({ verticalPacks: [testRegistryEntry('private-equity'), testRegistryEntry('wealth-management')] }, null, 2)
   );
   fs.writeFileSync(
-    path.join(repo, '.claude', 'settings.json'),
+    path.join(repo, '.opencode', 'settings.json'),
     JSON.stringify({ enabledPlugins: { 'private-equity@claude-for-financial-services': true } }, null, 2)
   );
   const stdout = execFileSync(process.execPath, [STATUS_SCRIPT], { cwd: repo, encoding: 'utf8' });
@@ -92,7 +92,7 @@ test('CLI: prints INSTALLED for an enabled vertical and a manual-install block f
 
 test('scaffold.md documents the combined tech-stack + domain-vertical question and both report families', () => {
   const scaffoldMd = fs.readFileSync(
-    path.join(__dirname, '..', '.claude', 'commands', 'scaffold.md'), 'utf8'
+    path.join(__dirname, '..', '.opencode', 'commands', 'scaffold.md'), 'utf8'
   );
   assert.match(scaffoldMd, /domainVerticalPacks/);
   assert.match(scaffoldMd, /scaffold-packs\.json/);
@@ -106,7 +106,7 @@ test('scaffold.md documents the combined tech-stack + domain-vertical question a
 
 test('scaffold.md wires the local tech pack and domain vertical into Step 1\'s question flow, not just the reference section', () => {
   const scaffoldMd = fs.readFileSync(
-    path.join(__dirname, '..', '.claude', 'commands', 'scaffold.md'), 'utf8'
+    path.join(__dirname, '..', '.opencode', 'commands', 'scaffold.md'), 'utf8'
   );
   const referenceSectionIndex = scaffoldMd.indexOf('### Optional Agent-Framework Skill Packs & Domain Vertical Plugins');
   assert.notStrictEqual(referenceSectionIndex, -1, 'reference section heading should exist');
@@ -116,14 +116,14 @@ test('scaffold.md wires the local tech pack and domain vertical into Step 1\'s q
   assert.match(step1Section, /Python AI Agents \(LangGraph \/ LangChain \/ DeepAgents\)/);
 
   const scaffoldApplyJs = fs.readFileSync(
-    path.join(__dirname, '..', '.claude', 'scripts', 'scaffold-apply.js'), 'utf8'
+    path.join(__dirname, '..', '.opencode', 'scripts', 'scaffold-apply.js'), 'utf8'
   );
   assert.match(scaffoldApplyJs, /domainVerticalPacks/);
 });
 
 test('scaffold.md Step 2 auto-attaches fastapi-code and react-code based on the chosen stack', () => {
   const scaffoldMd = fs.readFileSync(
-    path.join(__dirname, '..', '.claude', 'commands', 'scaffold.md'), 'utf8'
+    path.join(__dirname, '..', '.opencode', 'commands', 'scaffold.md'), 'utf8'
   );
   const step2Index = scaffoldMd.indexOf('## Step 2: Generate project-manifest.json');
   const step3Index = scaffoldMd.indexOf('## Step 3');
@@ -139,16 +139,16 @@ test('scaffold.md Step 2 auto-attaches fastapi-code and react-code based on the 
 
 test('copyFrameworkPackSkills copies fastapi-code when selected via an auto-attached frameworkPacks entry', () => {
   const { copyFrameworkPackSkills } = require(
-    path.join(__dirname, '..', '.claude', 'scripts', 'scaffold-copy.js')
+    path.join(__dirname, '..', '.opencode', 'scripts', 'scaffold-copy.js')
   );
-  const src = path.join(__dirname, '..', '.claude');
+  const src = path.join(__dirname, '..', '.opencode');
   const target = fs.mkdtempSync(path.join(require('os').tmpdir(), 'fastapi-attach-'));
   // Simulates what Step 2's auto-attach rule produces for a FastAPI-backend profile:
   // frameworkPacks includes "fastapi-code" even though the user never answered a
   // separate framework-pack question about it.
   copyFrameworkPackSkills(src, target, ['fastapi-code', 'react-code']);
-  assert.strictEqual(fs.existsSync(path.join(target, '.claude', 'skills', 'fastapi-code', 'SKILL.md')), true);
-  assert.strictEqual(fs.existsSync(path.join(target, '.claude', 'skills', 'react-code', 'SKILL.md')), true);
+  assert.strictEqual(fs.existsSync(path.join(target, '.opencode', 'skills', 'fastapi-code', 'SKILL.md')), true);
+  assert.strictEqual(fs.existsSync(path.join(target, '.opencode', 'skills', 'react-code', 'SKILL.md')), true);
 });
 
 test('deriveFrameworkPacks adds fastapi-code when stack.backend.framework is fastapi', () => {
@@ -188,8 +188,8 @@ test('buildManifest.framework_skill_packs reflects auto-derived packs even with 
 });
 
 test('CLI: scaffold-apply.js copies fastapi-code and react-code for a matching stack with NO explicit frameworkPacks selection', () => {
-  const SCAFFOLD_APPLY = path.join(__dirname, '..', '.claude', 'scripts', 'scaffold-apply.js');
-  const PLUGIN_SOURCE = path.join(__dirname, '..', '.claude');
+  const SCAFFOLD_APPLY = path.join(__dirname, '..', '.opencode', 'scripts', 'scaffold-apply.js');
+  const PLUGIN_SOURCE = path.join(__dirname, '..', '.opencode');
   const workDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'scaffold-apply-autopack-'));
   const target = path.join(workDir, 'project');
   try {
@@ -214,8 +214,8 @@ test('CLI: scaffold-apply.js copies fastapi-code and react-code for a matching s
       '--scaffold-profile', 'core',
     ], { encoding: 'utf8' });
 
-    assert.strictEqual(fs.existsSync(path.join(target, '.claude', 'skills', 'fastapi-code', 'SKILL.md')), true);
-    assert.strictEqual(fs.existsSync(path.join(target, '.claude', 'skills', 'react-code', 'SKILL.md')), true);
+    assert.strictEqual(fs.existsSync(path.join(target, '.opencode', 'skills', 'fastapi-code', 'SKILL.md')), true);
+    assert.strictEqual(fs.existsSync(path.join(target, '.opencode', 'skills', 'react-code', 'SKILL.md')), true);
     const manifest = JSON.parse(fs.readFileSync(path.join(target, 'project-manifest.json'), 'utf8'));
     assert.deepStrictEqual(manifest.framework_skill_packs.sort(), ['fastapi-code', 'react-code'].sort());
   } finally {

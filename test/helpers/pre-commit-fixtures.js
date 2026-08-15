@@ -21,10 +21,10 @@ const VALID_CONTRACT = JSON.stringify({
 });
 
 function installContractSchema(projectDir) {
-  const dir = path.join(projectDir, '.claude', 'skills', 'evaluate', 'references');
+  const dir = path.join(projectDir, '.opencode', 'skills', 'evaluate', 'references');
   fs.mkdirSync(dir, { recursive: true });
   fs.copyFileSync(
-    path.join(__dirname, '..', '..', '.claude', 'skills', 'evaluate', 'references', 'contract-schema.json'),
+    path.join(__dirname, '..', '..', '.opencode', 'skills', 'evaluate', 'references', 'contract-schema.json'),
     path.join(dir, 'contract-schema.json')
   );
 }

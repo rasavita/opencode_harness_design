@@ -4,7 +4,7 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const path = require('path');
 
-const canvas = require(path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'canvas.js'));
+const canvas = require(path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'canvas.js'));
 
 const FULL = `# Token Billing Canvas
 

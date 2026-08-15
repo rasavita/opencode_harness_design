@@ -3,8 +3,8 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
-const { reviewPolicyBlock, renderReviewMd } = require('../.claude/scripts/scaffold-encoding');
-const render = require('../.claude/scripts/scaffold-render');
+const { reviewPolicyBlock, renderReviewMd } = require('../.opencode/scripts/scaffold-encoding');
+const render = require('../.opencode/scripts/scaffold-render');
 const read = (p) => fs.readFileSync(path.join(__dirname, '..', p), 'utf8');
 
 const MANIFEST = {
@@ -24,7 +24,7 @@ test('reviewPolicyBlock encodes the project review rules', () => {
 });
 
 test('renderReviewMd fills the template with no dangling tokens', () => {
-  const body = read('.claude/templates/review.template.md');
+  const body = read('.opencode/templates/review.template.md');
   const out = renderReviewMd(body, { name: 'acme-svc' }, render);
   assert.match(out, /Review Policy — acme-svc/);
   assert.match(out, /Encoded Policy/);
@@ -33,7 +33,7 @@ test('renderReviewMd fills the template with no dangling tokens', () => {
 
 test('scaffold + reviewer wiring is in place', () => {
   // scaffold writes REVIEW.md
-  assert.match(read('.claude/scripts/scaffold-apply.js'), /writeReviewMd\(target, pluginSource, profile\)/);
+  assert.match(read('.opencode/scripts/scaffold-apply.js'), /writeReviewMd\(target, pluginSource, profile\)/);
   // the code-reviewer agent reads it (so REVIEW.md is not shelfware)
-  assert.match(read('.claude/agents/code-reviewer.md'), /REVIEW\.md/);
+  assert.match(read('.opencode/agents/code-reviewer.md'), /REVIEW\.md/);
 });

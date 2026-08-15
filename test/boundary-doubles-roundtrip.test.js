@@ -10,7 +10,7 @@ function hasPython() {
   return spawnSync('python3', ['--version'], { encoding: 'utf8' }).status === 0;
 }
 
-const TEMPLATES = path.join(__dirname, '..', '.claude', 'templates', 'boundary-doubles');
+const TEMPLATES = path.join(__dirname, '..', '.opencode', 'templates', 'boundary-doubles');
 
 function runPy(script, cwd) {
   return spawnSync('python3', ['-c', script], { cwd, encoding: 'utf8' });

@@ -18,7 +18,7 @@ const { test } = require('node:test');
 
 const {
   emittedSensorIds, resolveSensorId, instrumentedSensors,
-} = require('../.claude/scripts/validate-harness-manifest');
+} = require('../.opencode/scripts/validate-harness-manifest');
 
 const ROOT = path.join(__dirname, '..');
 const manifest = require('../harness-manifest.json');
@@ -58,7 +58,7 @@ test('instrumentation coverage does not regress', () => {
   // A ratchet, not a target: the 88 sensors are not all instrumentable (planning
   // and drift cadences mostly produce reports, not per-run outcomes). What must
   // never happen is coverage going DOWN, or a new gate landing uninstrumented.
-  const baseline = require('../.claude/state/instrumentation-baseline.json');
+  const baseline = require('../.opencode/state/instrumentation-baseline.json');
   const now = instrumentedSensors(manifest, ROOT).length;
   assert.ok(
     now >= baseline.instrumented,

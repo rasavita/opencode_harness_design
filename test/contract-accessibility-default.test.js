@@ -8,9 +8,9 @@ const { test } = require('node:test');
 const { execFileSync } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
-const SCRIPT = path.join(ROOT, '.claude', 'scripts', 'contract-accessibility-default.js');
-const VALIDATOR = path.join(ROOT, '.claude', 'scripts', 'validate-contract.js');
-const { normalizeContract } = require('../.claude/scripts/contract-accessibility-default.js');
+const SCRIPT = path.join(ROOT, '.opencode', 'scripts', 'contract-accessibility-default.js');
+const VALIDATOR = path.join(ROOT, '.opencode', 'scripts', 'validate-contract.js');
+const { normalizeContract } = require('../.opencode/scripts/contract-accessibility-default.js');
 const { readSkillCorpus } = require('./helpers/skill-corpus');
 
 const A11Y = { required: true, block_impacts: ['serious', 'critical'] };

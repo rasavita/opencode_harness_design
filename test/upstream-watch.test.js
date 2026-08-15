@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { addedLines, buildReport } = require('../.claude/scripts/upstream-watch.js');
+const { addedLines, buildReport } = require('../.opencode/scripts/upstream-watch.js');
 
 const OLD_CHANGELOG = [
   '# Changelog',

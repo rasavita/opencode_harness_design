@@ -5,7 +5,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { skipped, shouldBlock, localBinArgv, runLocalFirst } = require(path.join(
-  __dirname, '..', '.claude', 'hooks', 'lib', 'toolchain.js'
+  __dirname, '..', '.opencode', 'hooks', 'lib', 'toolchain.js'
 ));
 
 test('a clean pass (status 0) is neither skipped nor blocked', () => {

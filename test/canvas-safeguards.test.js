@@ -10,7 +10,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { checkSafeguardCoverage } = require('../.claude/hooks/lib/canvas.js');
+const { checkSafeguardCoverage } = require('../.opencode/hooks/lib/canvas.js');
 
 const SAFEGUARDS = [
   { id: 'SG-1', kind: 'invariant', text: 'An order total equals the sum of its line items' },

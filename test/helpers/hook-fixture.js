@@ -20,34 +20,34 @@ process.on('exit', () => {
 });
 
 // Hooks locate their project dir by walking up from their own location looking
-// for `.claude`, so they must run from a copy inside a temp project — never
+// for `.opencode`, so they must run from a copy inside a temp project — never
 // from the repo, or tests would read/write the repo's real state files.
 function makeHookProject(hookNames) {
   fs.mkdirSync(FIXTURE_BASE, { recursive: true });
   const dir = fs.mkdtempSync(path.join(FIXTURE_BASE, 'hook-fixture-'));
   createdFixtures.push(dir);
-  const hooksDir = path.join(dir, '.claude', 'hooks');
+  const hooksDir = path.join(dir, '.opencode', 'hooks');
   fs.mkdirSync(hooksDir, { recursive: true });
-  fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
-  const libSrc = path.join(REPO_ROOT, '.claude', 'hooks', 'lib');
+  fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
+  const libSrc = path.join(REPO_ROOT, '.opencode', 'hooks', 'lib');
   if (fs.existsSync(libSrc)) {
     fs.cpSync(libSrc, path.join(hooksDir, 'lib'), { recursive: true });
   }
   for (const name of hookNames) {
     fs.copyFileSync(
-      path.join(REPO_ROOT, '.claude', 'hooks', name),
+      path.join(REPO_ROOT, '.opencode', 'hooks', name),
       path.join(hooksDir, name)
     );
   }
   return dir;
 }
 
-// For the git pre-commit hook: a real temp git repo with .claude/ and the hook installed.
+// For the git pre-commit hook: a real temp git repo with .opencode/ and the hook installed.
 function makeGitProject() {
   const dir = makeHookProject([]);
-  const gitHooksSrc = path.join(REPO_ROOT, '.claude', 'git-hooks');
+  const gitHooksSrc = path.join(REPO_ROOT, '.opencode', 'git-hooks');
   if (fs.existsSync(gitHooksSrc)) {
-    fs.cpSync(gitHooksSrc, path.join(dir, '.claude', 'git-hooks'), { recursive: true });
+    fs.cpSync(gitHooksSrc, path.join(dir, '.opencode', 'git-hooks'), { recursive: true });
   }
   const { execSync } = require('child_process');
   execSync('git init -q && git config user.email t@t.t && git config user.name t', { cwd: dir });
@@ -57,7 +57,7 @@ function makeGitProject() {
 // args: optional array of positional arguments forwarded to the hook script
 // (e.g. the commit-message file path for commit-msg hooks).
 function runGitHook(projectDir, hookName, env, args) {
-  const hookPath = path.join(projectDir, '.claude', 'git-hooks', hookName);
+  const hookPath = path.join(projectDir, '.opencode', 'git-hooks', hookName);
   const hookArgs = Array.isArray(args) ? args : [];
   return new Promise((resolve) => {
     const child = spawn(process.execPath, [hookPath, ...hookArgs], {
@@ -77,13 +77,13 @@ function runGitHook(projectDir, hookName, env, args) {
 }
 
 function runHook(projectDir, hookName, input, env) {
-  const hookPath = path.join(projectDir, '.claude', 'hooks', hookName);
+  const hookPath = path.join(projectDir, '.opencode', 'hooks', hookName);
   return new Promise((resolve) => {
     const child = spawn(process.execPath, [hookPath], {
       cwd: projectDir,
-      // CLAUDE_PROJECT_DIR is what Claude Code sets for hook processes; it must
+      // OPENCODE_PROJECT_DIR is what Claude Code sets for hook processes; it must
       // point at the fixture project, not whatever repo is running the tests.
-      env: { ...process.env, CLAUDE_PROJECT_DIR: projectDir, ...env },
+      env: { ...process.env, OPENCODE_PROJECT_DIR: projectDir, ...env },
       stdio: ['pipe', 'pipe', 'pipe'],
     });
     let stdout = '';

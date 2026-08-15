@@ -11,7 +11,7 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
-const canvas = require(path.join(ROOT, '.claude/hooks/lib/canvas.js'));
+const canvas = require(path.join(ROOT, '.opencode/hooks/lib/canvas.js'));
 const { readSkillCorpus } = require('./helpers/skill-corpus');
 
 test('/design emits the Canvas and runs the structure gate', () => {
@@ -22,20 +22,20 @@ test('/design emits the Canvas and runs the structure gate', () => {
 });
 
 test('the shipped Canvas template is itself valid', () => {
-  const tmpl = read('.claude/skills/design/references/reasons-canvas-template.md');
+  const tmpl = read('.opencode/skills/design/references/reasons-canvas-template.md');
   const { errors, governs } = canvas.validateCanvas(tmpl);
   assert.deepStrictEqual(errors, [], `template should validate, got: ${errors.join('; ')}`);
   assert.ok(governs.length >= 1, 'template must demonstrate a non-empty Governs list');
 });
 
 test('validate-canvas CLI reuses the lib and is require-safe', () => {
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude/scripts/validate-canvas.js')));
-  const cli = read('.claude/scripts/validate-canvas.js');
+  assert.ok(fs.existsSync(path.join(ROOT, '.opencode/scripts/validate-canvas.js')));
+  const cli = read('.opencode/scripts/validate-canvas.js');
   assert.match(cli, /require\('\.\.\/hooks\/lib\/canvas'\)/, 'CLI must use the tested lib');
 });
 
 test('drift monitor reads the Canvas Governs list for design-vs-code drift', () => {
-  const cli = read('.claude/scripts/drift-report.js');
+  const cli = read('.opencode/scripts/drift-report.js');
   assert.match(cli, /hooks\/lib\/canvas/, 'drift-report must use the canvas lib');
   assert.match(cli, /withCanvasDrift/, 'drift-report must thread canvas drift into the snapshot');
 });

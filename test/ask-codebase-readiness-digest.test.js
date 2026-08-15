@@ -6,14 +6,14 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const ask = require('../.claude/scripts/ask-codebase');
-const digest = require('../.claude/scripts/readiness-digest');
+const ask = require('../.opencode/scripts/ask-codebase');
+const digest = require('../.opencode/scripts/readiness-digest');
 
 function tmp() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ask-'));
   fs.mkdirSync(path.join(root, 'specs', 'brownfield'), { recursive: true });
   fs.mkdirSync(path.join(root, 'specs', 'reviews'), { recursive: true });
-  fs.mkdirSync(path.join(root, '.claude', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(root, '.opencode', 'state'), { recursive: true });
   fs.mkdirSync(path.join(root, 'src'), { recursive: true });
   return root;
 }

@@ -5,8 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const { test } = require('node:test');
 
-const RUBRICS_PATH = path.join(__dirname, '..', '.claude', 'templates', 'phase-eval-rubrics.json');
-const EVALUATOR_PATH = path.join(__dirname, '..', '.claude', 'agents', 'evaluator.md');
+const RUBRICS_PATH = path.join(__dirname, '..', '.opencode', 'templates', 'phase-eval-rubrics.json');
+const EVALUATOR_PATH = path.join(__dirname, '..', '.opencode', 'agents', 'evaluator.md');
 
 test('phase-eval-rubrics.json has a design-delta phase with the standard 5 criteria', () => {
   const rubrics = JSON.parse(fs.readFileSync(RUBRICS_PATH, 'utf8'));

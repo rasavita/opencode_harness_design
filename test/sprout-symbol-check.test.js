@@ -12,7 +12,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { leafSymbols, symbolsTouchedByRanges } = require(
-  path.join(__dirname, '..', '.claude', 'hooks', 'lib', 'sprout-symbol-check')
+  path.join(__dirname, '..', '.opencode', 'hooks', 'lib', 'sprout-symbol-check')
 );
 
 test('leafSymbols: a top-level function with no children is its own leaf', () => {

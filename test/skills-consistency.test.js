@@ -6,8 +6,8 @@ const path = require('path');
 const { test } = require('node:test');
 
 const ROOT = path.join(__dirname, '..');
-const SKILLS_DIR = path.join(ROOT, '.claude', 'skills');
-const AGENTS_DIR = path.join(ROOT, '.claude', 'agents');
+const SKILLS_DIR = path.join(ROOT, '.opencode', 'skills');
+const AGENTS_DIR = path.join(ROOT, '.opencode', 'agents');
 
 function listSkills() {
   return fs.readdirSync(SKILLS_DIR).filter((d) =>
@@ -38,11 +38,11 @@ test('no SKILL.md is a reference-only tombstone', () => {
   assert.deepStrictEqual(offenders, [], `reference-only tombstone skills: ${offenders.join(', ')}`);
 });
 
-// Every `.claude/skills/<name>/...` path mentioned in any SKILL.md or agent
+// Every `.opencode/skills/<name>/...` path mentioned in any SKILL.md or agent
 // definition must resolve — catches broken reference moves and deleted skills.
 test('every referenced skills/ path resolves on disk', () => {
   const broken = [];
-  const re = /\.claude\/skills\/([A-Za-z0-9_-]+)\/([A-Za-z0-9_./-]+)/g;
+  const re = /\.opencode\/skills\/([A-Za-z0-9_-]+)\/([A-Za-z0-9_./-]+)/g;
   for (const file of allDocFiles()) {
     const text = fs.readFileSync(file, 'utf8');
     let m;
@@ -128,7 +128,7 @@ test('no doc references a removed agent', () => {
 
 // The discipline micro-skills are auto-invoked by agents mid-pipeline,
 // not typed by humans; without a marker they read as user commands when a
-// team browses .claude/skills/ (2026-07-02 audit fix #5). The marker is a
+// team browses .opencode/skills/ (2026-07-02 audit fix #5). The marker is a
 // SUFFIX: the leading "Use when…" trigger phrase drives auto-invocation and
 // must stay first (unlike seam-finder-style stage skills, which prefix).
 const INTERNAL_DISCIPLINE_SKILLS = [

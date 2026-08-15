@@ -14,14 +14,14 @@ const ROOT = path.resolve(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 test('modularity-pack CLI reuses the lib and is require-safe', () => {
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude/scripts/modularity-pack.js')));
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude/hooks/lib/modularity-pack.js')));
-  const cli = read('.claude/scripts/modularity-pack.js');
+  assert.ok(fs.existsSync(path.join(ROOT, '.opencode/scripts/modularity-pack.js')));
+  assert.ok(fs.existsSync(path.join(ROOT, '.opencode/hooks/lib/modularity-pack.js')));
+  const cli = read('.opencode/scripts/modularity-pack.js');
   assert.match(cli, /require\('\.\.\/hooks\/lib\/modularity-pack'\)/, 'CLI must use the tested lib');
 });
 
 test('the modularity-reviewer agent exists with frontmatter and a verdict', () => {
-  const agent = read('.claude/agents/modularity-reviewer.md');
+  const agent = read('.opencode/agents/modularity-reviewer.md');
   assert.match(agent, /^name:\s*modularity-reviewer/m);
   assert.match(agent, /^model:\s*claude-/m);
   assert.match(agent, /modularity-pack/, 'must be grounded in the pack');
@@ -29,7 +29,7 @@ test('the modularity-reviewer agent exists with frontmatter and a verdict', () =
 });
 
 test('/brownfield --full runs the pack and the reviewer', () => {
-  const skill = read('.claude/skills/brownfield/SKILL.md');
+  const skill = read('.opencode/skills/brownfield/SKILL.md');
   assert.match(skill, /modularity-pack\.js/, '--full must build the grounding pack');
   assert.match(skill, /modularity-reviewer/, '--full must spawn the inferential reviewer');
 });
@@ -46,7 +46,7 @@ test('manifest registers the two-part modularity sensor as active', () => {
 });
 
 test('modularity-reviewer.md documents an output-path override for scoped callers', () => {
-  const agent = read('.claude/agents/modularity-reviewer.md');
+  const agent = read('.opencode/agents/modularity-reviewer.md');
   assert.match(
     agent,
     /explicit output paths.*instead of the defaults/is,

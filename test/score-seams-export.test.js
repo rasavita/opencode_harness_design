@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { scoreSeams } = require('../.claude/skills/seam-finder/scripts/score_seams.js');
+const { scoreSeams } = require('../.opencode/skills/seam-finder/scripts/score_seams.js');
 
 const GRAPH = {
   nodes: [

@@ -10,7 +10,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { biteCheckFiles, DEFAULTS } = require(
-  path.join(__dirname, '..', '.claude', 'hooks', 'lib', 'legacy-bite-check')
+  path.join(__dirname, '..', '.opencode', 'hooks', 'lib', 'legacy-bite-check')
 );
 
 test('no files to check -> does not run, trivially passes', () => {

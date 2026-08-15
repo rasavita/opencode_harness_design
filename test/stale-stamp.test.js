@@ -12,7 +12,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { stampDerived, STALE_MARK } = require(
-  path.join(__dirname, '..', '.claude', 'hooks', 'lib', 'stale-stamp')
+  path.join(__dirname, '..', '.opencode', 'hooks', 'lib', 'stale-stamp')
 );
 
 function makeProject(files) {

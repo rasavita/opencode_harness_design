@@ -39,8 +39,8 @@ Product scaffolds (`web-app` / `api-service` / `cli-or-library`) default to
 Optional org policy: `token_governor.mode: "enforced"`. Measure with:
 
 ```bash
-node .claude/scripts/cost-report.js
-node .claude/scripts/pipeline-status.js   # Cost: line when metering
+node .opencode/scripts/cost-report.js
+node .opencode/scripts/pipeline-status.js   # Cost: line when metering
 ```
 
 Full operator guide: [token-cost-playbook.md](token-cost-playbook.md). This monorepo
@@ -98,7 +98,7 @@ Env overrides for the dial itself (when wired): `HARNESS_SENSOR_TIER=minimal|sta
 
 \* When architecture/contexts/component-map are configured; otherwise the gate no-ops or skips loudly as today.
 
-Enforcement of this table is **live** (PR3): `.claude/hooks/lib/sensor-tier.js` + `.claude/hooks/lib/gate-registry.js` filter the pre-commit dispatcher (`.claude/git-hooks/pre-commit`). Default `standard` preserves the historical pre-commit set.
+Enforcement of this table is **live** (PR3): `.opencode/hooks/lib/sensor-tier.js` + `.opencode/hooks/lib/gate-registry.js` filter the pre-commit dispatcher (`.opencode/git-hooks/pre-commit`). Default `standard` preserves the historical pre-commit set.
 
 ## Project Zero (this repository)
 
@@ -109,13 +109,13 @@ The harness monorepo dogfoods itself via root `project-manifest.json`:
 - `quality.sensor_tier`: `standard`
 - `quality.agent_readiness.mode`: **`ratchet`** with `min_active_pillars: 5` and `forbid_regression: true`
 
-Readiness baseline (committed): `.claude/state/agent-readiness-baseline.json`
+Readiness baseline (committed): `.opencode/state/agent-readiness-baseline.json`
 
 ```bash
 npm run agent-readiness          # write specs/reviews/agent-readiness.json (gitignored)
 npm run agent-readiness:assert   # hard-fail if below min or below baseline
 npm run agent-readiness:baseline # raise (or --force rewrite) the committed baseline after a real improvement
-npm run retention:dry            # preview prune of .claude/runs + state/archive
+npm run retention:dry            # preview prune of .opencode/runs + state/archive
 npm run retention                # prune runs >14d, archive >30d
 ```
 

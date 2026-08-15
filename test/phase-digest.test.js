@@ -14,8 +14,8 @@ const os = require('os');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const { digestFor } = require(path.join(ROOT, '.claude/hooks/lib/phase-digest.js'));
-const { render } = require(path.join(ROOT, '.claude/scripts/phase-digest.js'));
+const { digestFor } = require(path.join(ROOT, '.opencode/hooks/lib/phase-digest.js'));
+const { render } = require(path.join(ROOT, '.opencode/scripts/phase-digest.js'));
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 const LONG_TEXT = 'x'.repeat(4000);
@@ -90,13 +90,13 @@ test('an unknown phase has no digest rather than a wrong one', () => {
 });
 
 test('the three consuming phases orient from the digest, not the full artifacts', () => {
-  const spec = read('.claude/skills/spec/SKILL.md');
+  const spec = read('.opencode/skills/spec/SKILL.md');
   assert.match(spec, /phase-digest\.js --phase spec/);
   assert.match(spec, /[Dd]o not read `brd-requirements\.json`/,
     '/spec must say plainly that the spine is not read whole here');
   assert.match(
-    read('.claude/skills/design/references/mode-06-prerequisites-full-mode-only-doc-only-has-none.md'),
+    read('.opencode/skills/design/references/mode-06-prerequisites-full-mode-only-doc-only-has-none.md'),
     /phase-digest\.js --phase design/,
   );
-  assert.match(read('.claude/skills/test/SKILL.md'), /phase-digest\.js --phase test/);
+  assert.match(read('.opencode/skills/test/SKILL.md'), /phase-digest\.js --phase test/);
 });

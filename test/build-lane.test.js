@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { parseBuildInvocation } = require('../.claude/scripts/build-lane.js');
+const { parseBuildInvocation } = require('../.opencode/scripts/build-lane.js');
 const { readSkillCorpus } = require('./helpers/skill-corpus');
 
 // Phase 4 progressive loading moved Step 0's procedure into references/ —

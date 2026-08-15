@@ -47,11 +47,11 @@ test('G13/G14 controls are registered in harness-manifest.json', () => {
   assert.ok(guide, 'first-window-init guide must be registered (G13)');
   assert.strictEqual(guide.gap_ref, 'G13');
   assert.strictEqual(guide.status, 'active');
-  assert.strictEqual(guide.wired_at, '.claude/skills/auto/SKILL.md');
+  assert.strictEqual(guide.wired_at, '.opencode/skills/auto/SKILL.md');
 
   const sensor = manifest.sensors.find((s) => s.id === 'resume-smoke');
   assert.ok(sensor, 'resume-smoke sensor must be registered (G14)');
   assert.strictEqual(sensor.gap_ref, 'G14');
   assert.strictEqual(sensor.status, 'active');
-  assert.strictEqual(sensor.wired_at, '.claude/skills/auto/SKILL.md');
+  assert.strictEqual(sensor.wired_at, '.opencode/skills/auto/SKILL.md');
 });

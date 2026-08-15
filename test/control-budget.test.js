@@ -17,9 +17,9 @@ const {
   controlIds,
   justifiedIds,
   budgetDecision,
-} = require(path.join(REPO_ROOT, '.claude', 'hooks', 'lib', 'control-budget.js'));
+} = require(path.join(REPO_ROOT, '.opencode', 'hooks', 'lib', 'control-budget.js'));
 
-const BASELINE_PATH = path.join(REPO_ROOT, '.claude', 'state', 'control-budget-baseline.json');
+const BASELINE_PATH = path.join(REPO_ROOT, '.opencode', 'state', 'control-budget-baseline.json');
 const MANIFEST_PATH = path.join(REPO_ROOT, 'harness-manifest.json');
 
 function base(ids) {

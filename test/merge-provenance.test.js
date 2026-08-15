@@ -12,7 +12,7 @@ const {
   readProvenance,
   collectGitStats,
   recordAutoMerge,
-} = require('../.claude/hooks/lib/merge-provenance');
+} = require('../.opencode/hooks/lib/merge-provenance');
 
 function tmp() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'merge-prov-'));
@@ -83,6 +83,6 @@ test('collectGitStats never throws when git is unavailable', () => {
   assert.deepStrictEqual(stats, { sha: '', loc_added: 0, files: [] });
 });
 
-test('the ledger rel path is under .claude/state', () => {
-  assert.match(MERGE_PROVENANCE_REL, /\.claude[\\/]state[\\/]merge-provenance\.jsonl$/);
+test('the ledger rel path is under .opencode/state', () => {
+  assert.match(MERGE_PROVENANCE_REL, /\.opencode[\\/]state[\\/]merge-provenance\.jsonl$/);
 });

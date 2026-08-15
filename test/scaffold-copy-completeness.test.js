@@ -2,9 +2,9 @@
 
 // Mechanical guard for the "scaffold-copy list drift" bug class (harness gap G22).
 //
-// scaffold-copy.js copies `.claude/scripts/*.js` and `.claude/skills/*/SKILL.md`
+// scaffold-copy.js copies `.opencode/scripts/*.js` and `.opencode/skills/*/SKILL.md`
 // to scaffolded projects via explicit named lists (CORE_SCRIPTS, CORE_SKILLS),
-// not a directory glob. When a skill is edited to call `node .claude/scripts/X.js`
+// not a directory glob. When a skill is edited to call `node .opencode/scripts/X.js`
 // or invoke a `REQUIRED SUB-SKILL: name` discipline without adding that name to
 // the matching list, the reference silently breaks — but only in projects the
 // scaffold produces, never in this repo's own `npm test`, because this repo
@@ -21,10 +21,10 @@ const fs = require('fs');
 const path = require('path');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
-const SKILLS_DIR = path.join(REPO_ROOT, '.claude', 'skills');
-const PRE_COMMIT = path.join(REPO_ROOT, '.claude', 'git-hooks', 'pre-commit');
+const SKILLS_DIR = path.join(REPO_ROOT, '.opencode', 'skills');
+const PRE_COMMIT = path.join(REPO_ROOT, '.opencode', 'git-hooks', 'pre-commit');
 
-const SCRIPT_REF_RE = /node \.claude\/scripts\/([A-Za-z0-9_-]+\.js)/g;
+const SCRIPT_REF_RE = /node \.opencode\/scripts\/([A-Za-z0-9_-]+\.js)/g;
 // Matches both backtick conventions already in use: `` REQUIRED SUB-SKILL: `name` ``
 // (backticks around the name only) and `` `REQUIRED SUB-SKILL: name` `` (backticks
 // around the whole phrase) — the backticks around the name are optional either way.
@@ -49,7 +49,7 @@ function collectReferences() {
 }
 
 // The copy lists are no longer literals in scaffold-copy.js — they are derived from
-// .claude/config/packs.json. Reading the exported arrays tests what the copy step
+// .opencode/config/packs.json. Reading the exported arrays tests what the copy step
 // ACTUALLY does, rather than what its source text looks like; the old source-parsing
 // version silently matched nothing once the literals went away.
 //
@@ -57,18 +57,18 @@ function collectReferences() {
 // against the widest install (`full`), not `core` — a brownfield-only script referenced
 // by a brownfield skill is correct, not missing.
 function copyListNames(arrayName) {
-  const copy = require(path.join(REPO_ROOT, '.claude', 'scripts', 'scaffold-copy.js'));
+  const copy = require(path.join(REPO_ROOT, '.opencode', 'scripts', 'scaffold-copy.js'));
   const profileOf = { CORE_SCRIPTS: 'script', CORE_SKILLS: 'skill' };
   const kind = profileOf[arrayName];
   assert.ok(kind, `unsupported list: ${arrayName}`);
-  const packs = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, '.claude', 'config', 'packs.json'), 'utf8'));
+  const packs = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, '.opencode', 'config', 'packs.json'), 'utf8'));
   const names = new Set(packs.kernel[kind] || []);
   for (const spec of Object.values(packs.packs)) for (const n of spec[kind] || []) names.add(n);
   // keep the historical shape: script names carry their extension
   return kind === 'script' ? new Set([...names].map((n) => `${n}.js`)) : names;
 }
 
-test('every "node .claude/scripts/X.js" reference in a skill or pre-commit is in CORE_SCRIPTS', () => {
+test('every "node .opencode/scripts/X.js" reference in a skill or pre-commit is in CORE_SCRIPTS', () => {
   const coreScripts = copyListNames('CORE_SCRIPTS');
   const { scripts } = collectReferences();
 

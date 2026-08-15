@@ -6,10 +6,10 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
-const { stampEnvelope } = require('../.claude/hooks/lib/task-envelope');
-const { signReceipt } = require('../.claude/hooks/lib/authority-receipt');
-const { policyHash, verifyRuntime } = require('../.claude/scripts/runtime-policy');
-const { createRequest } = require('../.claude/scripts/credential-request');
+const { stampEnvelope } = require('../.opencode/hooks/lib/task-envelope');
+const { signReceipt } = require('../.opencode/hooks/lib/authority-receipt');
+const { policyHash, verifyRuntime } = require('../.opencode/scripts/runtime-policy');
+const { createRequest } = require('../.opencode/scripts/credential-request');
 
 function fixture() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'runtime-policy-'));
@@ -21,14 +21,14 @@ function fixture() {
   });
   const policy = {
     schema_version: 1, network: { mode: 'deny-by-default', allowed_domains: [] },
-    read_only_paths: ['.claude/hooks', '.claude/trust'], broker_only_commands: [],
+    read_only_paths: ['.opencode/hooks', '.opencode/trust'], broker_only_commands: [],
     credentials: { github_release: { allowed_commands: ['gh'] } },
   };
-  fs.mkdirSync(path.join(root, '.claude', 'state'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.claude', 'state', 'task-envelope.json'), JSON.stringify(envelope));
-  fs.writeFileSync(path.join(root, '.claude', 'unattended-policy.json'), JSON.stringify(policy));
-  fs.mkdirSync(path.join(root, '.claude', 'trust'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.claude', 'trust', 'issuers.json'), JSON.stringify({
+  fs.mkdirSync(path.join(root, '.opencode', 'state'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.opencode', 'state', 'task-envelope.json'), JSON.stringify(envelope));
+  fs.writeFileSync(path.join(root, '.opencode', 'unattended-policy.json'), JSON.stringify(policy));
+  fs.mkdirSync(path.join(root, '.opencode', 'trust'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.opencode', 'trust', 'issuers.json'), JSON.stringify({
     schema_version: 1, issuers: [{
       issuer: 'runtime', key_id: 'one',
       public_key_pem: pair.publicKey.export({ type: 'spki', format: 'pem' }),
@@ -43,7 +43,7 @@ function fixture() {
     nonce: 'one', runtime_id: 'container-1', policy_hash: policyHash(policy),
     network_enforced: true, credential_brokered: true, read_only_paths: policy.read_only_paths,
   }, pair.privateKey);
-  const dir = path.join(root, '.claude', 'authority', 'runtime');
+  const dir = path.join(root, '.opencode', 'authority', 'runtime');
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'runtime-1.json'), JSON.stringify(receipt));
   const capability = signReceipt({
@@ -53,7 +53,7 @@ function fixture() {
     issued_at: '2026-07-26T12:00:00Z', expires_at: '2026-07-26T13:00:00Z',
     nonce: 'two', actions: ['credential:github_release'], approval_receipt_ids: [],
   }, pair.privateKey);
-  const capDir = path.join(root, '.claude', 'authority', 'capabilities');
+  const capDir = path.join(root, '.opencode', 'authority', 'capabilities');
   fs.mkdirSync(capDir, { recursive: true });
   fs.writeFileSync(path.join(capDir, 'credential-cap.json'), JSON.stringify(capability));
   return { root, policy };
@@ -63,7 +63,7 @@ test('runtime verification binds external enforcement to the exact policy hash',
   const { root, policy } = fixture();
   assert.strictEqual(verifyRuntime(root, new Date('2026-07-26T12:10:00Z')).pass, true);
   policy.network.allowed_domains.push('example.com');
-  fs.writeFileSync(path.join(root, '.claude', 'unattended-policy.json'), JSON.stringify(policy));
+  fs.writeFileSync(path.join(root, '.opencode', 'unattended-policy.json'), JSON.stringify(policy));
   assert.strictEqual(verifyRuntime(root, new Date('2026-07-26T12:10:00Z')).pass, false);
 });
 

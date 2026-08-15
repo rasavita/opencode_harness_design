@@ -21,30 +21,30 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const { searchScope } = require('../.claude/hooks/lib/search-scope');
-const { adviseTokenUsage } = require('../.claude/hooks/token-advisor');
+const { searchScope } = require('../.opencode/hooks/lib/search-scope');
+const { adviseTokenUsage } = require('../.opencode/hooks/token-advisor');
 
 // Narrow or non-filesystem searches. Blocking any of these is a false positive.
 const CONSTRAINED = [
   'grep -n foo README.md',
   'grep -n "^| `/" README.md',
-  'ls .claude | grep lane',
+  'ls .opencode | grep lane',
   'cat notes.txt | grep TODO',
   'grep -rn TODO tools/',
   'grep -rn TODO docs/',
   'grep -rn TODO test/',
-  'grep -rl "recordOutcome" .claude/scripts .claude/hooks',
-  'grep -rl "recordOutcome" .claude --include=*.js',
+  'grep -rl "recordOutcome" .opencode/scripts .opencode/hooks',
+  'grep -rl "recordOutcome" .opencode --include=*.js',
   'rg secret src/auth',
   'rg -n pattern packages/core',
   'find tools -name x',
   'find harness-lite -maxdepth 2 -type d',
-  'node .claude/scripts/search-compact.js recordOutcome',
+  'node .opencode/scripts/search-compact.js recordOutcome',
   'echo hello',
   // A quoted metacharacter must not split the command and orphan the path.
   'rg "auth|login" src/auth',
-  'rg -F "a|b" .claude/hooks',
-  'rg "TODO #" .claude/',
+  'rg -F "a|b" .opencode/hooks',
+  'rg "TODO #" .opencode/',
   'rg "one;two" src/',
   'grep -n "#define" src/a.c',
   'grep -n "a|b" README.md',
@@ -199,8 +199,8 @@ test('searchScope: one bad segment in a chain is enough', () => {
 test('searchScope: a value-taking flag is not mistaken for a path operand', () => {
   // `**` belongs to --glob; rg is then left with no path operand at all.
   assert.strictEqual(searchScope('rg secret --glob "**"').unconstrained, true);
-  // `*.js` belongs to --include; `.claude` is the real path operand.
-  assert.strictEqual(searchScope('grep -rl foo .claude --include=*.js').unconstrained, false);
+  // `*.js` belongs to --include; `.opencode` is the real path operand.
+  assert.strictEqual(searchScope('grep -rl foo .opencode --include=*.js').unconstrained, false);
 });
 
 test('searchScope: NON-recursive grep with no path reads stdin, not the repo', () => {
@@ -223,7 +223,7 @@ test('searchScope: an unbalanced quote fails open rather than blocking', () => {
 
 function tempProject(extra = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tg-search-'));
-  fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
   fs.mkdirSync(path.join(dir, 'specs', 'brownfield'), { recursive: true });
   fs.writeFileSync(path.join(dir, 'project-manifest.json'), JSON.stringify({
     token_governor: { enabled: true, mode: 'enforced', ...extra },
@@ -270,7 +270,7 @@ test('a stale context-pack receipt no longer licenses unconstrained search', () 
   const dir = tempProject();
   try {
     fs.writeFileSync(
-      path.join(dir, '.claude', 'state', 'context-pack-last.json'),
+      path.join(dir, '.opencode', 'state', 'context-pack-last.json'),
       JSON.stringify({ ts: new Date().toISOString(), status: 'ok' })
     );
     // The receipt used to buy 4 hours of unlimited repo-wide search.

@@ -10,7 +10,7 @@ For teams that want a visible queue, parallel execution, and tracker-based revie
 2. After planning, run `/tracker-publish` — creates one Linear/Jira issue per dependency group
 3. Start the orchestrator:
    ```bash
-   cd ~/claude_harness_eng_v5/symphony_clone
+   cd ~/opencode_harness_design/symphony_clone
    cp .env.example .env && $EDITOR .env
    docker compose up --build
    ```
@@ -60,13 +60,13 @@ For brownfield refactors, the scaffold can consume an [Understand-Anything](http
    ```
 3. Run `/code-map` or import the graph directly:
    ```bash
-   node .claude/skills/code-map/scripts/import_understand_graph.js \
+   node .opencode/skills/code-map/scripts/import_understand_graph.js \
      --in .understand-anything/knowledge-graph.json \
      --out specs/brownfield/code-graph.json
-   node .claude/skills/code-map/scripts/build_graph.js \
+   node .opencode/skills/code-map/scripts/build_graph.js \
      --render-mermaid specs/brownfield/code-graph.json \
      --out specs/brownfield/dependency-graph.md
-   node .claude/skills/code-map/scripts/build_graph.js \
+   node .opencode/skills/code-map/scripts/build_graph.js \
      --coupling-report specs/brownfield/code-graph.json \
      --out specs/brownfield/coupling-report.md
    ```
@@ -77,4 +77,4 @@ Understand-Anything is optional. If its graph is absent, `/code-map` falls back 
 
 ## Dynamic workflows
 
-Dynamic workflows are JavaScript files in `.claude/workflows/` that auto-register as `/<name>` slash commands for deterministic multi-agent orchestration (fan-out -> verify -> synthesize). The harness ships none — earlier `/harness-*` workflows merely duplicated existing skills and were removed. Author your own when you have a genuinely new fan-out; see `.claude/workflows/README.md`.
+Dynamic workflows are JavaScript files in `.opencode/workflows/` that auto-register as `/<name>` slash commands for deterministic multi-agent orchestration (fan-out -> verify -> synthesize). The harness ships none — earlier `/harness-*` workflows merely duplicated existing skills and were removed. Author your own when you have a genuinely new fan-out; see `.opencode/workflows/README.md`.

@@ -1,12 +1,12 @@
 'use strict';
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { runCommitCustomSensors } = require('../.claude/hooks/lib/gate-registry');
+const { runCommitCustomSensors } = require('../.opencode/hooks/lib/gate-registry');
 const fs = require('fs'), os = require('os'), path = require('path');
 
 function proj(cs) {
   const d = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-'));
-  fs.mkdirSync(path.join(d, '.claude/state'), { recursive: true });
+  fs.mkdirSync(path.join(d, '.opencode/state'), { recursive: true });
   fs.writeFileSync(path.join(d, 'project-manifest.json'), JSON.stringify({ custom_sensors: cs }));
   return d;
 }

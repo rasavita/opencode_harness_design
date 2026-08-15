@@ -24,7 +24,7 @@ test('package.json exposes baseline + retention scripts', () => {
 
 // The LIVE ratchet is deliberately NOT asserted here.
 //
-// agent-readiness measures the live repo (specs/, .claude/state/), and node --test runs
+// agent-readiness measures the live repo (specs/, .opencode/state/), and node --test runs
 // this file in parallel with tests that write those same paths. The assertion reported
 // "active pillars regressed: N < 8" on roughly one run in three, while the identical
 // computation returns 8/8 in isolation. Isolating the output artifact did not help — the

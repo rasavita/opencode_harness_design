@@ -6,7 +6,7 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'telemetry-skill-helpers.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'telemetry-skill-helpers.js');
 const {
   parseSkillFrontmatter,
   truncateLabel,
@@ -41,7 +41,7 @@ test('truncateLabel collapses whitespace and caps length with an ellipsis', () =
 test('readSkillCatalog reads SKILL.md frontmatter into a sorted catalog', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cat-'));
   const mk = (name, desc) => {
-    const d = path.join(dir, '.claude', 'skills', name);
+    const d = path.join(dir, '.opencode', 'skills', name);
     fs.mkdirSync(d, { recursive: true });
     fs.writeFileSync(path.join(d, 'SKILL.md'), `---\nname: ${name}\ndescription: ${desc}\n---\n`);
   };
@@ -49,7 +49,7 @@ test('readSkillCatalog reads SKILL.md frontmatter into a sorted catalog', () => 
   mk('alpha', 'first one');
   const catalog = readSkillCatalog(dir);
   assert.deepStrictEqual(catalog.map((s) => s.name), ['alpha', 'zeta'], 'sorted by name');
-  assert.strictEqual(catalog[0].path, '.claude/skills/alpha/SKILL.md');
+  assert.strictEqual(catalog[0].path, '.opencode/skills/alpha/SKILL.md');
   assert.strictEqual(catalog[0].description, 'first one');
 });
 

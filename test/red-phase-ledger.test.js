@@ -31,7 +31,7 @@ const {
   readLedger,
   fileState,
   openRedFiles,
-} = require('../.claude/hooks/lib/red-phase-ledger');
+} = require('../.opencode/hooks/lib/red-phase-ledger');
 
 function tmpRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'red-phase-'));
@@ -257,7 +257,7 @@ test('openRedFiles is empty when nothing is failing', () => {
 // those, and refuses to attribute a verdict to a file whose text changed during
 // the command — we genuinely cannot tell which text produced that verdict.
 
-const { readSnapshot, writeSnapshot, snapshotHashes } = require('../.claude/hooks/lib/red-phase-ledger');
+const { readSnapshot, writeSnapshot, snapshotHashes } = require('../.opencode/hooks/lib/red-phase-ledger');
 
 test('writeSnapshot/readSnapshot round-trip the pre-run hashes for a command', () => {
   const root = tmpRoot();

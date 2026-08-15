@@ -4,7 +4,7 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const path = require('path');
 
-const drift = require(path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'drift.js'));
+const drift = require(path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'drift.js'));
 
 // A graph with one cycle (a<->b), one unstable hub (h), and one orphan (o.py).
 function graph() {

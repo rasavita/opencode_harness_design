@@ -3,17 +3,17 @@
 Operator CLIs for maintaining the harness itself. **Nothing here ships, and nothing here
 is a control.**
 
-That makes `tools/` a third top-level location alongside `.claude/` and `test/`, which
+That makes `tools/` a third top-level location alongside `.opencode/` and `test/`, which
 needs justifying — the harness is supposed to be shrinking, not sprouting directories.
 The rule is:
 
 | Location | Holds | Ships to a scaffolded project? |
 |---|---|---|
-| `.claude/` | the harness — skills, agents, hooks, scripts | yes, composed by profile |
+| `.opencode/` | the harness — skills, agents, hooks, scripts | yes, composed by profile |
 | `test/` | everything that verifies the repo | no |
 | `tools/` | CLIs for maintaining the partition + control inventory | **no** |
 
-## Why these can't live in `.claude/`
+## Why these can't live in `.opencode/`
 
 They'd be inert there, and they'd trip the harness's own rules:
 
@@ -24,7 +24,7 @@ They'd be inert there, and they'd trip the harness's own rules:
   already-composed profile (`core`/`brownfield`/`full`). It has no kernel-vs-pack split
   of its own left to check.
 - **`pack-install.js` would have to declare itself.** Its own `undeclaredUnits()` check
-  walks `.claude/`'s accounted dirs and flags any file no pack declares as shipping in no
+  walks `.opencode/`'s accounted dirs and flags any file no pack declares as shipping in no
   install. Moving these in means declaring them in the very partition they verify — and
   then either shipping dead weight into every SKU, or sitting permanently in that warning
   list.

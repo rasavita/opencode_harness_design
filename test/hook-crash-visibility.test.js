@@ -23,12 +23,12 @@ const path = require('path');
 const { test } = require('node:test');
 
 const ROOT = path.join(__dirname, '..');
-const COMMON = path.join(ROOT, '.claude', 'hooks', 'lib', 'common.js');
-const { recordOutcome, readOutcomes, timeOutcome } = require('../.claude/hooks/lib/sensor-outcomes');
+const COMMON = path.join(ROOT, '.opencode', 'hooks', 'lib', 'common.js');
+const { recordOutcome, readOutcomes, timeOutcome } = require('../.opencode/hooks/lib/sensor-outcomes');
 
 function tempProject() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hook-crash-'));
-  fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
   return dir;
 }
 
@@ -86,7 +86,7 @@ function crashingHook(dir) {
 function runHookScript(file, dir) {
   return execFileSync(process.execPath, [file], {
     input: JSON.stringify({ tool_name: 'Write', tool_input: { file_path: 'x.js' } }),
-    env: { ...process.env, CLAUDE_PROJECT_DIR: dir },
+    env: { ...process.env, OPENCODE_PROJECT_DIR: dir },
     encoding: 'utf8',
     stdio: ['pipe', 'pipe', 'pipe'],
   });
@@ -118,8 +118,8 @@ test('a crashing hook logs to the PROJECT being guarded, not the harness repo', 
   const dir = tempProject();
   try {
     runHookScript(crashingHook(dir), dir);
-    const log = path.join(dir, '.claude', 'state', 'hook-errors.log');
-    assert.ok(fs.existsSync(log), 'hook-errors.log must land under CLAUDE_PROJECT_DIR');
+    const log = path.join(dir, '.opencode', 'state', 'hook-errors.log');
+    assert.ok(fs.existsSync(log), 'hook-errors.log must land under OPENCODE_PROJECT_DIR');
     assert.match(fs.readFileSync(log, 'utf8'), /crasher: deliberate test crash/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
@@ -138,7 +138,7 @@ test('an EMPTY stdin is not a control outcome — a fixture must not forge an ER
   `);
   try {
     const proc = require('child_process').spawnSync(process.execPath, [file], {
-      input: '', env: { ...process.env, CLAUDE_PROJECT_DIR: dir }, encoding: 'utf8',
+      input: '', env: { ...process.env, OPENCODE_PROJECT_DIR: dir }, encoding: 'utf8',
     });
     assert.strictEqual(proc.status, 0);
     assert.deepStrictEqual(readOutcomes(dir), [], 'no event means no control outcome');
@@ -156,7 +156,7 @@ test('a MALFORMED but non-empty event is a real crash and IS recorded', () => {
   `);
   try {
     require('child_process').spawnSync(process.execPath, [file], {
-      input: '{"tool_name":', env: { ...process.env, CLAUDE_PROJECT_DIR: dir }, encoding: 'utf8',
+      input: '{"tool_name":', env: { ...process.env, OPENCODE_PROJECT_DIR: dir }, encoding: 'utf8',
     });
     const rows = readOutcomes(dir).filter((r) => r.sensor === 'truncated-event');
     assert.strictEqual(rows.length, 1);
@@ -168,7 +168,7 @@ test('a MALFORMED but non-empty event is a real crash and IS recorded', () => {
 
 // --- the value meter must not mistake a crashing control for a quiet one -----
 
-const { tally, classify, render } = require('../.claude/scripts/sensor-value-report');
+const { tally, classify, render } = require('../.opencode/scripts/sensor-value-report');
 
 function classified(outcomes) {
   return classify(tally(outcomes));
@@ -212,7 +212,7 @@ test('a crashing hook announces itself on stderr rather than dying mute', () => 
   try {
     const proc = require('child_process').spawnSync(process.execPath, [file], {
       input: JSON.stringify({ tool_name: 'Write' }),
-      env: { ...process.env, CLAUDE_PROJECT_DIR: dir },
+      env: { ...process.env, OPENCODE_PROJECT_DIR: dir },
       encoding: 'utf8',
     });
     assert.strictEqual(proc.status, 0);
@@ -285,7 +285,7 @@ test('an empty-stdin invocation still records nothing at all', () => {
   try {
     const file = healthyHook(dir);
     execFileSync(process.execPath, [file], {
-      input: '', env: { ...process.env, CLAUDE_PROJECT_DIR: dir },
+      input: '', env: { ...process.env, OPENCODE_PROJECT_DIR: dir },
       encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'],
     });
     assert.deepStrictEqual(readOutcomes(dir).filter((r) => r.sensor === 'healthy'), []);

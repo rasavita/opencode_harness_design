@@ -7,7 +7,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { planClusters } = require('../.claude/scripts/story-clusters.js');
+const { planClusters } = require('../.opencode/scripts/story-clusters.js');
 
 const s = (id, opts = {}) => ({
   id,

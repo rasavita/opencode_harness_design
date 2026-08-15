@@ -109,7 +109,7 @@ function withGatewayRequests(count, handler) {
 }
 
 function runHook(projectDir, input, env) {
-  const hookPath = path.join(projectDir, '.claude', 'hooks', 'record-run.js');
+  const hookPath = path.join(projectDir, '.opencode', 'hooks', 'record-run.js');
   return new Promise((resolve) => {
     const child = spawn(process.execPath, [hookPath], {
       cwd: projectDir,
@@ -139,25 +139,25 @@ const HOOK_LIB_SCRIPTS = [
 function copyHookLibFiles(hooksDir) {
   for (const libName of HOOK_LIB_SCRIPTS) {
     fs.copyFileSync(
-      path.join(REPO_ROOT, '.claude', 'hooks', 'lib', libName),
+      path.join(REPO_ROOT, '.opencode', 'hooks', 'lib', libName),
       path.join(hooksDir, 'lib', libName)
     );
   }
 }
 
 function copyHarnessFiles(dir) {
-  const hooksDir = path.join(dir, '.claude', 'hooks');
-  const scriptsDir = path.join(dir, '.claude', 'scripts');
+  const hooksDir = path.join(dir, '.opencode', 'hooks');
+  const scriptsDir = path.join(dir, '.opencode', 'scripts');
   fs.mkdirSync(hooksDir, { recursive: true });
   fs.mkdirSync(path.join(hooksDir, 'lib'), { recursive: true });
   fs.mkdirSync(scriptsDir, { recursive: true });
   fs.copyFileSync(
-    path.join(REPO_ROOT, '.claude', 'hooks', 'record-run.js'),
+    path.join(REPO_ROOT, '.opencode', 'hooks', 'record-run.js'),
     path.join(hooksDir, 'record-run.js')
   );
   copyHookLibFiles(hooksDir);
   for (const scriptName of HOOK_DEP_SCRIPTS) {
-    const source = path.join(REPO_ROOT, '.claude', 'scripts', scriptName);
+    const source = path.join(REPO_ROOT, '.opencode', 'scripts', scriptName);
     if (fs.existsSync(source)) {
       fs.copyFileSync(source, path.join(scriptsDir, scriptName));
     }
@@ -165,7 +165,7 @@ function copyHarnessFiles(dir) {
 }
 
 function writeState(dir) {
-  const stateDir = path.join(dir, '.claude', 'state');
+  const stateDir = path.join(dir, '.opencode', 'state');
   fs.mkdirSync(stateDir, { recursive: true });
   for (const [name, value] of Object.entries(STATE_FILES)) {
     fs.writeFileSync(path.join(stateDir, name), value);
@@ -173,7 +173,7 @@ function writeState(dir) {
 }
 
 function writeSkills(dir) {
-  const skillsDir = path.join(dir, '.claude', 'skills');
+  const skillsDir = path.join(dir, '.opencode', 'skills');
   for (const [name, description] of Object.entries(SKILL_DESCRIPTIONS)) {
     const skillDir = path.join(skillsDir, name);
     fs.mkdirSync(skillDir, { recursive: true });

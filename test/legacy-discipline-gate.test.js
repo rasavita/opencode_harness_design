@@ -6,7 +6,7 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'legacy-discipline-gate.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'legacy-discipline-gate.js');
 const { checkLegacyDiscipline, verdictsByFile, hasSymbolRecords, readReceipts, run } = require(SCRIPT);
 
 const COVERED_ROW = { path: 'src/a.py', symbol: '1#foo', start: 1, end: 5, verdict: 'COVERED', tests: ['t'], recordedAt: '2026-01-01T00:00:00Z' };

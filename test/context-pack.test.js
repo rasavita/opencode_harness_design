@@ -6,16 +6,16 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const { buildContextPack, estimateTextTokens } = require('../.claude/scripts/context-pack');
-const { applyScaffold } = require('../.claude/scripts/scaffold-apply');
+const { buildContextPack, estimateTextTokens } = require('../.opencode/scripts/context-pack');
+const { applyScaffold } = require('../.opencode/scripts/scaffold-apply');
 
 const ROOT = path.join(__dirname, '..');
-const PLUGIN_SOURCE = path.join(ROOT, '.claude');
+const PLUGIN_SOURCE = path.join(ROOT, '.opencode');
 
 function tempProject() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'context-pack-'));
   fs.mkdirSync(path.join(dir, 'specs', 'brownfield', 'wiki', 'pages'), { recursive: true });
-  fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
   return dir;
 }
 
@@ -198,9 +198,9 @@ test('context pack --diff boost ranks dirty files above equal lexical peers', ()
       edges: [],
     };
     fs.writeFileSync(path.join(dir, 'specs', 'brownfield', 'code-graph.json'), `${JSON.stringify(graph, null, 2)}\n`);
-    fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
+    fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
     fs.writeFileSync(
-      path.join(dir, '.claude', 'state', 'graph-dirty.jsonl'),
+      path.join(dir, '.opencode', 'state', 'graph-dirty.jsonl'),
       `${JSON.stringify({ path: 'src/foo_util.js' })}\n`,
     );
 
@@ -260,7 +260,7 @@ test('context pack writes a session receipt by default', () => {
   try {
     writeGraph(dir);
     const pack = buildContextPack({ projectDir: dir, question: 'validate_session', budgetTokens: 1200 });
-    const receiptPath = path.join(dir, '.claude', 'state', 'context-pack-last.json');
+    const receiptPath = path.join(dir, '.opencode', 'state', 'context-pack-last.json');
     assert.ok(fs.existsSync(receiptPath), 'receipt should exist');
     const receipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
     assert.strictEqual(receipt.status, pack.status);
@@ -305,8 +305,8 @@ test('brownfield scaffold copies the context skill; context-pack is kernel', () 
     }));
     applyScaffold({ profile, pluginSource: PLUGIN_SOURCE, target: path.join(dir, 'project'), scaffoldProfile: 'brownfield' });
 
-    assert.ok(fs.existsSync(path.join(dir, 'project', '.claude', 'scripts', 'context-pack.js')));
-    assert.ok(fs.existsSync(path.join(dir, 'project', '.claude', 'skills', 'context', 'SKILL.md')));
+    assert.ok(fs.existsSync(path.join(dir, 'project', '.opencode', 'scripts', 'context-pack.js')));
+    assert.ok(fs.existsSync(path.join(dir, 'project', '.opencode', 'skills', 'context', 'SKILL.md')));
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

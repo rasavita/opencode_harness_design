@@ -8,11 +8,11 @@ const path = require('path');
 
 const {
   styleValidationPillar, architectureFitnessPillar, testingPillar,
-} = require(path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'agent-readiness.js'));
+} = require(path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'agent-readiness.js'));
 const {
   modularityFreshnessPillar, documentationPillar, observabilityPillar,
   securityGovernancePillar, devEnvironmentPillar,
-} = require(path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'agent-readiness-project.js'));
+} = require(path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'agent-readiness-project.js'));
 
 function tmpRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'agent-readiness-'));
@@ -73,14 +73,14 @@ test('architecture-fitness: no baselines -> planned', () => {
 
 test('architecture-fitness: only one baseline -> partial', () => {
   const root = tmpRoot();
-  writeFile(root, '.claude/state/cycle-baseline.txt', '0\n');
+  writeFile(root, '.opencode/state/cycle-baseline.txt', '0\n');
   assert.strictEqual(architectureFitnessPillar(root).status, 'partial');
 });
 
 test('architecture-fitness: both baselines established -> active regardless of count', () => {
   const root = tmpRoot();
-  writeFile(root, '.claude/state/cycle-baseline.txt', '3\n');
-  writeFile(root, '.claude/state/coupling-baseline.txt', 'a.js\nb.js\n');
+  writeFile(root, '.opencode/state/cycle-baseline.txt', '3\n');
+  writeFile(root, '.opencode/state/coupling-baseline.txt', 'a.js\nb.js\n');
   const p = architectureFitnessPillar(root);
   assert.strictEqual(p.status, 'active');
   assert.match(p.detail, /3 cycle/);
@@ -95,10 +95,10 @@ test('testing: nothing present -> planned', () => {
 
 test('testing: all three signals present, no AT artifacts -> active with informational note', () => {
   const root = tmpRoot();
-  writeFile(root, '.claude/state/coverage-baseline.txt', '85\n');
-  writeFile(root, '.claude/scripts/mutation-gate.js', '// stub');
-  writeFile(root, '.claude/scripts/regression-gate.js', '// stub');
-  writeFile(root, '.claude/scripts/local-regression-gate.js', '// stub');
+  writeFile(root, '.opencode/state/coverage-baseline.txt', '85\n');
+  writeFile(root, '.opencode/scripts/mutation-gate.js', '// stub');
+  writeFile(root, '.opencode/scripts/regression-gate.js', '// stub');
+  writeFile(root, '.opencode/scripts/local-regression-gate.js', '// stub');
   writeJson(root, 'package.json', {
     scripts: { mutation: 'x', 'regression-gate': 'x', 'local-regression-gate': 'x' },
   });
@@ -109,10 +109,10 @@ test('testing: all three signals present, no AT artifacts -> active with informa
 
 test('testing: AT artifacts present are reported in detail', () => {
   const root = tmpRoot();
-  writeFile(root, '.claude/state/coverage-baseline.txt', '85\n');
-  writeFile(root, '.claude/scripts/mutation-gate.js', '// stub');
-  writeFile(root, '.claude/scripts/regression-gate.js', '// stub');
-  writeFile(root, '.claude/scripts/local-regression-gate.js', '// stub');
+  writeFile(root, '.opencode/state/coverage-baseline.txt', '85\n');
+  writeFile(root, '.opencode/scripts/mutation-gate.js', '// stub');
+  writeFile(root, '.opencode/scripts/regression-gate.js', '// stub');
+  writeFile(root, '.opencode/scripts/local-regression-gate.js', '// stub');
   writeJson(root, 'package.json', {
     scripts: { mutation: 'x', 'regression-gate': 'x', 'local-regression-gate': 'x' },
   });
@@ -123,8 +123,8 @@ test('testing: AT artifacts present are reported in detail', () => {
 
 test('testing: only mutation-gate script without npm script -> not counted, partial', () => {
   const root = tmpRoot();
-  writeFile(root, '.claude/state/coverage-baseline.txt', '85\n');
-  writeFile(root, '.claude/scripts/mutation-gate.js', '// stub');
+  writeFile(root, '.opencode/state/coverage-baseline.txt', '85\n');
+  writeFile(root, '.opencode/scripts/mutation-gate.js', '// stub');
   const p = testingPillar(root);
   assert.strictEqual(p.status, 'partial');
 });
@@ -156,7 +156,7 @@ test('modularity-freshness: marker covers all current unstable hubs -> active', 
   const root = tmpRoot();
   writeJson(root, 'specs/brownfield/code-graph.json',
     graphWithHubs([{ id: 'src/god.js', fan_in: 9, fan_out: 1, instability: 0.9 }]));
-  writeJson(root, '.claude/state/modularity-review-marker.json',
+  writeJson(root, '.opencode/state/modularity-review-marker.json',
     { timestamp: 'x', unstableHubIds: ['src/god.js'] });
   assert.strictEqual(modularityFreshnessPillar(root).status, 'active');
 });
@@ -165,7 +165,7 @@ test('modularity-freshness: a hub went unstable since the marker -> partial, nam
   const root = tmpRoot();
   writeJson(root, 'specs/brownfield/code-graph.json',
     graphWithHubs([{ id: 'src/new-hub.js', fan_in: 9, fan_out: 1, instability: 0.9 }]));
-  writeJson(root, '.claude/state/modularity-review-marker.json', { timestamp: 'x', unstableHubIds: [] });
+  writeJson(root, '.opencode/state/modularity-review-marker.json', { timestamp: 'x', unstableHubIds: [] });
   const p = modularityFreshnessPillar(root);
   assert.strictEqual(p.status, 'partial');
   assert.match(p.detail, /src\/new-hub\.js/);
@@ -245,14 +245,14 @@ test('security-governance: no security-scan.js -> planned', () => {
 
 test('security-governance: script present, all tools provisioned -> active', () => {
   const root = tmpRoot();
-  writeFile(root, '.claude/scripts/security-scan.js', '// stub');
+  writeFile(root, '.opencode/scripts/security-scan.js', '// stub');
   const p = securityGovernancePillar(root, { runCheck: allTrue });
   assert.strictEqual(p.status, 'active');
 });
 
 test('security-governance: script present, some tools unprovisioned -> partial', () => {
   const root = tmpRoot();
-  writeFile(root, '.claude/scripts/security-scan.js', '// stub');
+  writeFile(root, '.opencode/scripts/security-scan.js', '// stub');
   let calls = 0;
   const p = securityGovernancePillar(root, { runCheck: () => { calls += 1; return calls === 1; } });
   assert.strictEqual(p.status, 'partial');

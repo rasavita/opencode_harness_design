@@ -6,7 +6,7 @@ const { spawnSync } = require('child_process');
 const { test } = require('node:test');
 
 const repoRoot = path.join(__dirname, '..');
-const script = path.join(repoRoot, '.claude', 'skills', 'code-map', 'scripts', 'import_understand_graph.js');
+const script = path.join(repoRoot, '.opencode', 'skills', 'code-map', 'scripts', 'import_understand_graph.js');
 
 function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'understand-adapter-'));

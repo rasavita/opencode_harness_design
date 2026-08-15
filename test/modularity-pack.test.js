@@ -4,7 +4,7 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const path = require('path');
 
-const mp = require(path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'modularity-pack.js'));
+const mp = require(path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'modularity-pack.js'));
 
 // a.py and b.py both import the same two helpers (duplication candidate);
 // schema.py is a high-fan-in hub but legitimate by name; god.py is a suspicious hub.

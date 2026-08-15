@@ -16,13 +16,13 @@ const assert = require('assert');
 const { test } = require('node:test');
 const { randomUUID } = require('crypto');
 
-const { runClaude } = require('./helpers/claude-runner');
+const { runClaude } = require('./helpers/opencode-runner');
 const { runProjectSuite } = require('./helpers/project-suite');
 const { freshProject } = require('./helpers/fresh-project');
 const { alterAndVerify } = require('./helpers/alter-and-verify');
 
 const PROJECT_DIR = path.join(__dirname, 'semi-auto-output');
-const PLUGIN_DIR = path.join(__dirname, '..', '..', '.claude');
+const PLUGIN_DIR = path.join(__dirname, '..', '..', '.opencode');
 // Fresh id per run — hardcoded session ids fail with "already in use" on re-run.
 const SESSION = randomUUID();
 const APP = 'a Node.js CLI in index.js that reads two integer command-line arguments and prints their sum to stdout, with an npm test that runs it and checks the output';
@@ -42,7 +42,7 @@ test('semi-auto: /build --autonomous -> build -> alter (code-map), suite green',
   console.log('[semi] scaffold exit:', scaffold.exitCode);
   assert.ok(
     fs.existsSync(path.join(PROJECT_DIR, 'project-manifest.json'))
-      || fs.existsSync(path.join(PROJECT_DIR, 'CLAUDE.md')),
+      || fs.existsSync(path.join(PROJECT_DIR, 'AGENTS.md')),
     'scaffold must install harness before /build',
   );
 

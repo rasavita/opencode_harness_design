@@ -18,7 +18,7 @@ const fs = require('fs');
 const path = require('path');
 const { test } = require('node:test');
 
-const SKILLS_DIR = path.join(__dirname, '..', '.claude', 'skills');
+const SKILLS_DIR = path.join(__dirname, '..', '.opencode', 'skills');
 
 // Skills that stop and ask a human, either directly or by owning a gate whose
 // sub-skill asks. Adding a skill here is a claim that it must reach the user.

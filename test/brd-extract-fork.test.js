@@ -19,7 +19,7 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
-const EXTRACT = '.claude/skills/brd-extract/SKILL.md';
+const EXTRACT = '.opencode/skills/brd-extract/SKILL.md';
 
 function frontmatter(rel) {
   const out = {};
@@ -57,7 +57,7 @@ test('brd-extract keeps the properties adoption depends on', () => {
 });
 
 test('/brd dispatches extraction instead of doing it', () => {
-  const brd = read('.claude/skills/brd/SKILL.md');
+  const brd = read('.opencode/skills/brd/SKILL.md');
   assert.match(brd, /brd-extract/, '/brd must dispatch the extractor');
   assert.match(brd, /Do not extract the spine yourself/i);
   assert.match(brd, /Do not read `frd-requirements\.json`/i,
@@ -70,7 +70,7 @@ test('/brd dispatches extraction instead of doing it', () => {
 });
 
 test('brd-extract ships to scaffolded projects', () => {
-  const packs = JSON.parse(read('.claude/config/packs.json'));
+  const packs = JSON.parse(read('.opencode/config/packs.json'));
   assert.ok(
     packs.packs.planning.skill.includes('brd-extract'),
     'an unregistered skill is absent from every scaffolded project, so /brd would dispatch nothing',
@@ -82,7 +82,7 @@ test('/brd checks the PRD shape before adopting it as the baseline', () => {
   // measures against it — but /brd never ran the shape gate. A real PRD reached
   // adoption with 35 structural errors, 34 of them requirements with no
   // acceptance postcondition, and the gap surfaced by hand three hours later.
-  const brd = read('.claude/skills/brd/SKILL.md');
+  const brd = read('.opencode/skills/brd/SKILL.md');
   assert.match(brd, /validate-prd\.js/, '/brd must run the PRD shape gate');
   assert.match(brd, /before\*\* dispatching the extractor|Step 0\.0a/,
     'the check must precede extraction — after adoption it is no longer cheap to fix');

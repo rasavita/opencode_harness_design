@@ -19,18 +19,18 @@ const exists = (...p) => fs.existsSync(path.join(ROOT, ...p));
 // --- Phase 1: the /review -> /gate rename -------------------------------------
 
 test('the gate skill exists and the old review skill dir is gone', () => {
-  assert.ok(exists('.claude', 'skills', 'gate', 'SKILL.md'), 'gate skill present');
-  assert.ok(!exists('.claude', 'skills', 'review'), 'old review skill dir removed');
+  assert.ok(exists('.opencode', 'skills', 'gate', 'SKILL.md'), 'gate skill present');
+  assert.ok(!exists('.opencode', 'skills', 'review'), 'old review skill dir removed');
 });
 
 test('the gate skill is named gate, not review', () => {
-  const gate = read('.claude', 'skills', 'gate', 'SKILL.md');
+  const gate = read('.opencode', 'skills', 'gate', 'SKILL.md');
   assert.match(gate, /^name:\s*gate\s*$/m, 'frontmatter name is gate');
   assert.match(gate, /native `\/review`/, 'disambiguates from the native PR /review');
 });
 
 test('the security-reviewer reads its references from skills/gate, not skills/review', () => {
-  const agent = read('.claude', 'agents', 'security-reviewer.md');
+  const agent = read('.opencode', 'agents', 'security-reviewer.md');
   assert.match(agent, /skills\/gate\/references\/security-/, 'points at the renamed dir');
   assert.ok(!/skills\/review\//.test(agent), 'no stale skills/review path remains');
 });
@@ -44,7 +44,7 @@ test('the README documents the harness-vs-native command boundaries', () => {
 // --- Phase 2: /refactor delegates mechanical cleanup to native /simplify -------
 
 test('/refactor runs native /simplify as a fenced mechanical-cleanup step', () => {
-  const refactor = read('.claude', 'skills', 'refactor', 'SKILL.md');
+  const refactor = read('.opencode', 'skills', 'refactor', 'SKILL.md');
   assert.match(refactor, /native \*\*`\/simplify`\*\*/, 'invokes native /simplify');
   assert.match(refactor, /Green precondition/, 'fences on a passing suite');
   assert.match(refactor, /HARNESS_COMMIT_KIND=refactor/, 'commits as a pure refactor');

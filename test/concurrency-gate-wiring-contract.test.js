@@ -6,7 +6,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const settings = JSON.parse(fs.readFileSync(
-  path.join(__dirname, '..', '.claude', 'settings.json'), 'utf8'));
+  path.join(__dirname, '..', '.opencode', 'settings.json'), 'utf8'));
 
 function commandsFor(hookList) {
   return (hookList || []).flatMap((m) => (m.hooks || []).map((h) => h.command || ''));

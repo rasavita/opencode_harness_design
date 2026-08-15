@@ -13,10 +13,10 @@ const HOOK = 'pre-commit';
 // helpers/pre-commit-fixtures the main pre-commit suite uses.
 
 function installMatrixGate(projectDir) {
-  const dir = path.join(projectDir, '.claude', 'scripts');
+  const dir = path.join(projectDir, '.opencode', 'scripts');
   fs.mkdirSync(dir, { recursive: true });
   fs.copyFileSync(
-    path.join(__dirname, '..', '.claude', 'scripts', 'verification-matrix-gate.js'),
+    path.join(__dirname, '..', '.opencode', 'scripts', 'verification-matrix-gate.js'),
     path.join(dir, 'verification-matrix-gate.js')
   );
 }

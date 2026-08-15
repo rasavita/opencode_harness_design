@@ -11,7 +11,7 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { emitTerraform, hcl } = require('../.claude/scripts/terraform-emit');
+const { emitTerraform, hcl } = require('../.opencode/scripts/terraform-emit');
 
 const GITHUB = {
   org: 'acme',

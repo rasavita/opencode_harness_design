@@ -7,7 +7,7 @@ const path = require('path');
 const { describe, test, before, after } = require('node:test');
 const { spawnSync, execFileSync } = require('child_process');
 
-const { runClaude } = require('./helpers/claude-runner');
+const { runClaude } = require('./helpers/opencode-runner');
 const { readSkillCorpus } = require('../helpers/skill-corpus');
 
 const HARNESS_ROOT = path.join(__dirname, '..', '..');
@@ -21,14 +21,14 @@ function logResult(stage, data) {
 }
 
 function runHook(hookName, stdinData, cwd) {
-  const hookPath = path.join(HARNESS_ROOT, '.claude', 'hooks', hookName);
+  const hookPath = path.join(HARNESS_ROOT, '.opencode', 'hooks', hookName);
   if (!fs.existsSync(hookPath)) return { stdout: '', stderr: '', exitCode: null, missing: true };
   const result = spawnSync('node', [hookPath], {
     input: JSON.stringify(stdinData),
     cwd: cwd || PROJECT_DIR,
     encoding: 'utf8',
     timeout: 10000,
-    env: { ...process.env, CLAUDE_PROJECT_DIR: PROJECT_DIR },
+    env: { ...process.env, OPENCODE_PROJECT_DIR: PROJECT_DIR },
   });
   return { stdout: result.stdout || '', stderr: result.stderr || '', exitCode: result.status };
 }
@@ -38,8 +38,8 @@ describe('Harness Framework Validation', { timeout: 600000 }, () => {
   before(() => {
     PROJECT_DIR = path.join(os.tmpdir(), 'harness-fw-test-' + Date.now());
     fs.mkdirSync(PROJECT_DIR, { recursive: true });
-    fs.mkdirSync(path.join(PROJECT_DIR, '.claude', 'hooks'), { recursive: true });
-    fs.mkdirSync(path.join(PROJECT_DIR, '.claude', 'state'), { recursive: true });
+    fs.mkdirSync(path.join(PROJECT_DIR, '.opencode', 'hooks'), { recursive: true });
+    fs.mkdirSync(path.join(PROJECT_DIR, '.opencode', 'state'), { recursive: true });
     fs.mkdirSync(RESULTS_DIR, { recursive: true });
     console.log('[fw] Project directory:', PROJECT_DIR);
   });
@@ -52,7 +52,7 @@ describe('Harness Framework Validation', { timeout: 600000 }, () => {
   // ── 1. Scaffold: /scaffold mandates Q1, so two turns: invoke, then consent ──
 
   test('Scaffold: /scaffold creates correct project structure', { timeout: 600000 }, () => {
-    const pluginDir = path.join(HARNESS_ROOT, '.claude');
+    const pluginDir = path.join(HARNESS_ROOT, '.opencode');
     const sessionId = require('crypto').randomUUID();
     runClaude('/scaffold', {
       cwd: PROJECT_DIR, model: 'sonnet', budgetUsd: '1.00', timeoutMs: 90000, pluginDir, sessionId,
@@ -65,9 +65,9 @@ describe('Harness Framework Validation', { timeout: 600000 }, () => {
       { cwd: PROJECT_DIR, model: 'sonnet', budgetUsd: '3.00', timeoutMs: 480000, continueSession: true, pluginDir, sessionId }
     );
 
-    const hasClaudeDir = fs.existsSync(path.join(PROJECT_DIR, '.claude'));
-    const hasClaudeMd = fs.existsSync(path.join(PROJECT_DIR, 'CLAUDE.md'));
-    const hasSettings = fs.existsSync(path.join(PROJECT_DIR, '.claude', 'settings.json'));
+    const hasClaudeDir = fs.existsSync(path.join(PROJECT_DIR, '.opencode'));
+    const hasClaudeMd = fs.existsSync(path.join(PROJECT_DIR, 'AGENTS.md'));
+    const hasSettings = fs.existsSync(path.join(PROJECT_DIR, '.opencode', 'settings.json'));
 
     logResult('fw-1-scaffold', {
       exitCode: result.exitCode,
@@ -77,14 +77,14 @@ describe('Harness Framework Validation', { timeout: 600000 }, () => {
       files: fs.readdirSync(PROJECT_DIR),
     });
 
-    console.log('[fw] .claude/ dir:', hasClaudeDir);
-    console.log('[fw] CLAUDE.md:', hasClaudeMd);
+    console.log('[fw] .opencode/ dir:', hasClaudeDir);
+    console.log('[fw] AGENTS.md:', hasClaudeMd);
     console.log('[fw] settings.json:', hasSettings);
     console.log('[fw] Files:', fs.readdirSync(PROJECT_DIR).join(', '));
 
     assert.ok(!result.error, 'claude CLI must spawn: ' + result.error); // artifacts are the gate; exit 143 at timeout is OK
-    assert.ok(hasClaudeDir, '.claude/ directory must exist after scaffold');
-    assert.ok(hasClaudeMd, 'CLAUDE.md must exist after scaffold');
+    assert.ok(hasClaudeDir, '.opencode/ directory must exist after scaffold');
+    assert.ok(hasClaudeMd, 'AGENTS.md must exist after scaffold');
   });
 
   // ── 2. pre-write-gate blocks oversized files ─────────────────────────────
@@ -147,15 +147,15 @@ describe('Harness Framework Validation', { timeout: 600000 }, () => {
   // ── 4. record-run.js captures telemetry records ─────────────────────────
 
   test('Hook: record-run.js creates JSONL records on Stop event', () => {
-    const runsDir = path.join(PROJECT_DIR, '.claude', 'runs');
+    const runsDir = path.join(PROJECT_DIR, '.opencode', 'runs');
     fs.mkdirSync(runsDir, { recursive: true });
 
     const date = new Date().toISOString().slice(0, 10);
     const jsonlPath = path.join(runsDir, date + '.jsonl');
     if (fs.existsSync(jsonlPath)) fs.unlinkSync(jsonlPath);
 
-    const localHook = path.join(PROJECT_DIR, '.claude', 'hooks', 'record-run.js');
-    const hookPath = fs.existsSync(localHook) ? localHook : path.join(HARNESS_ROOT, '.claude', 'hooks', 'record-run.js');
+    const localHook = path.join(PROJECT_DIR, '.opencode', 'hooks', 'record-run.js');
+    const hookPath = fs.existsSync(localHook) ? localHook : path.join(HARNESS_ROOT, '.opencode', 'hooks', 'record-run.js');
     const result = spawnSync('node', [hookPath], {
       input: JSON.stringify({
         hook_event_name: 'Stop',
@@ -165,7 +165,7 @@ describe('Harness Framework Validation', { timeout: 600000 }, () => {
       cwd: PROJECT_DIR,
       encoding: 'utf8',
       timeout: 10000,
-      env: { ...process.env, CLAUDE_PROJECT_DIR: PROJECT_DIR },
+      env: { ...process.env, OPENCODE_PROJECT_DIR: PROJECT_DIR },
     });
 
     const hasJsonl = fs.existsSync(jsonlPath);
@@ -178,13 +178,13 @@ describe('Harness Framework Validation', { timeout: 600000 }, () => {
       assert.strictEqual(lastRecord.kind, 'turn', 'Stop event should produce a turn record');
       console.log('[fw] record-run.js: created JSONL record (kind:', lastRecord.kind + ')');
     } else {
-      console.log('[fw] record-run.js: JSONL file not created (hook may need .claude structure)');
+      console.log('[fw] record-run.js: JSONL file not created (hook may need .opencode structure)');
     }
   });
 
   // ── 5. Evaluator agent definition is valid (merged from phase-evaluator) ──
   test('Agent: evaluator.md is properly configured', () => {
-    const agentPath = path.join(HARNESS_ROOT, '.claude', 'agents', 'evaluator.md');
+    const agentPath = path.join(HARNESS_ROOT, '.opencode', 'agents', 'evaluator.md');
     assert.ok(fs.existsSync(agentPath), 'evaluator.md must exist');
     const content = fs.readFileSync(agentPath, 'utf8');
     assert.ok(content.includes('model: claude-opus'), 'Must use opus model');
@@ -202,7 +202,7 @@ describe('Harness Framework Validation', { timeout: 600000 }, () => {
 
   test('Rubrics: all 6 phases defined with correct thresholds', () => {
     const rubrics = JSON.parse(
-      fs.readFileSync(path.join(HARNESS_ROOT, '.claude', 'templates', 'phase-eval-rubrics.json'), 'utf8')
+      fs.readFileSync(path.join(HARNESS_ROOT, '.opencode', 'templates', 'phase-eval-rubrics.json'), 'utf8')
     );
 
     assert.strictEqual(rubrics.threshold, 7.0, 'Threshold must be 7.0');
@@ -238,7 +238,7 @@ describe('Harness Framework Validation', { timeout: 600000 }, () => {
   // ── 8. Telemetry memory produces phase eval metrics ────────────────────
 
   test('Telemetry: buildSnapshot produces phase_eval metrics', () => {
-    const { buildSnapshot } = require(path.join(HARNESS_ROOT, '.claude', 'scripts', 'telemetry-memory.js'));
+    const { buildSnapshot } = require(path.join(HARNESS_ROOT, '.opencode', 'scripts', 'telemetry-memory.js'));
 
     const mockRecord = {
       kind: 'phase_eval',
@@ -266,7 +266,7 @@ describe('Harness Framework Validation', { timeout: 600000 }, () => {
 
   test('Settings: enforcement hooks are wired (PostToolUse + PreToolUse)', () => {
     const settings = JSON.parse(
-      fs.readFileSync(path.join(HARNESS_ROOT, '.claude', 'settings.json'), 'utf8')
+      fs.readFileSync(path.join(HARNESS_ROOT, '.opencode', 'settings.json'), 'utf8')
     );
     // Only inspect hooks on the Edit|Write matcher; Task matcher legitimately carries record-run.
     const hookNames = (event, matcherRe) =>

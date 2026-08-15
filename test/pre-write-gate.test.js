@@ -16,8 +16,8 @@ const FAKE_SSN = ['123', '45', '6789'].join('-');
 const ENV = { HARNESS_TDD_GATE: 'off' };
 
 function writeTaskEnvelope(projectDir, allowedPaths) {
-  const { stampEnvelope } = require('../.claude/hooks/lib/task-envelope');
-  fs.writeFileSync(path.join(projectDir, '.claude', 'state', 'task-envelope.json'), JSON.stringify(stampEnvelope({
+  const { stampEnvelope } = require('../.opencode/hooks/lib/task-envelope');
+  fs.writeFileSync(path.join(projectDir, '.opencode', 'state', 'task-envelope.json'), JSON.stringify(stampEnvelope({
     schema_version: 1,
     task_id: 'TASK-1',
     risk_tier: 'R1',
@@ -46,7 +46,7 @@ function srcFile(projectDir, rel, content) {
 // instead of throwing, so the outcome has to be written on the way out.
 
 function ledger(projectDir) {
-  const { readOutcomes } = require('../.claude/hooks/lib/sensor-outcomes');
+  const { readOutcomes } = require('../.opencode/hooks/lib/sensor-outcomes');
   return readOutcomes(projectDir);
 }
 
@@ -119,7 +119,7 @@ test('task envelope allows declared paths and blocks silent scope expansion', as
 
 test('an invalid task envelope blocks rather than becoming unrestricted', async () => {
   const projectDir = makeHookProject([HOOK]);
-  fs.writeFileSync(path.join(projectDir, '.claude', 'state', 'task-envelope.json'), '{"schema_version":1}');
+  fs.writeFileSync(path.join(projectDir, '.opencode', 'state', 'task-envelope.json'), '{"schema_version":1}');
   const result = await runHook(projectDir, HOOK, {
     tool_name: 'Write',
     tool_input: { file_path: path.join(projectDir, 'src', 'a.ts'), content: 'const a = 1;\n' },
@@ -131,8 +131,8 @@ test('an invalid task envelope blocks rather than becoming unrestricted', async 
 test('a completed task cannot continue writing', async () => {
   const projectDir = makeHookProject([HOOK]);
   writeTaskEnvelope(projectDir, ['src/**']);
-  const task = JSON.parse(fs.readFileSync(path.join(projectDir, '.claude', 'state', 'task-envelope.json'), 'utf8'));
-  const { appendEvent } = require('../.claude/hooks/lib/task-lifecycle');
+  const task = JSON.parse(fs.readFileSync(path.join(projectDir, '.opencode', 'state', 'task-envelope.json'), 'utf8'));
+  const { appendEvent } = require('../.opencode/hooks/lib/task-lifecycle');
   appendEvent(projectDir, task, 'created');
   appendEvent(projectDir, task, 'active');
   appendEvent(projectDir, task, 'completed');
@@ -208,7 +208,7 @@ test('blocks a MultiEdit that inserts a secret', async () => {
 test('blocks content matching a block:true rule in security-patterns.json', async () => {
   const projectDir = makeHookProject([HOOK]);
   fs.writeFileSync(
-    path.join(projectDir, '.claude', 'security-patterns.json'),
+    path.join(projectDir, '.opencode', 'security-patterns.json'),
     JSON.stringify({ patterns: [{ rule_name: 'no-eval', substrings: ['eval('], block: true, reminder: 'eval is banned' }] })
   );
   const result = await runHook(projectDir, HOOK, {

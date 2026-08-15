@@ -37,7 +37,7 @@ launch, simplify) rather than calling them. That is the duplication to address.
 | `/verify` | `/evaluate` Layer 2 (Playwright) | Overlap | Both run the app and observe behavior |
 | `/run` | `/evaluate` app-launch logic | Overlap | Native launches/drives the app |
 | `/loop` | `/auto` ratchet loop | Conceptual overlap | Different semantics — see §4 boundary |
-| `/init` | `/scaffold` Step 5 (CLAUDE.md gen) | Partial overlap | Scaffold does far more; CLAUDE.md gen is the shared slice |
+| `/init` | `/scaffold` Step 5 (AGENTS.md gen) | Partial overlap | Scaffold does far more; AGENTS.md gen is the shared slice |
 | plan mode + `AskUserQuestion` | `/clarify` + phase 1–3 human gates | Overlap | Native plan mode is the canonical approval gate |
 
 **Key insight:** the harness's bespoke reviewers are *not* redundant. They add what native lacks —
@@ -65,8 +65,8 @@ operations; delegate to native where equivalent; keep the GAN/ratchet discipline
 - **`/auto` vs `/loop`** — `/auto` is the *ratcheting build loop* (contracts, gates, self-heal).
   `/loop` is a *generic interval/self-paced runner*. Use `/loop` to **schedule** repeated `/auto`
   invocations across context windows; don't confuse it for the build loop itself.
-- **`/scaffold` vs `/init`** — `/scaffold` bootstraps the entire harness (`.claude/`, manifest,
-  agents, hooks). `/init` only authors CLAUDE.md. Scaffold may *call* `/init` for the CLAUDE.md slice.
+- **`/scaffold` vs `/init`** — `/scaffold` bootstraps the entire harness (`.opencode/`, manifest,
+  agents, hooks). `/init` only authors AGENTS.md. Scaffold may *call* `/init` for the AGENTS.md slice.
 - **harness `/review` vs native `/review`** — collision. Rename harness `/review` → `/gate`
   (or `/quality-gate`): it is the pre-merge evaluator+security gate, not a GitHub PR review.
 

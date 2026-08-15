@@ -6,7 +6,7 @@ const { test } = require('node:test');
 
 const {
   publishGroups, textToAdf, basicAuth, looksAlreadyPublished, pickTransition,
-} = require(path.join(__dirname, '..', '.claude/skills/tracker-publish/scripts/publish-to-jira.js'));
+} = require(path.join(__dirname, '..', '.opencode/skills/tracker-publish/scripts/publish-to-jira.js'));
 
 const CONFIG = { projectKey: 'PROJ', issueType: 'Task', readyState: 'Ready for Agent', baseUrl: 'JIRA_BASE' };
 

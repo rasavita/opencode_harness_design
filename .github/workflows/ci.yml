@@ -66,7 +66,7 @@ jobs:
         # made it RED and the run that made it GREEN.
         #
         # Runs NON-STRICT deliberately: the recorder that writes the ledger is not
-        # yet wired in .claude/settings.json, so there is nothing to check and
+        # yet wired in .opencode/settings.json, so there is nothing to check and
         # --strict would fail every build. Non-strict still prints a loud WARNING
         # and marks the emitted verdict `vacuous: true`, so this step cannot be
         # mistaken for a proof. ADD --strict THE MOMENT THE RECORDER IS WIRED —
@@ -84,7 +84,7 @@ jobs:
       - name: Package SKU smoke (harness-core)
         run: |
           npm run package:core
-          test -f dist/skus/harness-core/.claude-plugin/plugin.json
+          test -f dist/skus/harness-core/.opencode-plugin/plugin.json
           test -f dist/skus/harness-core/skills/build/SKILL.md
           test ! -d dist/skus/harness-core/skills/pe-ic-memo
 

@@ -10,7 +10,7 @@ const ROOT = path.resolve(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 test('BRD skill emits SPDD-grade analysis before synthesis', () => {
-  const skill = read('.claude/skills/brd/SKILL.md');
+  const skill = read('.opencode/skills/brd/SKILL.md');
   for (const phrase of [
     'brd-analysis.json',
     'Domain Concepts',
@@ -24,7 +24,7 @@ test('BRD skill emits SPDD-grade analysis before synthesis', () => {
 });
 
 test('phase evaluator rubric scores BRD analysis depth', () => {
-  const rubrics = JSON.parse(read('.claude/templates/phase-eval-rubrics.json'));
+  const rubrics = JSON.parse(read('.opencode/templates/phase-eval-rubrics.json'));
   const brdText = JSON.stringify(rubrics.phases.brd);
   for (const phrase of ['ambiguity', 'edge-case', 'acceptance criteria coverage', 'domain concepts']) {
     assert.match(brdText, new RegExp(phrase, 'i'), `BRD rubric should mention ${phrase}`);
@@ -37,7 +37,7 @@ test('sensor arbitration policy and waiver schema are documented and registered'
     assert.match(doc, new RegExp(phrase), `sensor arbitration doc missing ${phrase}`);
   }
 
-  const schema = JSON.parse(read('.claude/templates/sensor-waivers.schema.json'));
+  const schema = JSON.parse(read('.opencode/templates/sensor-waivers.schema.json'));
   assert.deepStrictEqual(schema.required, ['waivers']);
   assert.ok(schema.properties.waivers.items.required.includes('sensor_id'));
   assert.ok(schema.properties.waivers.items.required.includes('expires'));
@@ -48,18 +48,18 @@ test('sensor arbitration policy and waiver schema are documented and registered'
 });
 
 test('scaffold ships an optional drift cadence workflow template', () => {
-  const workflow = read('.claude/templates/github-workflows/harness-drift.yml');
+  const workflow = read('.opencode/templates/github-workflows/harness-drift.yml');
   for (const command of ['npm run drift', 'npm run harness-coverage', 'npm run flakes', 'npm run approved-fixtures', 'npm run contract-drift']) {
     assert.match(workflow, new RegExp(command.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `workflow missing ${command}`);
   }
   assert.match(workflow, /HARNESS_SLO_URL/);
 
-  const scaffold = read('.claude/scripts/scaffold-apply.js');
+  const scaffold = read('.opencode/scripts/scaffold-apply.js');
   assert.match(scaffold, /harness-drift\.yml/);
 });
 
 test('Canvas sync checker compares changed files with the living Canvas', () => {
-  const sync = require(path.join(ROOT, '.claude/hooks/lib/canvas-sync.js'));
+  const sync = require(path.join(ROOT, '.opencode/hooks/lib/canvas-sync.js'));
   const canvas = [
     '## Requirements',
     'x',

@@ -7,10 +7,10 @@ const { test } = require('node:test');
 
 const repoRoot = path.join(__dirname, '..');
 const indexer = path.join(
-  repoRoot, '.claude', 'skills', 'code-map', 'scripts', 'code_index', 'code_index.py'
+  repoRoot, '.opencode', 'skills', 'code-map', 'scripts', 'code_index', 'code_index.py'
 );
 const coverageMap = path.join(
-  repoRoot, '.claude', 'skills', 'code-map', 'scripts', 'code_index', 'coverage_map.py'
+  repoRoot, '.opencode', 'skills', 'code-map', 'scripts', 'code_index', 'coverage_map.py'
 );
 const fixture = path.join(__dirname, 'fixtures', 'code-index', 'sample');
 

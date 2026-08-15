@@ -6,9 +6,9 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
-const { stampEnvelope } = require('../.claude/hooks/lib/task-envelope');
-const { signReceipt } = require('../.claude/hooks/lib/authority-receipt');
-const { finalize } = require('../.claude/scripts/finalize-task-evidence');
+const { stampEnvelope } = require('../.opencode/hooks/lib/task-envelope');
+const { signReceipt } = require('../.opencode/hooks/lib/authority-receipt');
+const { finalize } = require('../.opencode/scripts/finalize-task-evidence');
 
 function setup() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'task-evidence-'));
@@ -22,14 +22,14 @@ function setup() {
     budgets: { warn_at_pct: 80, dimensions: [{ unit: 'agents', limit: 2 }] },
     stopping_conditions: ['gate_pass'], created_at: created,
   });
-  fs.mkdirSync(path.join(root, '.claude', 'state'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.claude', 'state', 'task-envelope.json'), JSON.stringify(envelope));
-  fs.writeFileSync(path.join(root, '.claude', 'state', 'gate-receipt.json'), JSON.stringify({ pass: true }));
+  fs.mkdirSync(path.join(root, '.opencode', 'state'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.opencode', 'state', 'task-envelope.json'), JSON.stringify(envelope));
+  fs.writeFileSync(path.join(root, '.opencode', 'state', 'gate-receipt.json'), JSON.stringify({ pass: true }));
   fs.mkdirSync(path.join(root, 'specs', 'reviews'), { recursive: true });
   fs.writeFileSync(path.join(root, 'specs', 'reviews', 'gate-checks.json'), JSON.stringify({ pass: true }));
   fs.writeFileSync(path.join(root, 'specs', 'reviews', 'code-review-verdict.json'), JSON.stringify({ pass: true }));
-  fs.mkdirSync(path.join(root, '.claude', 'trust'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.claude', 'trust', 'issuers.json'), JSON.stringify({
+  fs.mkdirSync(path.join(root, '.opencode', 'trust'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.opencode', 'trust', 'issuers.json'), JSON.stringify({
     schema_version: 1, issuers: [{
       issuer: 'review-board', key_id: 'one',
       public_key_pem: pair.publicKey.export({ type: 'spki', format: 'pem' }),
@@ -44,7 +44,7 @@ function setup() {
     issued_at: new Date(Date.now() - 5_000).toISOString(),
     expires_at: new Date(Date.now() + 60_000).toISOString(), nonce: 'unique',
   }, pair.privateKey);
-  const dir = path.join(root, '.claude', 'authority', 'approvals');
+  const dir = path.join(root, '.opencode', 'authority', 'approvals');
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'approval-1.json'), JSON.stringify(approval));
   return { root };

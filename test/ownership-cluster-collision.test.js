@@ -8,7 +8,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { checkClusterCollisions, parseStoryOwnership } = require('../.claude/scripts/ownership-check.js');
+const { checkClusterCollisions, parseStoryOwnership } = require('../.opencode/scripts/ownership-check.js');
 
 const MAP = `
 # Component Map

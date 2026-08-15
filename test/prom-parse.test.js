@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const { test } = require('node:test');
-const { parseProm, errorRate, histogramP95 } = require('../.claude/hooks/lib/prom-parse.js');
+const { parseProm, errorRate, histogramP95 } = require('../.opencode/hooks/lib/prom-parse.js');
 
 const SAMPLE = `# HELP http_requests_total Total HTTP requests
 # TYPE http_requests_total counter

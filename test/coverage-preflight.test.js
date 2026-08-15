@@ -50,10 +50,10 @@ function writeCoverage(projectDir, srcPath) {
 }
 
 function installCoverageMapScript(projectDir) {
-  const scriptDir = path.join(projectDir, '.claude', 'skills', 'code-map', 'scripts', 'code_index');
+  const scriptDir = path.join(projectDir, '.opencode', 'skills', 'code-map', 'scripts', 'code_index');
   fs.mkdirSync(scriptDir, { recursive: true });
   fs.copyFileSync(
-    path.join(REPO_ROOT, '.claude', 'skills', 'code-map', 'scripts', 'code_index', 'coverage_map.py'),
+    path.join(REPO_ROOT, '.opencode', 'skills', 'code-map', 'scripts', 'code_index', 'coverage_map.py'),
     path.join(scriptDir, 'coverage_map.py')
   );
 }
@@ -120,7 +120,7 @@ test('degrades to a note when no coverage data exists AND no tooling could produ
 // tooling must not be read as "can cover this .js file". Asserted on the pure function
 // so it does not depend on what the machine has installed.
 test('python coverage tooling does not count as coverage tooling for a .js file', () => {
-  const { canProduceCoverage } = require('../.claude/hooks/lib/coverage-preflight.js');
+  const { canProduceCoverage } = require('../.opencode/hooks/lib/coverage-preflight.js');
   const projectDir = makeHookProject([HOOK]);
   installCoverageMapScript(projectDir); // python side present
   fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify({ name: 'fixture' }));
@@ -129,7 +129,7 @@ test('python coverage tooling does not count as coverage tooling for a .js file'
 });
 
 test('a JS runner does not count as coverage tooling for a .py file', () => {
-  const { canProduceCoverage } = require('../.claude/hooks/lib/coverage-preflight.js');
+  const { canProduceCoverage } = require('../.opencode/hooks/lib/coverage-preflight.js');
   const projectDir = makeHookProject([HOOK]);
   fs.writeFileSync(
     path.join(projectDir, 'package.json'),

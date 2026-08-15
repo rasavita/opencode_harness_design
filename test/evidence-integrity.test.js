@@ -3,7 +3,7 @@
 // Pure-classification tests for the evidence-integrity sensor (gap G39).
 //
 // Every contract fixture here is round-tripped through the REAL schema
-// validator before it is fed to the gate (CLAUDE.md principle 5): real sprint
+// validator before it is fed to the gate (AGENTS.md principle 5): real sprint
 // contracts nest their checks under a `contract` key, and a flat fixture would
 // keep these tests green while the gate read nothing at all.
 
@@ -11,12 +11,12 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
-const { classifyEvidence } = require('../.claude/hooks/lib/evidence-integrity');
-const { validate } = require('../.claude/hooks/lib/contract-schema');
+const { classifyEvidence } = require('../.opencode/hooks/lib/evidence-integrity');
+const { validate } = require('../.opencode/hooks/lib/contract-schema');
 
 const SCHEMA = JSON.parse(
   fs.readFileSync(
-    path.join(__dirname, '..', '.claude', 'skills', 'evaluate', 'references', 'contract-schema.json'),
+    path.join(__dirname, '..', '.opencode', 'skills', 'evaluate', 'references', 'contract-schema.json'),
     'utf8'
   )
 );

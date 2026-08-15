@@ -13,7 +13,7 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { decideLock } = require('../.claude/hooks/lib/test-write-lock');
+const { decideLock } = require('../.opencode/hooks/lib/test-write-lock');
 
 const TEST_FILE = 'tests/test_a.py';
 

@@ -50,7 +50,7 @@ test('fast profile includes e2e contracts and helper tests without live Claude',
   assert.ok(runner.FAST_FILES.includes('test/automated-e2e-contract.test.js'));
   assert.ok(runner.FAST_FILES.includes('test/e2e-no-hang-contract.test.js'));
   assert.ok(runner.FAST_FILES.includes('test/e2e-route-matrix-contract.test.js'));
-  assert.ok(runner.FAST_FILES.some((file) => file.endsWith('claude-runner.test.js')));
+  assert.ok(runner.FAST_FILES.some((file) => file.endsWith('opencode-runner.test.js')));
   assert.ok(!runner.FAST_FILES.some((file) => file.endsWith('app-runtime.test.js')));
   assert.ok(runner.FAST_FILES.every((file) => !file.startsWith('test/e2e/harness-')));
 });

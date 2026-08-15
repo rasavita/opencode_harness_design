@@ -7,7 +7,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'constraints-extract.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'constraints-extract.js');
 const { extractObligations, obligationIndex } = require(SCRIPT);
 
 // constraints-extract mines machine-readable validation rules out of the design
@@ -197,7 +197,7 @@ test('CLI: a malformed schema file fails loudly (exit 2)', () => {
 const ROOT = path.join(__dirname, '..');
 
 test('/test SKILL reads test-design.md and runs the constraint-obligation gate', () => {
-  const skill = fs.readFileSync(path.join(ROOT, '.claude', 'skills', 'test', 'SKILL.md'), 'utf8');
+  const skill = fs.readFileSync(path.join(ROOT, '.opencode', 'skills', 'test', 'SKILL.md'), 'utf8');
   assert.match(skill, /test-design\.md/, 'reads the technique reference');
   assert.match(skill, /constraints-extract\.js/, 'invokes the extractor');
   assert.match(skill, /constraint-obligations\.json/, 'names the obligations artifact');
@@ -205,7 +205,7 @@ test('/test SKILL reads test-design.md and runs the constraint-obligation gate',
 });
 
 test('test-design.md exists and covers the core techniques', () => {
-  const p = path.join(ROOT, '.claude', 'skills', 'test', 'references', 'test-design.md');
+  const p = path.join(ROOT, '.opencode', 'skills', 'test', 'references', 'test-design.md');
   assert.ok(fs.existsSync(p), 'test-design.md present');
   const doc = fs.readFileSync(p, 'utf8').toLowerCase();
   for (const technique of ['equivalence partition', 'boundary-value', 'state-transition', 'error-path', 'idempotency']) {

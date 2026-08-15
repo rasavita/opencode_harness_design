@@ -10,7 +10,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const { selectChecks, runChecks, summarize } = require('../.claude/scripts/run-gate-checks.js');
+const { selectChecks, runChecks, summarize } = require('../.opencode/scripts/run-gate-checks.js');
 
 const CHECKS = [
   { id: 'always-one', pack: 'verification', script: 'a.js', when: 'always', blocking: true },
@@ -21,9 +21,9 @@ const CHECKS = [
 
 function makeRoot(scripts = []) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gate-checks-'));
-  fs.mkdirSync(path.join(root, '.claude', 'scripts'), { recursive: true });
+  fs.mkdirSync(path.join(root, '.opencode', 'scripts'), { recursive: true });
   for (const [name, body] of scripts) {
-    fs.writeFileSync(path.join(root, '.claude', 'scripts', name), body);
+    fs.writeFileSync(path.join(root, '.opencode', 'scripts', name), body);
   }
   return root;
 }
@@ -119,7 +119,7 @@ test('a check without accepts_files is not given the file list', () => {
 // a fixture — a mistyped script name or a check with no owning pack would otherwise
 // only surface at gate time.
 test('the shipped gate-checks registry is internally consistent', () => {
-  const { loadRegistry } = require('../.claude/scripts/run-gate-checks.js');
+  const { loadRegistry } = require('../.opencode/scripts/run-gate-checks.js');
   const checks = loadRegistry(path.join(__dirname, '..'));
   assert.ok(checks.length > 0, 'registry must not be empty');
   const ids = new Set();
@@ -133,11 +133,11 @@ test('the shipped gate-checks registry is internally consistent', () => {
 });
 
 test('every script named in the shipped registry exists on disk today', () => {
-  const { loadRegistry } = require('../.claude/scripts/run-gate-checks.js');
+  const { loadRegistry } = require('../.opencode/scripts/run-gate-checks.js');
   const root = path.join(__dirname, '..');
   for (const c of loadRegistry(root)) {
     assert.ok(
-      fs.existsSync(path.join(root, '.claude', 'scripts', c.script)),
+      fs.existsSync(path.join(root, '.opencode', 'scripts', c.script)),
       `${c.id} points at a missing script: ${c.script}`
     );
   }

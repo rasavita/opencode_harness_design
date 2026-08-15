@@ -59,7 +59,7 @@ function adopt() {
     path.join(dir, 'specs/brd/frd-requirements.json'),
     JSON.stringify(extractSpine(markdown), null, 1),
   );
-  execFileSync('node', [path.join(ROOT, '.claude/scripts/brd-adopt.js'), '--root', dir]);
+  execFileSync('node', [path.join(ROOT, '.opencode/scripts/brd-adopt.js'), '--root', dir]);
   const read = (f) => JSON.parse(fs.readFileSync(path.join(dir, 'specs/brd', f), 'utf8'));
   return {
     requirements: read('brd-requirements.json'),
@@ -74,7 +74,7 @@ function adopt() {
 test('the fixture passes the PRD shape gate clean — no errors, no warnings', () => {
   // A fixture that ships warnings teaches operators to ignore the gate's output,
   // which is how the 35-error PRD reached adoption unexamined.
-  const out = execFileSync('node', [path.join(ROOT, '.claude/scripts/validate-prd.js'), PRD])
+  const out = execFileSync('node', [path.join(ROOT, '.opencode/scripts/validate-prd.js'), PRD])
     .toString();
   assert.match(out, /validate-prd: OK — 24 requirements, 0 warning\(s\)\./);
 });
@@ -130,7 +130,7 @@ test('taxonomy is left unassigned for the session that has the human', () => {
 // had chosen for itself. These assert the supported route instead, against the
 // real adopter output rather than a fixture that could encode the wrong shape.
 
-const TRACE_CHECK = path.join(ROOT, '.claude/scripts/trace-check.js');
+const TRACE_CHECK = path.join(ROOT, '.opencode/scripts/trace-check.js');
 
 // The PRD label a requirement carries, as brd-adopt.js records it. The adopter
 // keys requirements on the spine id (`FRD-1`) and preserves the label only in
@@ -240,7 +240,7 @@ test('a story tracing to a deferred requirement is not net-new — deferred ids 
 // traces — and the result was two runs of the same pipeline emitting
 // brd-requirements.json in two different id spaces.
 
-const ADOPT = path.join(ROOT, '.claude/scripts/brd-adopt.js');
+const ADOPT = path.join(ROOT, '.opencode/scripts/brd-adopt.js');
 
 /** A real adopted workspace, from the real PRD through the real adopter. */
 function adoptedRoot() {

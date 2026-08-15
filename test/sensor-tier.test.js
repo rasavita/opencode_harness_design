@@ -12,7 +12,7 @@ const {
   isGateEnabled,
   normalizeTier,
   GATE_TIERS,
-} = require('../.claude/hooks/lib/sensor-tier');
+} = require('../.opencode/hooks/lib/sensor-tier');
 
 test('VALID_TIERS are minimal, standard, strict', () => {
   assert.deepStrictEqual([...VALID_TIERS], ['minimal', 'standard', 'strict']);

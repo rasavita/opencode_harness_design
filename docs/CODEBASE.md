@@ -35,7 +35,7 @@ npm run ask -- "..."     # ask the codebase
 |---|---|---|
 | `test/helpers/hook-fixture.js` | 25 | 0 |
 | `test/helpers/skill-corpus.js` | 24 | 0 |
-| `test/e2e/helpers/claude-runner.js` | 17 | 0 |
+| `test/e2e/helpers/opencode-runner.js` | 17 | 0 |
 | `test/e2e/helpers/project-suite.js` | 9 | 0 |
 | `test/helpers/pre-commit-fixtures.js` | 9 | 0 |
 | `symphony_clone/src/orchestrator/scheduler.js` | 7 | 6 |

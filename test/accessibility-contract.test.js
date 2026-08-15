@@ -5,9 +5,9 @@ const fs = require('fs');
 const path = require('path');
 const { test } = require('node:test');
 
-const { validate } = require(path.join(__dirname, '..', '.claude', 'hooks', 'lib', 'contract-schema'));
+const { validate } = require(path.join(__dirname, '..', '.opencode', 'hooks', 'lib', 'contract-schema'));
 const schema = JSON.parse(fs.readFileSync(
-  path.join(__dirname, '..', '.claude', 'skills', 'evaluate', 'references', 'contract-schema.json'), 'utf8'));
+  path.join(__dirname, '..', '.opencode', 'skills', 'evaluate', 'references', 'contract-schema.json'), 'utf8'));
 
 // W4: the sprint contract can carry an accessibility (axe-core) gate, mirroring
 // design_checks. Because `contract` is additionalProperties:false, the block only

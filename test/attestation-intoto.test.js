@@ -13,7 +13,7 @@ const assert = require('node:assert');
 const {
   toInTotoStatement, fromInTotoStatement, isInTotoStatement,
   IN_TOTO_STATEMENT_TYPE, PREDICATE_TYPE,
-} = require('../.claude/scripts/attestation-bundle');
+} = require('../.opencode/scripts/attestation-bundle');
 
 const BUNDLE = {
   schema_version: 1,

@@ -5,10 +5,10 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
-const { applyScaffold } = require('../.claude/scripts/scaffold-apply');
-const { planUpgrade } = require('../.claude/scripts/scaffold-upgrade');
+const { applyScaffold } = require('../.opencode/scripts/scaffold-apply');
+const { planUpgrade } = require('../.opencode/scripts/scaffold-upgrade');
 
-const PLUGIN = path.resolve(__dirname, '..', '.claude');
+const PLUGIN = path.resolve(__dirname, '..', '.opencode');
 
 function scaffoldCore() {
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'upgrade-'));

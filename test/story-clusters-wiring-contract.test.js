@@ -15,10 +15,10 @@ const ROOT = path.resolve(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 test('story-clusters CLI reuses the tested lib rather than reimplementing the graph algebra', () => {
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude/scripts/story-clusters.js')));
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude/hooks/lib/story-graph.js')));
+  assert.ok(fs.existsSync(path.join(ROOT, '.opencode/scripts/story-clusters.js')));
+  assert.ok(fs.existsSync(path.join(ROOT, '.opencode/hooks/lib/story-graph.js')));
   assert.match(
-    read('.claude/scripts/story-clusters.js'),
+    read('.opencode/scripts/story-clusters.js'),
     /require\('\.\.\/hooks\/lib\/story-graph'\)/,
     'CLI must use the tested lib',
   );
@@ -27,7 +27,7 @@ test('story-clusters CLI reuses the tested lib rather than reimplementing the gr
 test('package.json exposes the script and /spec Step 4.5 runs it', () => {
   assert.strictEqual(
     JSON.parse(read('package.json')).scripts['story-clusters'],
-    'node .claude/scripts/story-clusters.js',
+    'node .opencode/scripts/story-clusters.js',
   );
   const spec = readSkillCorpus('spec');
   assert.match(spec, /story-clusters\.js/, '/spec must run the clusterer');
@@ -67,7 +67,7 @@ test('manifest registers the sensor as an active traceability control with a bud
   assert.ok(s, 'expected a story-ownership-clusters sensor entry');
   assert.strictEqual(s.axis, 'traceability');
   assert.strictEqual(s.status, 'active');
-  assert.strictEqual(s.wired_at, '.claude/scripts/story-clusters.js');
+  assert.strictEqual(s.wired_at, '.opencode/scripts/story-clusters.js');
   assert.ok(s.net_add_justification, 'a net-add control must justify its budget cost');
 });
 

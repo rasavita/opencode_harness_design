@@ -13,7 +13,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const { run, readReceipt } = require('../.claude/scripts/plan-approval.js');
+const { run, readReceipt } = require('../.opencode/scripts/plan-approval.js');
 
 function tmpRoot() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'plan-approval-'));

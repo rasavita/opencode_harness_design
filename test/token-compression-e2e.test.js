@@ -8,15 +8,15 @@ const { spawnSync } = require('child_process');
 const { test } = require('node:test');
 
 const ROOT = path.join(__dirname, '..');
-const TOKEN_ADVISOR = path.join(ROOT, '.claude', 'hooks', 'token-advisor.js');
-const PRE_BASH_GATE = path.join(ROOT, '.claude', 'hooks', 'pre-bash-gate.js');
-const RUN_COMPACT = path.join(ROOT, '.claude', 'scripts', 'run-compact.js');
-const RETRIEVE = path.join(ROOT, '.claude', 'scripts', 'context-retrieve.js');
-const STATUS = path.join(ROOT, '.claude', 'scripts', 'pipeline-status.js');
+const TOKEN_ADVISOR = path.join(ROOT, '.opencode', 'hooks', 'token-advisor.js');
+const PRE_BASH_GATE = path.join(ROOT, '.opencode', 'hooks', 'pre-bash-gate.js');
+const RUN_COMPACT = path.join(ROOT, '.opencode', 'scripts', 'run-compact.js');
+const RETRIEVE = path.join(ROOT, '.opencode', 'scripts', 'context-retrieve.js');
+const STATUS = path.join(ROOT, '.opencode', 'scripts', 'pipeline-status.js');
 
 function makeProject() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'token-compression-e2e-'));
-  fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
   fs.mkdirSync(path.join(dir, 'specs', 'brownfield'), { recursive: true });
   fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
   fs.writeFileSync(path.join(dir, 'project-manifest.json'), JSON.stringify({
@@ -43,7 +43,7 @@ function makeProject() {
 function runHook(projectDir, hook, input) {
   return spawnSync(process.execPath, [hook], {
     cwd: projectDir,
-    env: { ...process.env, CLAUDE_PROJECT_DIR: projectDir },
+    env: { ...process.env, OPENCODE_PROJECT_DIR: projectDir },
     input: JSON.stringify(input),
     encoding: 'utf8',
   });

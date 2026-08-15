@@ -14,7 +14,7 @@ const fs = require('fs');
 const os = require('os');
 const { test } = require('node:test');
 
-const gate = require(path.join(__dirname, '..', '.claude', 'scripts', 'sprout-diff-gate'));
+const gate = require(path.join(__dirname, '..', '.opencode', 'scripts', 'sprout-diff-gate'));
 
 const GRAPH = {
   files: [{ path: 'src/legacy.py', symbols: [{ name: 'f', start: 1, end: 5 }, { name: 'g', start: 20, end: 25 }] }],

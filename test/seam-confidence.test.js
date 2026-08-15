@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { seamConfidence, THRESHOLD } = require('../.claude/scripts/seam-confidence.js');
+const { seamConfidence, THRESHOLD } = require('../.opencode/scripts/seam-confidence.js');
 
 test('THRESHOLD matches the sprouting cutoff', () => {
   assert.strictEqual(THRESHOLD, 0.5);

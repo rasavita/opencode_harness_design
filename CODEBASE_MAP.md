@@ -1,6 +1,6 @@
 # Codebase Map
 
-Top-level navigation for the Claude Harness Engine repository. **This file is the
+Top-level navigation for the OpenCode Harness Engine repository. **This file is the
 canonical "where things live" map** — start here, then follow the pointer to the one doc
 that owns each topic (below) instead of piecing it together from several.
 
@@ -18,23 +18,23 @@ restate:
 | `CODEBASE_MAP.md` *(this file)* | Directory layout + which doc owns which topic | Any topic's details — it points, it doesn't restate |
 | `docs/legacy-change-disciplines.md` | The 7 legacy-change disciplines as one family + their gates | The rest of the control system (HARNESS.md) |
 | `wiki/` (committed DeepWiki) | Generated, code-synced map of the current source | Hand-authored rationale (design.md) |
-| `CLAUDE.md` | Always-loaded project rules for agents | Reference material (kept out to protect the prompt-cache prefix) |
+| `AGENTS.md` | Always-loaded project rules for agents | Reference material (kept out to protect the prompt-cache prefix) |
 
 ## Directory layout
 
 | Path | What it is |
 |---|---|
-| `.claude/commands/` | The one true slash command (`/scaffold` bootloader) |
-| `.claude/skills/` | All pipeline workflows as skills (brd, spec, design, implement, evaluate, auto, brownfield, code-map, refactor, change, vibe, …) |
-| `.claude/agents/` | Subagent definitions (planner, generator, evaluator, design-critic, security-reviewer, code-reviewer, codebase-explorer) |
-| `.claude/hooks/` | Lifecycle hooks (pre-write gate, pre-bash gate, verify-on-save, record-run, review-on-stop, graph-refresh, check-git-hooks) + shared `lib/` |
-| `.claude/git-hooks/` | Git-level hooks installed by `/scaffold` (pre-commit ratchet, commit-msg) |
-| `.claude/scripts/` | Standalone utilities (model-tier, trace-check, archive-state, telemetry-*, certification, upstream-watch, control-budget-gate, sensor-value-report) |
-| `.claude/templates/` | File templates `/scaffold` copies into target projects, including `state-seeds/` |
-| `.claude/workflows/` | Empty slot for user-authored dynamic workflow commands |
-| `.claude/state/` | Tracked runtime snapshot for this harness repo (lane, learned rules, failure log, telemetry ledger, ratchet baselines); scaffolded targets start from `.claude/templates/state-seeds/` |
+| `.opencode/commands/` | The one true slash command (`/scaffold` bootloader) |
+| `.opencode/skills/` | All pipeline workflows as skills (brd, spec, design, implement, evaluate, auto, brownfield, code-map, refactor, change, vibe, …) |
+| `.opencode/agents/` | Subagent definitions (planner, generator, evaluator, design-critic, security-reviewer, code-reviewer, codebase-explorer) |
+| `.opencode/hooks/` | Lifecycle hooks (pre-write gate, pre-bash gate, verify-on-save, record-run, review-on-stop, graph-refresh, check-git-hooks) + shared `lib/` |
+| `.opencode/git-hooks/` | Git-level hooks installed by `/scaffold` (pre-commit ratchet, commit-msg) |
+| `.opencode/scripts/` | Standalone utilities (model-tier, trace-check, archive-state, telemetry-*, certification, upstream-watch, control-budget-gate, sensor-value-report) |
+| `.opencode/templates/` | File templates `/scaffold` copies into target projects, including `state-seeds/` |
+| `.opencode/workflows/` | Empty slot for user-authored dynamic workflow commands |
+| `.opencode/state/` | Tracked runtime snapshot for this harness repo (lane, learned rules, failure log, telemetry ledger, ratchet baselines); scaffolded targets start from `.opencode/templates/state-seeds/` |
 | `.github/workflows/` | GitHub Actions for fast CI and upstream Claude Code drift watch |
-| `.github/upstream/` | Checked-in upstream snapshots consumed by `.claude/scripts/upstream-watch.js` |
+| `.github/upstream/` | Checked-in upstream snapshots consumed by `.opencode/scripts/upstream-watch.js` |
 | `docs/` | Authoring standards, telemetry/testing guides, design proposals, legacy-change-disciplines map |
 | `docs/archive/` | Completed build journal — the superpowers plans/specs and internal proposals behind shipped work. Rationale for *why* something was built; nothing reads it at runtime |
 | `docs/zl-continuum-rubric.md` | One-page Z/L task-placement rubric (L/M/Z bands → harness lanes + human review) |
@@ -46,5 +46,5 @@ restate:
 | `HARNESS.md` | The control-system registry (guides × sensors); see the doc map above |
 | `harness-manifest.json` | Machine-readable source of truth behind HARNESS.md |
 | `design.md` | Full architecture reference |
-| `CLAUDE.md` | Always-loaded project rules for agents |
+| `AGENTS.md` | Always-loaded project rules for agents |
 | `README.md` | Install + command/agent/superpowers reference tables |

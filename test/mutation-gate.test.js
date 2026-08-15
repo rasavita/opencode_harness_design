@@ -6,7 +6,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const lib = require(path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'mutation-gate.js'));
+const lib = require(path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'mutation-gate.js'));
 
 test('mutatableFiles keeps production source, drops tests and vendored trees', () => {
   const files = [

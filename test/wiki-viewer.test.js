@@ -5,7 +5,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { buildWikiModel, render } = require(
-  path.join(__dirname, '..', '.claude', 'skills', 'code-map', 'scripts', 'wiki_viewer')
+  path.join(__dirname, '..', '.opencode', 'skills', 'code-map', 'scripts', 'wiki_viewer')
 );
 
 function sampleFiles() {

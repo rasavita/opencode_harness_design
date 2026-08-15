@@ -6,12 +6,12 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'vertical-glossary-pack.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'vertical-glossary-pack.js');
 const {
   loadRegistry, isPluginEnabled, findSkillsDir, readSkillDescriptions, buildPack,
 } = require(SCRIPT);
 
-const REGISTRY_PATH = path.join(__dirname, '..', '.claude', 'config', 'scaffold-packs.json');
+const REGISTRY_PATH = path.join(__dirname, '..', '.opencode', 'config', 'scaffold-packs.json');
 
 function mkTmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'vertical-glossary-'));
@@ -53,8 +53,8 @@ test('isPluginEnabled matches a prefixed key with a truthy value', () => {
 test('findSkillsDir prefers the marketplace path over the cache path when both exist', () => {
   const home = mkTmpDir();
   const entry = {
-    marketplace_skills_subpath: path.join('.claude', 'plugins', 'marketplaces', 'test-mp', 'skills'),
-    cache_skills_subpath: path.join('.claude', 'plugins', 'cache', 'test-mp', 'skills'),
+    marketplace_skills_subpath: path.join('.opencode', 'plugins', 'marketplaces', 'test-mp', 'skills'),
+    cache_skills_subpath: path.join('.opencode', 'plugins', 'cache', 'test-mp', 'skills'),
   };
   fs.mkdirSync(path.join(home, entry.marketplace_skills_subpath), { recursive: true });
   fs.mkdirSync(path.join(home, entry.cache_skills_subpath), { recursive: true });
@@ -64,8 +64,8 @@ test('findSkillsDir prefers the marketplace path over the cache path when both e
 test('findSkillsDir falls back to the cache path when only it exists', () => {
   const home = mkTmpDir();
   const entry = {
-    marketplace_skills_subpath: path.join('.claude', 'plugins', 'marketplaces', 'test-mp', 'skills'),
-    cache_skills_subpath: path.join('.claude', 'plugins', 'cache', 'test-mp', 'skills'),
+    marketplace_skills_subpath: path.join('.opencode', 'plugins', 'marketplaces', 'test-mp', 'skills'),
+    cache_skills_subpath: path.join('.opencode', 'plugins', 'cache', 'test-mp', 'skills'),
   };
   fs.mkdirSync(path.join(home, entry.cache_skills_subpath), { recursive: true });
   assert.strictEqual(findSkillsDir(home, entry), path.join(home, entry.cache_skills_subpath));
@@ -74,8 +74,8 @@ test('findSkillsDir falls back to the cache path when only it exists', () => {
 test('findSkillsDir returns null when neither candidate path exists', () => {
   const home = mkTmpDir();
   const entry = {
-    marketplace_skills_subpath: path.join('.claude', 'plugins', 'marketplaces', 'test-mp', 'skills'),
-    cache_skills_subpath: path.join('.claude', 'plugins', 'cache', 'test-mp', 'skills'),
+    marketplace_skills_subpath: path.join('.opencode', 'plugins', 'marketplaces', 'test-mp', 'skills'),
+    cache_skills_subpath: path.join('.opencode', 'plugins', 'cache', 'test-mp', 'skills'),
   };
   assert.strictEqual(findSkillsDir(home, entry), null);
 });
@@ -126,17 +126,17 @@ function mkTmpRepo() {
 }
 
 function writeSettings(repoDir, enabledPlugins) {
-  fs.mkdirSync(path.join(repoDir, '.claude'), { recursive: true });
+  fs.mkdirSync(path.join(repoDir, '.opencode'), { recursive: true });
   fs.writeFileSync(
-    path.join(repoDir, '.claude', 'settings.json'),
+    path.join(repoDir, '.opencode', 'settings.json'),
     JSON.stringify({ enabledPlugins }, null, 2)
   );
 }
 
 function writeRepoRegistry(repoDir, packs) {
-  fs.mkdirSync(path.join(repoDir, '.claude', 'config'), { recursive: true });
+  fs.mkdirSync(path.join(repoDir, '.opencode', 'config'), { recursive: true });
   fs.writeFileSync(
-    path.join(repoDir, '.claude', 'config', 'scaffold-packs.json'),
+    path.join(repoDir, '.opencode', 'config', 'scaffold-packs.json'),
     JSON.stringify({ verticalPacks: packs }, null, 2)
   );
 }
@@ -155,8 +155,8 @@ function testEntry(name) {
     enabled_plugin_prefix: `${name}@`,
     marketplace: 'test-marketplace',
     install_id: `${name}@test-marketplace`,
-    marketplace_skills_subpath: path.join('.claude', 'plugins', 'marketplaces', 'test-marketplace', 'plugins', name, 'skills'),
-    cache_skills_subpath: path.join('.claude', 'plugins', 'cache', 'test-marketplace', name, 'skills'),
+    marketplace_skills_subpath: path.join('.opencode', 'plugins', 'marketplaces', 'test-marketplace', 'plugins', name, 'skills'),
+    cache_skills_subpath: path.join('.opencode', 'plugins', 'cache', 'test-marketplace', name, 'skills'),
     bounded_contexts: [{ name: 'Everything', skills: ['a-skill'] }],
   };
 }

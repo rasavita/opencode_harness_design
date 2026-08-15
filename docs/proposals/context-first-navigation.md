@@ -26,13 +26,13 @@ We already have the hard substrate peers lack: an **incremental AST code-graph**
 | Piece | Path | Today |
 |-------|------|--------|
 | Graph | `specs/brownfield/code-graph.json` | AST / SCIP / regex; incremental via `graph-refresh` |
-| Structural query | `.claude/skills/code-map/scripts/code_wiki.js query` | `--callers`, `--calls`, `--symbol`, `--module`, `--hubs`, `--cycles` |
-| NL retrieval | `.claude/scripts/context-pack.js` | Word overlap on path/symbol/signature; 1-hop neighbors; budget trim |
-| Skill | `.claude/skills/context/SKILL.md` | Thin wrapper; agents rarely required to call it |
+| Structural query | `.opencode/skills/code-map/scripts/code_wiki.js query` | `--callers`, `--calls`, `--symbol`, `--module`, `--hubs`, `--cycles` |
+| NL retrieval | `.opencode/scripts/context-pack.js` | Word overlap on path/symbol/signature; 1-hop neighbors; budget trim |
+| Skill | `.opencode/skills/context/SKILL.md` | Thin wrapper; agents rarely required to call it |
 | Policy | `project-manifest.json#token_governor` | `context_search_required: true` present but **unused by hooks** |
-| Advisor | `.claude/hooks/token-advisor.js` | Warns broad `Read` if symbol ranges exist; does not require pack |
-| Change entry | `.claude/skills/change/SKILL.md` Step S2 | Reads full brownfield essay set; symbol-map optional; no `/context` |
-| Impact | `.claude/scripts/impact-scope.js` | Reverse deps for tests — not wired into context-pack output |
+| Advisor | `.opencode/hooks/token-advisor.js` | Warns broad `Read` if symbol ranges exist; does not require pack |
+| Change entry | `.opencode/skills/change/SKILL.md` Step S2 | Reads full brownfield essay set; symbol-map optional; no `/context` |
+| Impact | `.opencode/scripts/impact-scope.js` | Reverse deps for tests — not wired into context-pack output |
 
 Wiki text is already written in tests for context-pack fixtures but **not scored** by the pack builder (design/impl drift).
 
@@ -126,7 +126,7 @@ Existing fields stay. New fields are additive so old tests keep working when ign
     ],
     "tests_to_run": [
       { "kind": "symbol_test", "path": "tests/test_session.py" },
-      { "kind": "impact_hint", "command": "node .claude/scripts/local-regression-gate.js" }
+      { "kind": "impact_hint", "command": "node .opencode/scripts/local-regression-gate.js" }
     ],
     "clusters": [
       { "id": "auth", "paths": ["src/auth/session.py", "src/api/middleware.py"], "score": 0.9 }
@@ -176,7 +176,7 @@ Reuse edge shape already in graph (`source`/`target` or `from`/`to`, kinds `impo
 
 ### 3.3 Optional semantic index (P1 only)
 
-Store under `.claude/state/nav-index/` (gitignored):
+Store under `.opencode/state/nav-index/` (gitignored):
 
 ```json
 {
@@ -236,13 +236,13 @@ Regenerate only when any member hash differs from `code-graph.json#files[].hash`
 ### 4.1 Context pack CLI (extend existing)
 
 ```bash
-node .claude/scripts/context-pack.js "question"
-node .claude/scripts/context-pack.js --budget 1600 "question"
-node .claude/scripts/context-pack.js --root <dir> --budget 1600 "question"
+node .opencode/scripts/context-pack.js "question"
+node .opencode/scripts/context-pack.js --budget 1600 "question"
+node .opencode/scripts/context-pack.js --root <dir> --budget 1600 "question"
 # P0 additions:
-node .claude/scripts/context-pack.js --diff          # boost files from git status + dirty list
-node .claude/scripts/context-pack.js --depth 2        # graph expansion depth (default 2)
-node .claude/scripts/context-pack.js --json-out path  # optional write receipt
+node .opencode/scripts/context-pack.js --diff          # boost files from git status + dirty list
+node .opencode/scripts/context-pack.js --depth 2        # graph expansion depth (default 2)
+node .opencode/scripts/context-pack.js --json-out path  # optional write receipt
 ```
 
 Exit codes: `0` always for successful run (including `no_match`); `2` only on I/O/parse failure. Agents must branch on `status` / `confidence`, not exit code.
@@ -253,10 +253,10 @@ Prefer **one facade** so skills document a single entrypoint:
 
 ```bash
 # New thin CLI (P0.5 / P1) — pure wrappers, no new graph logic
-node .claude/scripts/nav-query.js symbol validate_session
-node .claude/scripts/nav-query.js callers py:src/auth/session.py
-node .claude/scripts/nav-query.js impact --files src/auth/session.py
-node .claude/scripts/nav-query.js pack --budget 1600 "session validation"
+node .opencode/scripts/nav-query.js symbol validate_session
+node .opencode/scripts/nav-query.js callers py:src/auth/session.py
+node .opencode/scripts/nav-query.js impact --files src/auth/session.py
+node .opencode/scripts/nav-query.js pack --budget 1600 "session validation"
 ```
 
 Implementation:
@@ -282,7 +282,7 @@ Suggested tool names: `nav_pack`, `nav_symbol`, `nav_callers`, `nav_impact`.
 Add to change-family skills as a **required pre-step** (same tone as coverage preflight):
 
 > **Before any production `Read` of a source file > N lines, or any unconstrained repo-wide search, run:**  
-> `node .claude/scripts/context-pack.js --diff --budget 1600 "<user request / story problem>"`  
+> `node .opencode/scripts/context-pack.js --diff --budget 1600 "<user request / story problem>"`  
 > Then read **only** `read_next` ranges (and skeletons for god files).  
 > If `status` is `missing`/`placeholder` → `/code-map` or `/brownfield` first.  
 > If `confidence` is `low` or `status` is `no_match` → either ask a clarifying question using `task_map.clarify_options` / top clusters, or run **one** narrow `rg` and re-pack. Do not open a multi-file exploration loop.
@@ -291,14 +291,14 @@ Add to change-family skills as a **required pre-step** (same tone as coverage pr
 
 | File | Change |
 |------|--------|
-| `.claude/skills/change/SKILL.md` | Replace S2 “read all brownfield essays” with: context-pack → task_map → optional essay slices only if pack low-confidence or risk flags |
-| `.claude/skills/feature/SKILL.md` | After wiki freshness, run context-pack on the feature request before routing |
-| `.claude/skills/refactor/SKILL.md` | Context-pack + `nav-query callers` for rename/move blast radius before edit |
-| `.claude/skills/vibe/SKILL.md` | Micro-pack for tiny fixes (lower budget, still required if graph exists) |
-| `.claude/skills/implement/SKILL.md` / generator agent | Story text → pack before teammate fan-out |
-| `.claude/skills/context/SKILL.md` | Document v2 fields + Iron Law consumers |
-| `.claude/agents/generator.md` (if present) | Same pre-read rule |
-| `CLAUDE.md` / target-project CLAUDE snippet | One short bullet: context-pack before broad source reads (keep cache-stable; no mid-session churn) |
+| `.opencode/skills/change/SKILL.md` | Replace S2 “read all brownfield essays” with: context-pack → task_map → optional essay slices only if pack low-confidence or risk flags |
+| `.opencode/skills/feature/SKILL.md` | After wiki freshness, run context-pack on the feature request before routing |
+| `.opencode/skills/refactor/SKILL.md` | Context-pack + `nav-query callers` for rename/move blast radius before edit |
+| `.opencode/skills/vibe/SKILL.md` | Micro-pack for tiny fixes (lower budget, still required if graph exists) |
+| `.opencode/skills/implement/SKILL.md` / generator agent | Story text → pack before teammate fan-out |
+| `.opencode/skills/context/SKILL.md` | Document v2 fields + Iron Law consumers |
+| `.opencode/agents/generator.md` (if present) | Same pre-read rule |
+| `AGENTS.md` / target-project CLAUDE snippet | One short bullet: context-pack before broad source reads (keep cache-stable; no mid-session churn) |
 
 **Essay policy for `/change`:** do **not** require `architecture-map.md` + `test-map.md` + `risk-map.md` + `change-strategy.md` on every S2. Prefer:
 
@@ -323,7 +323,7 @@ Do not implement across both without confirmation.
 
 ### 5.4 Hook enforcement (P0.5)
 
-Extend `.claude/hooks/token-advisor.js` (still fail-open):
+Extend `.opencode/hooks/token-advisor.js` (still fail-open):
 
 | Predicate | Advisory message | Enforced mode |
 |-----------|------------------|---------------|
@@ -331,7 +331,7 @@ Extend `.claude/hooks/token-advisor.js` (still fail-open):
 | **New:** brownfield lane skill active (detect via command transcript / env if available) **and** first source `Read` with no prior `context-pack` receipt in session state | Run context-pack first | block if `context_search_required` && mode=enforced |
 | Optional: `rg`/`find` over `.` without path filter when graph exists | Prefer pack then narrow path | warn only |
 
-**Receipt:** context-pack writes `.claude/state/context-pack-last.json` (question hash, status, confidence, ts). Advisor checks mtime/session. Avoid false blocks: greenfield placeholder graph → fail open (already).
+**Receipt:** context-pack writes `.opencode/state/context-pack-last.json` (question hash, status, confidence, ts). Advisor checks mtime/session. Avoid false blocks: greenfield placeholder graph → fail open (already).
 
 Wire `context_search_required` from manifest (today dead config).
 
@@ -345,13 +345,13 @@ Wire `context_search_required` from manifest (today dead config).
 
 | # | Work item | Files |
 |---|-----------|--------|
-| P0.1 | Implement hybrid **lexical + wiki BM25** + **depth-2** expansion + **git-diff boost** + **task_map** + **confidence** | `.claude/scripts/context-pack.js` |
-| P0.2 | Extract pure helpers if needed for testability | `.claude/scripts/lib/context-rank.js` (new, optional) |
+| P0.1 | Implement hybrid **lexical + wiki BM25** + **depth-2** expansion + **git-diff boost** + **task_map** + **confidence** | `.opencode/scripts/context-pack.js` |
+| P0.2 | Extract pure helpers if needed for testability | `.opencode/scripts/lib/context-rank.js` (new, optional) |
 | P0.3 | Extend unit tests: wiki-only match, depth-2, diff boost, low multi-cluster confidence, no_match | `test/context-pack.test.js` |
 | P0.4 | Iron Law text in change/feature/refactor/vibe (+ implement if easy) | skill SKILL.md files listed above |
-| P0.5 | Document v2 in `/context` skill + token-governor.md short section | `.claude/skills/context/SKILL.md`, `docs/token-governor.md` |
-| P0.6 | Receipt file for advisor | context-pack.js writes `.claude/state/context-pack-last.json` |
-| P0.7 | Advisor: honor `context_search_required`; warn on first broad read without fresh receipt | `.claude/hooks/token-advisor.js`, `test/token-advisor.test.js` |
+| P0.5 | Document v2 in `/context` skill + token-governor.md short section | `.opencode/skills/context/SKILL.md`, `docs/token-governor.md` |
+| P0.6 | Receipt file for advisor | context-pack.js writes `.opencode/state/context-pack-last.json` |
+| P0.7 | Advisor: honor `context_search_required`; warn on first broad read without fresh receipt | `.opencode/hooks/token-advisor.js`, `test/token-advisor.test.js` |
 | P0.8 | Register any new sensor/hook honesty in harness-manifest if behavior is a named control | `harness-manifest.json`, `HARNESS.md` only if new gate semantics |
 
 **Out of P0:** embeddings, MCP, concept LLM pages, co-change index.
@@ -369,9 +369,9 @@ Wire `context_search_required` from manifest (today dead config).
 
 | # | Work item | Files |
 |---|-----------|--------|
-| P1.1 | `nav-query.js` facade over code_wiki + pack + impact | `.claude/scripts/nav-query.js`, tests |
+| P1.1 | `nav-query.js` facade over code_wiki + pack + impact | `.opencode/scripts/nav-query.js`, tests |
 | P1.2 | Integrate `impact-scope` neighbors into `task_map.tests_to_run` when matrix exists | context-pack or nav-query |
-| P1.3 | Optional local embedding index rebuild hook after graph-refresh | `.claude/scripts/nav-index-build.js`, `graph-refresh.js` call site |
+| P1.3 | Optional local embedding index rebuild hook after graph-refresh | `.opencode/scripts/nav-index-build.js`, `graph-refresh.js` call site |
 | P1.4 | Ranker semantic term (fail open) | context-rank / context-pack |
 | P1.5 | Telemetry counters: pack requests, no_match rate, advisor context_search warnings | jsonl + `/status` line |
 | P1.6 | Benchmark harness: scripted agent tasks with/without pack (token estimate from tool log) | `test/fixtures/nav-bench/` or docs metric only |
@@ -457,31 +457,31 @@ Do not claim “Devin parity” without a golden-query set and before/after numb
 ### Create
 
 - `docs/proposals/context-first-navigation.md` (this file)  
-- `.claude/scripts/lib/context-rank.js` (optional extract)  
-- `.claude/scripts/nav-query.js` (P1)  
-- `.claude/scripts/nav-index-build.js` (P1)  
+- `.opencode/scripts/lib/context-rank.js` (optional extract)  
+- `.opencode/scripts/nav-query.js` (P1)  
+- `.opencode/scripts/nav-index-build.js` (P1)  
 - `.harness/wiki.json` template (P2)  
-- `.claude/state/context-pack-last.json` (runtime receipt, gitignored via existing state rules)
+- `.opencode/state/context-pack-last.json` (runtime receipt, gitignored via existing state rules)
 
 ### Modify (P0)
 
-- `.claude/scripts/context-pack.js`  
+- `.opencode/scripts/context-pack.js`  
 - `test/context-pack.test.js`  
-- `.claude/hooks/token-advisor.js`  
+- `.opencode/hooks/token-advisor.js`  
 - `test/token-advisor.test.js`  
-- `.claude/skills/context/SKILL.md`  
-- `.claude/skills/change/SKILL.md`  
-- `.claude/skills/feature/SKILL.md`  
-- `.claude/skills/refactor/SKILL.md`  
-- `.claude/skills/vibe/SKILL.md`  
+- `.opencode/skills/context/SKILL.md`  
+- `.opencode/skills/change/SKILL.md`  
+- `.opencode/skills/feature/SKILL.md`  
+- `.opencode/skills/refactor/SKILL.md`  
+- `.opencode/skills/vibe/SKILL.md`  
 - `docs/token-governor.md`  
 - `docs/token-usage-optimizer-design.md` (mark §2 “implemented subset” vs remaining)  
 - `harness-manifest.json` (only if new named sensor/behavior is registered)
 
 ### Modify (P1+)
 
-- `.claude/hooks/graph-refresh.js`  
-- `.claude/scripts/impact-scope.js` (export helpers if needed)  
+- `.opencode/hooks/graph-refresh.js`  
+- `.opencode/scripts/impact-scope.js` (export helpers if needed)  
 - status/telemetry scripts as applicable  
 
 ### Do not touch in P0
@@ -509,8 +509,8 @@ That is the Devin/Cursor lesson without abandoning the deterministic control pla
 - Review conversation 2026-07-11 (code-map / DeepWiki vs Devin, Cursor, CodeGraph)  
 - `docs/archive/internal/DEEPWIKI_BROWNFIELD_PROPOSAL_2026-06-21.md`  
 - `docs/token-usage-optimizer-design.md`  
-- `.claude/scripts/context-pack.js`, `test/context-pack.test.js`  
-- `.claude/skills/change/SKILL.md` Step S2  
-- `.claude/hooks/token-advisor.js`  
-- `.claude/skills/code-map/scripts/code_wiki/query.js`  
+- `.opencode/scripts/context-pack.js`, `test/context-pack.test.js`  
+- `.opencode/skills/change/SKILL.md` Step S2  
+- `.opencode/hooks/token-advisor.js`  
+- `.opencode/skills/code-map/scripts/code_wiki/query.js`  
 - Devin DeepWiki docs (`.devin/wiki.json` steering, Ask Devin + wiki grounding)  

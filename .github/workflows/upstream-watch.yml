@@ -26,7 +26,7 @@ jobs:
         id: diff
         run: |
           set +e
-          node .claude/scripts/upstream-watch.js > report.md
+          node .opencode/scripts/upstream-watch.js > report.md
           code=$?
           set -e
           if [ "$code" -ne 0 ] && [ "$code" -ne 10 ]; then

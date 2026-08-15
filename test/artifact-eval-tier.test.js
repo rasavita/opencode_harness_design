@@ -20,19 +20,19 @@ const ROOT = path.resolve(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 const CALLERS = {
-  brd: '.claude/skills/brd/SKILL.md',
-  spec: '.claude/skills/spec/SKILL.md',
-  test: '.claude/skills/test/SKILL.md',
-  design: '.claude/skills/design/references/mode-10-step-1-spawn-two-agents-concurrently.md',
+  brd: '.opencode/skills/brd/SKILL.md',
+  spec: '.opencode/skills/spec/SKILL.md',
+  test: '.opencode/skills/test/SKILL.md',
+  design: '.opencode/skills/design/references/mode-10-step-1-spawn-two-agents-concurrently.md',
 };
 
 test('the evaluator keeps its frontier pin for runtime mode', () => {
-  assert.match(read('.claude/agents/evaluator.md'), /^model: claude-opus-5$/m,
+  assert.match(read('.opencode/agents/evaluator.md'), /^model: claude-opus-5$/m,
     'runtime evaluation drives a live app — that is where the tier earns its cost');
 });
 
 test('artifact mode documents the sidekick tier and the escalation rule', () => {
-  const agent = read('.claude/agents/evaluator.md');
+  const agent = read('.opencode/agents/evaluator.md');
   assert.match(agent, /## Model policy \(artifact mode\)/);
   assert.match(agent, /claude-sonnet-5/, 'artifact mode must name the tier it runs on');
   assert.match(agent, /[Ee]scalate back to Opus/,
@@ -42,7 +42,7 @@ test('artifact mode documents the sidekick tier and the escalation rule', () => 
 });
 
 test('artifact mode returns a summary and never the result file', () => {
-  const agent = read('.claude/agents/evaluator.md');
+  const agent = read('.opencode/agents/evaluator.md');
   assert.match(agent, /## Return contract \(artifact mode\)/);
   assert.match(agent, /caller must not read the result file back/i);
   assert.match(agent, /Do not restate the scores table/i);

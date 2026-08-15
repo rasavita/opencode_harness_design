@@ -11,16 +11,16 @@ const BASH_HOOK = 'pre-bash-gate.js';
 const ENV = { HARNESS_TDD_GATE: 'off' };
 
 // Paths that are prefix-only (machinery trust-boundary does not cover them).
-const PREFIX_ONLY_RELS = ['CLAUDE.md', 'Claude.md', '.mcp.json'];
+const PREFIX_ONLY_RELS = ['AGENTS.md', 'Claude.md', '.mcp.json'];
 // Settings are dual-guarded: machinery blocks first in target projects; prefix
 // still applies in the harness monorepo where machinery is skipped.
 const SETTINGS_PREFIX_RELS = [
-  '.claude/settings.json',
-  '.claude/settings.auto.json',
-  '.claude/settings.local.json',
+  '.opencode/settings.json',
+  '.opencode/settings.auto.json',
+  '.opencode/settings.local.json',
 ];
 
-test('pre-write-gate blocks CLAUDE.md and .mcp.json with prefix message', async () => {
+test('pre-write-gate blocks AGENTS.md and .mcp.json with prefix message', async () => {
   const projectDir = makeHookProject([WRITE_HOOK]);
   for (const rel of PREFIX_ONLY_RELS) {
     const result = await runHook(projectDir, WRITE_HOOK, {
@@ -39,7 +39,7 @@ test('pre-write-gate blocks settings*.json via prefix inside harness repo', asyn
   const projectDir = makeHookProject([WRITE_HOOK]);
   fs.writeFileSync(
     path.join(projectDir, 'package.json'),
-    JSON.stringify({ name: 'claude-harness-eng-v5' })
+    JSON.stringify({ name: 'opencode-harness-design' })
   );
   for (const rel of SETTINGS_PREFIX_RELS) {
     const result = await runHook(projectDir, WRITE_HOOK, {
@@ -54,15 +54,15 @@ test('pre-write-gate blocks settings*.json via prefix inside harness repo', asyn
   }
 });
 
-test('pre-write-gate blocks CLAUDE.md even inside the harness repo', async () => {
+test('pre-write-gate blocks AGENTS.md even inside the harness repo', async () => {
   const projectDir = makeHookProject([WRITE_HOOK]);
   fs.writeFileSync(
     path.join(projectDir, 'package.json'),
-    JSON.stringify({ name: 'claude-harness-eng-v5' })
+    JSON.stringify({ name: 'opencode-harness-design' })
   );
   const result = await runHook(projectDir, WRITE_HOOK, {
     tool_name: 'Write',
-    tool_input: { file_path: path.join(projectDir, 'CLAUDE.md'), content: '# x\n' },
+    tool_input: { file_path: path.join(projectDir, 'AGENTS.md'), content: '# x\n' },
   }, ENV);
   assert.strictEqual(result.status, 2, result.stdout);
   assert.ok(/prompt-cache prefix/i.test(result.stdout), result.stdout);
@@ -72,7 +72,7 @@ test('HARNESS_PREFIX_EDIT=1 allows prefix edits', async () => {
   const projectDir = makeHookProject([WRITE_HOOK]);
   const result = await runHook(projectDir, WRITE_HOOK, {
     tool_name: 'Write',
-    tool_input: { file_path: path.join(projectDir, 'CLAUDE.md'), content: '# ok\n' },
+    tool_input: { file_path: path.join(projectDir, 'AGENTS.md'), content: '# ok\n' },
   }, { ...ENV, HARNESS_PREFIX_EDIT: '1' });
   assert.strictEqual(result.status, 0, result.stdout);
 });
@@ -89,9 +89,9 @@ test('ordinary project files are not blocked by the prefix gate', async () => {
   assert.strictEqual(result.status, 0, result.stdout);
 });
 
-test('pre-bash-gate blocks shell writes to CLAUDE.md and .mcp.json', async () => {
+test('pre-bash-gate blocks shell writes to AGENTS.md and .mcp.json', async () => {
   const projectDir = makeHookProject([BASH_HOOK]);
-  for (const rel of ['CLAUDE.md', '.mcp.json']) {
+  for (const rel of ['AGENTS.md', '.mcp.json']) {
     const result = await runHook(projectDir, BASH_HOOK, {
       tool_name: 'Bash',
       tool_input: { command: `echo x > ${rel}` },
@@ -105,7 +105,7 @@ test('pre-bash-gate allows prefix write when HARNESS_PREFIX_EDIT=allow', async (
   const projectDir = makeHookProject([BASH_HOOK]);
   const result = await runHook(projectDir, BASH_HOOK, {
     tool_name: 'Bash',
-    tool_input: { command: 'echo x > CLAUDE.md' },
+    tool_input: { command: 'echo x > AGENTS.md' },
   }, { HARNESS_PREFIX_EDIT: 'allow' });
   assert.strictEqual(result.status, 0, result.stdout);
 });

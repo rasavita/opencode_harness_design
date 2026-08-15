@@ -62,7 +62,7 @@ test('verify-on-save: cjs file with eslint absent does not block (fail-open)', a
 // a "canceled due to missing packages" response — unavailable() should catch it.
 test('verify-on-save: js file treats npx-canceled-due-to-missing-packages as unprovisioned', () => {
   const { unavailable } = require(path.join(
-    __dirname, '..', '.claude', 'hooks', 'lib', 'toolchain.js'
+    __dirname, '..', '.opencode', 'hooks', 'lib', 'toolchain.js'
   ));
   assert.strictEqual(
     unavailable('npm error npx canceled due to missing packages and no YES option: ["eslint@9.0.0"]'),

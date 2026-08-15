@@ -5,10 +5,10 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { rotateLedgerIfNeeded } = require(path.join(
-  __dirname, '..', '.claude', 'scripts', 'telemetry-ledger-rotate.js'
+  __dirname, '..', '.opencode', 'scripts', 'telemetry-ledger-rotate.js'
 ));
 const { appendLedger } = require(path.join(
-  __dirname, '..', '.claude', 'scripts', 'telemetry-memory.js'
+  __dirname, '..', '.opencode', 'scripts', 'telemetry-memory.js'
 ));
 
 function tmpState() {

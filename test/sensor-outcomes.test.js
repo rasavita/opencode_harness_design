@@ -2,9 +2,9 @@
 const { test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs'), os = require('os'), path = require('path');
-const { recordOutcome, readOutcomes, OUTCOMES_REL } = require('../.claude/hooks/lib/sensor-outcomes');
+const { recordOutcome, readOutcomes, OUTCOMES_REL } = require('../.opencode/hooks/lib/sensor-outcomes');
 
-function tmp() { const d = fs.mkdtempSync(path.join(os.tmpdir(), 'so-')); fs.mkdirSync(path.join(d, '.claude/state'), { recursive: true }); return d; }
+function tmp() { const d = fs.mkdtempSync(path.join(os.tmpdir(), 'so-')); fs.mkdirSync(path.join(d, '.opencode/state'), { recursive: true }); return d; }
 
 // The ledger is what makes the control set subtractable, so the fields the value
 // meter depends on — surface and cost — have to survive a round-trip.
@@ -57,7 +57,7 @@ test('readOutcomes returns [] when ledger absent', () => {
 // Step 7 (strengthened per controller override): verify the actual NEW behavior —
 // fail() records a blocked:true outcome for the current sensor before exiting,
 // and does so without ever letting a logging failure change control flow.
-const { setFailContext, fail } = require('../.claude/hooks/lib/pre-commit-util');
+const { setFailContext, fail } = require('../.opencode/hooks/lib/pre-commit-util');
 
 test('fail() records a blocked outcome for the current sensor before exiting', () => {
   const d = tmp();

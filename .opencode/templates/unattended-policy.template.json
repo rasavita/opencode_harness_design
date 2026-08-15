@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "network": {
+    "mode": "deny-by-default",
+    "allowed_domains": []
+  },
+  "required_scanners": ["gitleaks", "semgrep"],
+  "credential_paths": [".ssh", ".aws", ".azure", ".config/gcloud"],
+  "authority": {
+    "read_only_paths": [
+      ".opencode/hooks",
+      ".opencode/settings.json",
+      ".opencode/settings.auto.json",
+      ".opencode/trust",
+      ".opencode/authority",
+      ".opencode/certification",
+      ".opencode/config/autonomy-policy.json",
+      ".opencode/state/autonomy-policy.json"
+    ]
+  },
+  "read_only_paths": [
+    ".opencode/hooks",
+    ".opencode/settings.json",
+    ".opencode/settings.auto.json",
+    ".opencode/trust",
+    ".opencode/authority",
+    ".opencode/certification",
+    ".opencode/config/autonomy-policy.json",
+    ".opencode/state/autonomy-policy.json"
+  ],
+  "broker_only_commands": ["gh", "aws", "gcloud", "kubectl", "terraform", "npm publish"],
+  "allow_package_install": false,
+  "credentials": {},
+  "note": "Copy to .opencode/unattended-policy.json and add only the domains the task requires. Empty allowed_domains means no outbound destinations are approved."
+}

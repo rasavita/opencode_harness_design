@@ -14,17 +14,17 @@ That maps directly onto a three-layer engineering-agent architecture: a thin, to
 
 ## What Already Exists (verified by direct file read, not assumed)
 
-1. **Generalist core.** `.claude/scripts/scaffold-copy.js:21-39` enumerates it explicitly: 8 `CORE_AGENTS` (clean-code-reviewer, design-critic, diff-reviewer, evaluator, generator, planner, security-reviewer, codebase-explorer) and 29 `CORE_SKILLS` (the full SDLC pipeline — `brd`, `spec`, `design`, `implement`, `code-gen`, `refactor`, `vibe`, `checking-coverage-before-change`, etc.). `BROWNFIELD_SKILLS` at line 37-39 is literally `= CORE_SKILLS` — brownfield mode reuses the identical generalist core rather than adding a separate skill set. `selectedCopySet()` (lines 113-119) confirms every scaffold profile copies this same fixed set regardless of chosen stack or domain. **This is Fowler's generalist core, already shipped.**
+1. **Generalist core.** `.opencode/scripts/scaffold-copy.js:21-39` enumerates it explicitly: 8 `CORE_AGENTS` (clean-code-reviewer, design-critic, diff-reviewer, evaluator, generator, planner, security-reviewer, codebase-explorer) and 29 `CORE_SKILLS` (the full SDLC pipeline — `brd`, `spec`, `design`, `implement`, `code-gen`, `refactor`, `vibe`, `checking-coverage-before-change`, etc.). `BROWNFIELD_SKILLS` at line 37-39 is literally `= CORE_SKILLS` — brownfield mode reuses the identical generalist core rather than adding a separate skill set. `selectedCopySet()` (lines 113-119) confirms every scaffold profile copies this same fixed set regardless of chosen stack or domain. **This is Fowler's generalist core, already shipped.**
 
-2. **Tech-stack specialty layer (partially generalized).** `project-manifest.json#framework_skill_packs` + the `install-framework-packs` skill is exactly the composition mechanism this research asked whether the harness needed to invent — it doesn't. Today it registers two packs in prose inside `install-framework-packs/SKILL.md`: `langchain` → `github.com/cwijayasundara/agent_cli_langchain` (9 skills) and `google-adk` → `github.com/google/agents-cli` (7 skills). Critically, the `langchain` pack's own declared skill list (`.claude/commands/scaffold.md:590-619`) already includes `langgraph-code` and `deepagents-code` as named, scoped sub-skills alongside `langchain-code` — **LangGraph and DeepAgents are not an unaddressed gap in kind.** They already exist as distinct skills inside an installable pack.
+2. **Tech-stack specialty layer (partially generalized).** `project-manifest.json#framework_skill_packs` + the `install-framework-packs` skill is exactly the composition mechanism this research asked whether the harness needed to invent — it doesn't. Today it registers two packs in prose inside `install-framework-packs/SKILL.md`: `langchain` → `github.com/cwijayasundara/agent_cli_langchain` (9 skills) and `google-adk` → `github.com/google/agents-cli` (7 skills). Critically, the `langchain` pack's own declared skill list (`.opencode/commands/scaffold.md:590-619`) already includes `langgraph-code` and `deepagents-code` as named, scoped sub-skills alongside `langchain-code` — **LangGraph and DeepAgents are not an unaddressed gap in kind.** They already exist as distinct skills inside an installable pack.
 
-3. **Domain specialty layer (already being generalized, separately).** `docs/architecture/vertical-glossary-seeding-generalization.md` (this repo, same session) proposes exactly the registry pattern the tech-stack side is still missing: a declarative `.claude/config/vertical-glossary-packs.json` instead of a hardcoded per-vertical script, so a new FSI vertical (or, eventually, insurance) is a config entry, not new code.
+3. **Domain specialty layer (already being generalized, separately).** `docs/architecture/vertical-glossary-seeding-generalization.md` (this repo, same session) proposes exactly the registry pattern the tech-stack side is still missing: a declarative `.opencode/config/vertical-glossary-packs.json` instead of a hardcoded per-vertical script, so a new FSI vertical (or, eventually, insurance) is a config entry, not new code.
 
 ## What's Genuinely Missing
 
 **1. The tech-stack side lacks the registry generalization the domain side already has.** `install-framework-packs/SKILL.md:23` states: *"If `framework_skill_packs` contains a key not in this registry, report it as unknown and skip — do not invent install commands."* That "registry" is a two-row table written in prose inside a skill file, not data. Every new pack today requires editing `SKILL.md` prose. This is the direct tech-stack-side analog of the domain-side gap the vertical-glossary proposal already closed — it should be closed the same way, for consistency and so `/scaffold` can validate/list packs programmatically instead of a human reading a markdown table.
 
-**2. No single scaffold-time step composes stack + domain together.** Today, `framework_skill_packs` is chosen in `/scaffold` Step 4 (tech stack), while a vertical plugin like `private-equity` is enabled through an entirely separate mechanism (`enabledPlugins` in `.claude/settings.json`, set up outside the scaffold flow, e.g. via `claude plugin install`). A user wanting "Python + FastAPI + LangChain/LangGraph/DeepAgents senior engineer with private-equity domain skills" has to know to do both, through two different systems, at two different times. Fowler's model treats stack and domain specialties as peers (both are "a few deep specialties atop the generalist core") — the scaffold UX should treat them as peers too: one composition step, two independent choices.
+**2. No single scaffold-time step composes stack + domain together.** Today, `framework_skill_packs` is chosen in `/scaffold` Step 4 (tech stack), while a vertical plugin like `private-equity` is enabled through an entirely separate mechanism (`enabledPlugins` in `.opencode/settings.json`, set up outside the scaffold flow, e.g. via `claude plugin install`). A user wanting "Python + FastAPI + LangChain/LangGraph/DeepAgents senior engineer with private-equity domain skills" has to know to do both, through two different systems, at two different times. Fowler's model treats stack and domain specialties as peers (both are "a few deep specialties atop the generalist core") — the scaffold UX should treat them as peers too: one composition step, two independent choices.
 
 **3. Unverified: does the existing `langgraph-code`/`deepagents-code` skill *content* actually teach the right things?** This is the load-bearing caveat from the research, not a minor footnote. The pack's real file contents (`github.com/cwijayasundara/agent_cli_langchain`) were not fetchable this session — everything known about it comes from this repo's own `scaffold.md` prose describing the pack, not the pack's own source. Research independently confirmed (3-0 each) what a *good* LangGraph/DeepAgents skill needs to teach:
    - LangGraph: agents as explicit state machines/graphs (nodes + conditional edges, not linear chains), checkpointer configuration for crash/interrupt recovery, `interrupt()`-based human-in-the-loop placement ([langchain.com/langgraph](https://www.langchain.com/langgraph), [LangGraph persistence docs](https://docs.langchain.com/oss/python/langgraph/persistence)).
@@ -46,7 +46,7 @@ That maps directly onto a three-layer engineering-agent architecture: a thin, to
                     │                           │
    ┌────────────────────────────┐   ┌────────────────────────────┐
    │ Tech-Stack Specialty Packs │   │ Domain Specialty Packs      │
-   │ .claude/config/            │   │ .claude/config/              │
+   │ .opencode/config/            │   │ .opencode/config/              │
    │  framework-skill-packs.json│   │  vertical-glossary-packs.json│
    │  (NEW — mirrors domain side)│  │  (already proposed, this repo)│
    │ e.g. langchain (→langgraph- │  │ e.g. private-equity (→CONTEXT│
@@ -54,7 +54,7 @@ That maps directly onto a three-layer engineering-agent architecture: a thin, to
    └────────────────────────────┘   └────────────────────────────┘
 ```
 
-**Registry entry shape** (`.claude/config/framework-skill-packs.json`, new — mirrors `vertical-glossary-packs.json`'s already-proposed shape):
+**Registry entry shape** (`.opencode/config/framework-skill-packs.json`, new — mirrors `vertical-glossary-packs.json`'s already-proposed shape):
 
 ```json
 {
@@ -96,7 +96,7 @@ That maps directly onto a three-layer engineering-agent architecture: a thin, to
 ## Rollout Path
 
 **Phase 1 — Generalize the tech-stack registry (mirrors the already-proposed domain-side work); gate on a real content audit.**
-- Add `.claude/config/framework-skill-packs.json` with the `langchain` and `google-adk` entries migrated verbatim from today's `install-framework-packs/SKILL.md` prose table.
+- Add `.opencode/config/framework-skill-packs.json` with the `langchain` and `google-adk` entries migrated verbatim from today's `install-framework-packs/SKILL.md` prose table.
 - Update `install-framework-packs/SKILL.md` to read the registry file instead of hardcoding it; keep the "unknown key → report, don't invent" behavior.
 - **Before marking LangGraph/DeepAgents coverage adequate:** have a human (or a dedicated research pass with repo access) actually read `agent_cli_langchain`'s `langgraph-code` and `deepagents-code` `SKILL.md` bodies and confirm they teach checkpointer configuration, `interrupt()` placement, and the specific default middleware stack — not just that the skill files exist. If thin, either file an upstream PR to that pack or add a harness-side supplemental reference file.
 
@@ -117,7 +117,7 @@ That maps directly onto a three-layer engineering-agent architecture: a thin, to
 - `dotnet/skills`' adoption/maturity as a pattern precedent is not independently confirmed beyond the repo itself — don't over-cite it as "industry standard," cite it as "one validated example."
 
 **Dependencies**
-- Requires `.claude/settings.json#enabledPlugins` to remain authoritative for plugin/domain state (existing CLAUDE.md Prompt-Caching rule).
+- Requires `.opencode/settings.json#enabledPlugins` to remain authoritative for plugin/domain state (existing AGENTS.md Prompt-Caching rule).
 - Depends on the vertical-glossary-seeding-generalization.md proposal shipping its own registry first, so both registries can be cross-linked and follow the same JSON shape convention.
 
 **Open questions for the human before this becomes an implementation plan**

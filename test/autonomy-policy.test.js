@@ -7,15 +7,15 @@ const path = require('path');
 const { test } = require('node:test');
 const {
   applyPromotion, currentMode, loadState, recommendation, reconcile, stamp,
-} = require('../.claude/scripts/autonomy-policy');
-const { stampEnvelope } = require('../.claude/hooks/lib/task-envelope');
+} = require('../.opencode/scripts/autonomy-policy');
+const { stampEnvelope } = require('../.opencode/hooks/lib/task-envelope');
 
 function fixture() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'autonomy-policy-'));
-  fs.mkdirSync(path.join(root, '.claude', 'config'), { recursive: true });
-  fs.mkdirSync(path.join(root, '.claude', 'evidence'), { recursive: true });
-  fs.mkdirSync(path.join(root, '.claude', 'state'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.claude', 'config', 'autonomy-policy.json'), JSON.stringify({
+  fs.mkdirSync(path.join(root, '.opencode', 'config'), { recursive: true });
+  fs.mkdirSync(path.join(root, '.opencode', 'evidence'), { recursive: true });
+  fs.mkdirSync(path.join(root, '.opencode', 'state'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.opencode', 'config', 'autonomy-policy.json'), JSON.stringify({
     schema_version: 1,
     modes: ['attended', 'supervised', 'unattended'],
     risk_ceiling: {
@@ -32,13 +32,13 @@ function fixture() {
     comparison_id: `P${index}`, risk_tier: 'R1',
     agentic_rework_events: 0, baseline_rework_events: 1,
   }));
-  fs.writeFileSync(path.join(root, '.claude', 'evidence', 'productivity-study.json'), JSON.stringify({
+  fs.writeFileSync(path.join(root, '.opencode', 'evidence', 'productivity-study.json'), JSON.stringify({
     schema_version: 1, study_id: 'S1', pairs,
     summary: { study_complete: true, eligible_pairs: 10 },
   }));
-  fs.writeFileSync(path.join(root, '.claude', 'state', 'task-envelope.json'), JSON.stringify(stampEnvelope({
+  fs.writeFileSync(path.join(root, '.opencode', 'state', 'task-envelope.json'), JSON.stringify(stampEnvelope({
     schema_version: 1, task_id: 'ADMIN-1', risk_tier: 'R1',
-    allowed_paths: ['.claude/state/**'], forbidden_actions: [],
+    allowed_paths: ['.opencode/state/**'], forbidden_actions: [],
     required_evidence: ['unit'], required_approvals: 1,
     budgets: { dimensions: [{ unit: 'agents', limit: 2 }] },
   })));
@@ -58,7 +58,7 @@ function evidence(root) {
       pass: true,
       failures: [],
       report: JSON.parse(fs.readFileSync(
-        path.join(root, '.claude', 'evidence', 'productivity-study.json'), 'utf8'
+        path.join(root, '.opencode', 'evidence', 'productivity-study.json'), 'utf8'
       )),
     }),
   };
@@ -113,7 +113,7 @@ test('risk ceilings prevent R4 promotion and cap R2 at supervised', () => {
     schema_version: 1, revision: 1, previous_state_hash: null,
     tiers: { R2: { mode: 'unattended' } },
   });
-  fs.writeFileSync(path.join(root, '.claude', 'state', 'autonomy-policy.json'), JSON.stringify(state));
+  fs.writeFileSync(path.join(root, '.opencode', 'state', 'autonomy-policy.json'), JSON.stringify(state));
   const resolved = currentMode(root, 'R2');
   assert.strictEqual(resolved.pass, false);
   assert.strictEqual(resolved.mode, 'supervised');
@@ -126,7 +126,7 @@ test('tampered state fails closed to attended', () => {
     tiers: { R1: { mode: 'unattended' } },
   });
   state.tiers.R1.mode = 'supervised';
-  fs.writeFileSync(path.join(root, '.claude', 'state', 'autonomy-policy.json'), JSON.stringify(state));
+  fs.writeFileSync(path.join(root, '.opencode', 'state', 'autonomy-policy.json'), JSON.stringify(state));
   const resolved = currentMode(root, 'R1');
   assert.strictEqual(resolved.pass, false);
   assert.strictEqual(resolved.mode, 'attended');
@@ -137,7 +137,7 @@ test('evidence drift automatically regresses autonomy without requiring authorit
   applyPromotion(root, 'R1', new Date(), {
     ...authority('CAP-1'), ...evidence(root), certificationCheck: () => ({ pass: true }),
   });
-  const reportFile = path.join(root, '.claude', 'evidence', 'productivity-study.json');
+  const reportFile = path.join(root, '.opencode', 'evidence', 'productivity-study.json');
   const report = JSON.parse(fs.readFileSync(reportFile, 'utf8'));
   report.summary.study_complete = false;
   fs.writeFileSync(reportFile, JSON.stringify(report));

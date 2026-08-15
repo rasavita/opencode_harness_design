@@ -14,7 +14,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
-const SCANNED_DIRS = ['.claude/hooks', '.claude/git-hooks', '.claude/scripts'];
+const SCANNED_DIRS = ['.opencode/hooks', '.opencode/git-hooks', '.opencode/scripts'];
 const DIRECT_REQUIRE_RE = /require\(\s*['"](\.\.?\/[^'"]+)['"]\s*\)/g;
 const JOIN_REQUIRE_RE = /require\(\s*path\.join\(\s*__dirname\s*((?:,\s*['"][^'"]+['"])+)\s*\)\s*\)/g;
 

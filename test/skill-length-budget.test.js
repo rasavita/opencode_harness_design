@@ -29,21 +29,21 @@ for (const [skill, budget] of Object.entries(ENTRY_BUDGETS)) {
 }
 
 test('auto has references for progressive sections', () => {
-  const refs = path.join(ROOT, '.claude', 'skills', 'auto', 'references');
+  const refs = path.join(ROOT, '.opencode', 'skills', 'auto', 'references');
   assert.ok(fs.existsSync(refs));
   const files = fs.readdirSync(refs).filter((f) => f.endsWith('.md'));
   assert.ok(files.length >= 10, `expected many section files, got ${files.length}`);
 });
 
 test('design has mode references for progressive loading', () => {
-  const refs = path.join(ROOT, '.claude', 'skills', 'design', 'references');
+  const refs = path.join(ROOT, '.opencode', 'skills', 'design', 'references');
   assert.ok(fs.existsSync(refs));
   const modes = fs.readdirSync(refs).filter((f) => f.startsWith('mode-') && f.endsWith('.md'));
   assert.ok(modes.length >= 8, `expected mode-*.md files, got ${modes.length}`);
 });
 
 test('build has section references for progressive loading', () => {
-  const refs = path.join(ROOT, '.claude', 'skills', 'build', 'references');
+  const refs = path.join(ROOT, '.opencode', 'skills', 'build', 'references');
   assert.ok(fs.existsSync(refs));
   const sections = fs.readdirSync(refs).filter((f) => f.startsWith('section-') && f.endsWith('.md'));
   assert.ok(sections.length >= 5, `expected section-*.md files, got ${sections.length}`);

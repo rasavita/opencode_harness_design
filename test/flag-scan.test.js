@@ -12,7 +12,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { test } = require('node:test');
 
-const script = path.join(__dirname, '..', '.claude', 'scripts', 'flag-scan.js');
+const script = path.join(__dirname, '..', '.opencode', 'scripts', 'flag-scan.js');
 const { scanContent } = require(script);
 
 test('detects LaunchDarkly variation calls with the flag key', () => {

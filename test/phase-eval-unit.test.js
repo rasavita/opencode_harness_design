@@ -9,7 +9,7 @@ const ROOT = path.join(__dirname, '..');
 // ── 1. Rubrics validation ───────────────────────────────────────────────────
 
 const rubrics = JSON.parse(
-  fs.readFileSync(path.join(ROOT, '.claude', 'templates', 'phase-eval-rubrics.json'), 'utf8')
+  fs.readFileSync(path.join(ROOT, '.opencode', 'templates', 'phase-eval-rubrics.json'), 'utf8')
 );
 
 test('phase-eval-rubrics.json is valid JSON', () => {
@@ -38,7 +38,7 @@ test('global threshold is 7.0 and per_criterion_minimum is 5', () => {
 // ── 2. Result schema validation ─────────────────────────────────────────────
 
 const resultSchema = JSON.parse(
-  fs.readFileSync(path.join(ROOT, '.claude', 'templates', 'phase-eval-result.schema.json'), 'utf8')
+  fs.readFileSync(path.join(ROOT, '.opencode', 'templates', 'phase-eval-result.schema.json'), 'utf8')
 );
 
 test('phase-eval-result.schema.json is valid JSON', () => {
@@ -67,7 +67,7 @@ test('phase enum matches the rubric phases (incl. test)', () => {
 
 // ── 3. Evaluator agent — artifact mode (merged from phase-evaluator) ─────────
 
-const agentPath = path.join(ROOT, '.claude', 'agents', 'evaluator.md');
+const agentPath = path.join(ROOT, '.opencode', 'agents', 'evaluator.md');
 const agentContent = fs.readFileSync(agentPath, 'utf8');
 
 test('evaluator.md exists and is non-empty', () => {
@@ -91,16 +91,16 @@ test('evaluator.md artifact mode contains all 7 phase-specific guidance sections
 });
 
 test('phase-evaluator.md no longer exists (merged into evaluator)', () => {
-  assert.ok(!fs.existsSync(path.join(ROOT, '.claude', 'agents', 'phase-evaluator.md')));
+  assert.ok(!fs.existsSync(path.join(ROOT, '.opencode', 'agents', 'phase-evaluator.md')));
 });
 
 // ── 4. Hook limit values ────────────────────────────────────────────────────
 
 const lengthLib = fs.readFileSync(
-  path.join(ROOT, '.claude', 'hooks', 'lib', 'length.js'), 'utf8'
+  path.join(ROOT, '.opencode', 'hooks', 'lib', 'length.js'), 'utf8'
 );
 const settingsJson = fs.readFileSync(
-  path.join(ROOT, '.claude', 'settings.json'), 'utf8'
+  path.join(ROOT, '.opencode', 'settings.json'), 'utf8'
 );
 
 test('length lib enforces the single 300-line file limit', () => {
@@ -167,7 +167,7 @@ test('record-run.js is wired per-edit (receipt-append-only) and on Stop', () => 
 
 // ── 6. Telemetry phase eval module ──────────────────────────────────────────
 
-const phaseEvalScriptPath = path.join(ROOT, '.claude', 'scripts', 'telemetry-phase-eval.js');
+const phaseEvalScriptPath = path.join(ROOT, '.opencode', 'scripts', 'telemetry-phase-eval.js');
 
 test('telemetry-phase-eval.js exists', () => {
   assert.ok(fs.existsSync(phaseEvalScriptPath));
@@ -181,7 +181,7 @@ test('telemetry-phase-eval.js exports processPhaseEval', () => {
 
 test('telemetry-memory.js requires phase eval module', () => {
   const memoryContent = fs.readFileSync(
-    path.join(ROOT, '.claude', 'scripts', 'telemetry-memory.js'), 'utf8'
+    path.join(ROOT, '.opencode', 'scripts', 'telemetry-memory.js'), 'utf8'
   );
   assert.match(memoryContent, /require\(.*telemetry-phase-eval.*\)/);
 });
@@ -193,7 +193,7 @@ const skillNames = ['brd', 'spec', 'design', 'brownfield', 'seam-finder', 'deplo
 // Progressive-loaded skills: scan full corpus (entry SKILL.md + references/).
 function skillBody(skill) {
   if (skill === 'design' || skill === 'auto' || skill === 'build') return readSkillCorpus(skill);
-  return fs.readFileSync(path.join(ROOT, '.claude', 'skills', skill, 'SKILL.md'), 'utf8');
+  return fs.readFileSync(path.join(ROOT, '.opencode', 'skills', skill, 'SKILL.md'), 'utf8');
 }
 
 for (const skill of skillNames) {
@@ -219,7 +219,7 @@ for (const skill of skillNames) {
 
 test('spec/SKILL.md references specs/brd/brd.md as upstream', () => {
   const content = fs.readFileSync(
-    path.join(ROOT, '.claude', 'skills', 'spec', 'SKILL.md'), 'utf8'
+    path.join(ROOT, '.opencode', 'skills', 'spec', 'SKILL.md'), 'utf8'
   );
   assert.match(content, /specs\/brd\/brd\.md/);
 });
@@ -231,7 +231,7 @@ test('design/SKILL.md references specs/stories/ as upstream', () => {
 
 test('brownfield/SKILL.md references actual codebase or verify against for upstream validation', () => {
   const content = fs.readFileSync(
-    path.join(ROOT, '.claude', 'skills', 'brownfield', 'SKILL.md'), 'utf8'
+    path.join(ROOT, '.opencode', 'skills', 'brownfield', 'SKILL.md'), 'utf8'
   );
   assert.ok(
     /actual codebase/i.test(content) || /verify against/i.test(content),

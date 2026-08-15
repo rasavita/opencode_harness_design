@@ -10,7 +10,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { hasRelatedEvidence, storyOwnersFor, namingRelated } = require(
-  path.join(__dirname, '..', '.claude', 'hooks', 'lib', 'legacy-discipline-relatedness')
+  path.join(__dirname, '..', '.opencode', 'hooks', 'lib', 'legacy-discipline-relatedness')
 );
 
 test('no staged test-shaped files at all -> not related, no tier', () => {

@@ -11,8 +11,8 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const lib = require('../.claude/hooks/lib/security-baseline');
-const strict = require('../.claude/hooks/lib/gates-strict');
+const lib = require('../.opencode/hooks/lib/security-baseline');
+const strict = require('../.opencode/hooks/lib/gates-strict');
 
 const GOOD_WORKFLOW = [
   'name: Security', 'on:', '  pull_request:', 'jobs:',

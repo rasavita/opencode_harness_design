@@ -7,7 +7,7 @@ const ROOT = path.join(__dirname, '..');
 
 // ── 1. Telemetry snapshot with phase_eval record ────────────────────────────
 
-const { buildSnapshot } = require(path.join(ROOT, '.claude', 'scripts', 'telemetry-memory.js'));
+const { buildSnapshot } = require(path.join(ROOT, '.opencode', 'scripts', 'telemetry-memory.js'));
 
 const mockPhaseEvalRecord = {
   kind: 'phase_eval',

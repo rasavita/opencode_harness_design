@@ -58,10 +58,10 @@ test('selection is deduplicated and stable', () => {
 
 test('filesFor maps unit kinds to their on-disk paths', () => {
   const files = filesFor({ skill: ['vibe'], lib: ['common'], script: ['review-tier'], agent: ['implementer'], hook: [], githook: [] });
-  assert.ok(files.some((f) => f === '.claude/skills/vibe'));
-  assert.ok(files.some((f) => f === '.claude/hooks/lib/common.js'));
-  assert.ok(files.some((f) => f === '.claude/scripts/review-tier.js'));
-  assert.ok(files.some((f) => f === '.claude/agents/implementer.md'));
+  assert.ok(files.some((f) => f === '.opencode/skills/vibe'));
+  assert.ok(files.some((f) => f === '.opencode/hooks/lib/common.js'));
+  assert.ok(files.some((f) => f === '.opencode/scripts/review-tier.js'));
+  assert.ok(files.some((f) => f === '.opencode/agents/implementer.md'));
 });
 
 test('filesFor refuses an unknown kind rather than dropping it', () => {

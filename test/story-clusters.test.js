@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { planClusters, normalizeEdges } = require('../.claude/scripts/story-clusters.js');
+const { planClusters, normalizeEdges } = require('../.opencode/scripts/story-clusters.js');
 
 // --- fixtures -----------------------------------------------------------------
 

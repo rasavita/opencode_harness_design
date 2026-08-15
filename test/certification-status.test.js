@@ -7,7 +7,7 @@ const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
 const ROOT = path.join(__dirname, '..');
-const STATUS_PATH = path.join(ROOT, '.claude', 'certification', 'status.json');
+const STATUS_PATH = path.join(ROOT, '.opencode', 'certification', 'status.json');
 const REQUIRED_CAPABILITIES = [
   'greenfield_scaffold',
   'brownfield_adaptation',
@@ -23,7 +23,7 @@ function readJson(file) {
 }
 
 test('certification status declares every autonomous engineering proof area', () => {
-  assert.ok(fs.existsSync(STATUS_PATH), '.claude/certification/status.json must exist');
+  assert.ok(fs.existsSync(STATUS_PATH), '.opencode/certification/status.json must exist');
   const status = readJson(STATUS_PATH);
 
   assert.strictEqual(status.schema_version, 1);
@@ -71,9 +71,9 @@ test('certification matrix is conservative about proof claims', () => {
 
 test('certification report command summarizes the matrix', () => {
   const pkg = readJson(path.join(ROOT, 'package.json'));
-  assert.strictEqual(pkg.scripts.certification, 'node .claude/scripts/certification-report.js');
+  assert.strictEqual(pkg.scripts.certification, 'node .opencode/scripts/certification-report.js');
 
-  const output = execFileSync('node', ['.claude/scripts/certification-report.js'], {
+  const output = execFileSync('node', ['.opencode/scripts/certification-report.js'], {
     cwd: ROOT,
     encoding: 'utf8',
   });

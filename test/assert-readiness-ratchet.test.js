@@ -7,7 +7,7 @@ const { test } = require('node:test');
 const {
   evaluateReadinessRatchet,
   loadReadinessConfig,
-} = require('../.claude/scripts/assert-readiness-ratchet');
+} = require('../.opencode/scripts/assert-readiness-ratchet');
 
 const ROOT = path.resolve(__dirname, '..');
 

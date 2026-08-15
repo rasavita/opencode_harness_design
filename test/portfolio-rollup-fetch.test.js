@@ -12,7 +12,7 @@ const H = require('./portfolio-rollup-helpers');
 const { run } = require(path.join(H.SCRIPTS, 'portfolio-rollup'));
 const secBaseline = require(path.join(H.SCRIPTS, 'scaffold-security-baseline'));
 const { validate } = require(path.join(H.SCRIPTS, 'validate-harness-manifest'));
-const { controlIds, budgetDecision, justifiedIds } = require(path.join(H.REPO_ROOT, '.claude', 'hooks', 'lib', 'control-budget'));
+const { controlIds, budgetDecision, justifiedIds } = require(path.join(H.REPO_ROOT, '.opencode', 'hooks', 'lib', 'control-budget'));
 const { tmp, attestRoot, gitRunner, capture, readReport, contentsResponse, fetchRoutesFor, ghStub, generateAttestation, REPO_ROOT, SCRIPTS, NOW } = H;
 
 // Named throw-stubs (an inline `() => { throw }` arrow trips the length parser).
@@ -26,7 +26,7 @@ function forbiddenGh() { throw new Error('gh must not be called on a traversal e
 function recordingIndexGh(calls, indexObj) {
   return function gh(args) {
     calls.push(args.join(' '));
-    if (args.join(' ').includes('/contents/.claude/attestations/index.json')) {
+    if (args.join(' ').includes('/contents/.opencode/attestations/index.json')) {
       return JSON.stringify(contentsResponse(JSON.stringify(indexObj)));
     }
     throw new Error('unexpected gh call: ' + args.join(' '));
@@ -55,7 +55,7 @@ test('7b: a 404 repo is skipped and surfaces as not-attested', () => {
   fs.writeFileSync(fleet, JSON.stringify({ repos: [{ owner: 'acme', repo: 'alpha' }, { owner: 'acme', repo: 'ghost' }] }));
   const routes = [
     ...fetchRoutesFor('acme', 'alpha', 'a'.repeat(40)),
-    ['repos/acme/ghost/contents/.claude/attestations/index.json', { __throw: 'gh: Not Found (HTTP 404)' }],
+    ['repos/acme/ghost/contents/.opencode/attestations/index.json', { __throw: 'gh: Not Found (HTTP 404)' }],
   ];
   const outFile = path.join(dir, 'rollup.json');
   const res = capture(() => run([dir, '--fetch', '--fleet', fleet, '--target-version', '2.5.0', '--out', outFile], { cwd: dir, gh: ghStub(routes), now: () => NOW }));
@@ -89,8 +89,8 @@ test('7e: a MULTI-line gh 404 (real execFileSync shape) is recorded not-attested
   fs.writeFileSync(fleet, JSON.stringify({ repos: [{ owner: 'acme', repo: 'alpha' }, { owner: 'acme', repo: 'ghost' }] }));
   const routes = [
     ...fetchRoutesFor('acme', 'alpha', 'a'.repeat(40)),
-    ['repos/acme/ghost/contents/.claude/attestations/index.json',
-      { __throw: 'Command failed: gh api repos/acme/ghost/contents/.claude/attestations/index.json\ngh: Not Found (HTTP 404)' }],
+    ['repos/acme/ghost/contents/.opencode/attestations/index.json',
+      { __throw: 'Command failed: gh api repos/acme/ghost/contents/.opencode/attestations/index.json\ngh: Not Found (HTTP 404)' }],
   ];
   const outFile = path.join(dir, 'rollup.json');
   const res = capture(() => run([dir, '--fetch', '--fleet', fleet, '--target-version', '2.5.0', '--out', outFile], { cwd: dir, gh: ghStub(routes), now: () => NOW }));
@@ -99,7 +99,7 @@ test('7e: a MULTI-line gh 404 (real execFileSync shape) is recorded not-attested
   assert.ok(report.repos.find((r) => r.repo === 'acme/ghost' && r.status === 'not-attested'), 'multi-line 404 => not-attested, not exit 2');
 });
 
-test('7f: a remote index entry path escaping .claude/attestations/ is rejected — no contents call — => not-attested', () => {
+test('7f: a remote index entry path escaping .opencode/attestations/ is rejected — no contents call — => not-attested', () => {
   const dir = tmp('pr-fetch-relpath-');
   const fleet = path.join(dir, 'fleet.json');
   fs.writeFileSync(fleet, JSON.stringify({ repos: [{ owner: 'acme', repo: 'evil' }] }));
@@ -117,7 +117,7 @@ test('7g: a >1MB (encoding:"none") contents response is a fetch-miss => not-atte
   const dir = tmp('pr-fetch-enc-');
   const fleet = path.join(dir, 'fleet.json');
   fs.writeFileSync(fleet, JSON.stringify({ repos: [{ owner: 'acme', repo: 'big' }] }));
-  const routes = [['repos/acme/big/contents/.claude/attestations/index.json', { content: '', encoding: 'none' }]];
+  const routes = [['repos/acme/big/contents/.opencode/attestations/index.json', { content: '', encoding: 'none' }]];
   const outFile = path.join(dir, 'rollup.json');
   const res = capture(() => run([dir, '--fetch', '--fleet', fleet, '--target-version', '2.5.0', '--out', outFile], { cwd: dir, gh: ghStub(routes), now: () => NOW }));
   assert.strictEqual(res.code, 0, res.stderr);
@@ -146,7 +146,7 @@ test('8b: scaffold round-trip stamps harness_version + ships the rollup script/s
     stack: { backend: null, frontend: null, database: null },
     projectType: 'D', verificationMode: 'C', modelTier: 'balanced', tracker: 'A', frameworkPacks: [], lsp: [],
   }));
-  applyScaffold({ profile: profilePath, pluginSource: path.join(REPO_ROOT, '.claude'), target, scaffoldProfile: 'full' });
+  applyScaffold({ profile: profilePath, pluginSource: path.join(REPO_ROOT, '.opencode'), target, scaffoldProfile: 'full' });
   const manifest = JSON.parse(fs.readFileSync(path.join(target, 'project-manifest.json'), 'utf8'));
   const harnessPkg = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
   assert.strictEqual(manifest.harness_version, harnessPkg.version);
@@ -154,7 +154,7 @@ test('8b: scaffold round-trip stamps harness_version + ships the rollup script/s
     path.join('scripts', 'portfolio-rollup.js'), path.join('scripts', 'portfolio-rollup-core.js'),
     path.join('skills', 'portfolio-rollup', 'SKILL.md'),
   ]) {
-    assert.ok(fs.existsSync(path.join(target, '.claude', rel)), rel + ' must ship to scaffolded targets');
+    assert.ok(fs.existsSync(path.join(target, '.opencode', rel)), rel + ' must ship to scaffolded targets');
   }
 });
 
@@ -164,7 +164,7 @@ test('9: generate-attestation prefers project-manifest.json#harness_version over
   const root = attestRoot('2.5.0', 'notevaluated');
   fs.writeFileSync(path.join(root, 'project-manifest.json'), JSON.stringify({ harness_version: '7.7.7' }));
   const res = generateAttestation({
-    root, attestDir: path.join(root, '.claude', 'attestations'),
+    root, attestDir: path.join(root, '.opencode', 'attestations'),
     runner: gitRunner('acme', 'e', 'e'.repeat(40)), now: () => NOW,
   });
   assert.strictEqual(res.bundle.harness_version, '7.7.7', 'manifest stamp wins over package.json 2.5.0');
@@ -181,7 +181,7 @@ test('10: manifest valid; portfolio-compliance-rollup registered; control budget
   assert.ok(ids.includes('portfolio-compliance-rollup'));
   // phase-context-handoff: the /clear handoff turned from advice into a block.
   assert.ok(ids.includes('phase-context-handoff'));
-  const baseline = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, '.claude', 'state', 'control-budget-baseline.json'), 'utf8'));
+  const baseline = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, '.opencode', 'state', 'control-budget-baseline.json'), 'utf8'));
   assert.strictEqual(baseline.count, 162);
   assert.strictEqual(budgetDecision(ids, baseline, justifiedIds(manifest)).blocked, false);
 });

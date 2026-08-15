@@ -127,7 +127,7 @@ Not “stop reading code” or “always read code” — **route attention**:
 - Agents generate under contracts and ratchets.  
 - Machines verify what is cheap to verify.  
 - Humans spend scarce review budget where wrongness is expensive.  
-- Independent whole-branch review remains load-bearing for non-trivial work (CLAUDE.md §5).
+- Independent whole-branch review remains load-bearing for non-trivial work (AGENTS.md §5).
 
 If the team only remembers one line:
 

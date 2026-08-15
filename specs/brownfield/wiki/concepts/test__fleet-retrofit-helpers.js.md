@@ -24,7 +24,7 @@ Cluster `test/fleet-retrofit-helpers.js` groups **1** file(s) (hub fan-in hint 2
 
 ## Repo notes (steering)
 
-- Primary harness control plane lives under .claude/ (hooks, scripts, skills). Brownfield navigation artifacts live under specs/brownfield/. Prefer /context or nav-query pack before broad source reads.
+- Primary harness control plane lives under .opencode/ (hooks, scripts, skills). Brownfield navigation artifacts live under specs/brownfield/. Prefer /context or nav-query pack before broad source reads.
 
 ## Inbound edges (sample)
 

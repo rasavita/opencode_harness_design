@@ -11,7 +11,7 @@ const os = require('os');
 const path = require('path');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
-const SCRIPTS = path.join(REPO_ROOT, '.claude', 'scripts');
+const SCRIPTS = path.join(REPO_ROOT, '.opencode', 'scripts');
 const { generateAttestation } = require(path.join(SCRIPTS, 'generate-attestation'));
 const NOW = '2026-07-19T00:00:00.000Z';
 
@@ -33,7 +33,7 @@ function gitRunner(owner, repo, sha) {
 // project-manifest.json is present).
 function attestRoot(version, mode) {
   const root = tmp('pr-att-');
-  fs.mkdirSync(path.join(root, '.claude', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(root, '.opencode', 'state'), { recursive: true });
   fs.mkdirSync(path.join(root, 'specs', 'reviews'), { recursive: true });
   fs.copyFileSync(path.join(REPO_ROOT, 'harness-manifest.json'), path.join(root, 'harness-manifest.json'));
   fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ version }));
@@ -55,7 +55,7 @@ function attestRoot(version, mode) {
 function genInto(collectionDir, owner, repo, sha, version, mode) {
   const root = attestRoot(version, mode);
   const res = generateAttestation({
-    root, attestDir: path.join(root, '.claude', 'attestations'),
+    root, attestDir: path.join(root, '.opencode', 'attestations'),
     runner: gitRunner(owner, repo, sha), now: () => NOW,
   });
   fs.mkdirSync(collectionDir, { recursive: true });
@@ -86,10 +86,10 @@ function contentsResponse(text) {
 function fetchRoutesFor(owner, repo, sha) {
   const gen = genInto(tmp('pr-fetch-src-'), owner, repo, sha, '2.5.0', 'compliant');
   const attText = fs.readFileSync(gen.file, 'utf8');
-  const relPath = '.claude/attestations/' + sha + '.json';
+  const relPath = '.opencode/attestations/' + sha + '.json';
   const index = { entries: [{ commit_sha: sha, generated_at: NOW, path: relPath }], integrity: { algo: 'sha256', hash: 'x' } };
   return [
-    ['repos/' + owner + '/' + repo + '/contents/.claude/attestations/index.json', contentsResponse(JSON.stringify(index))],
+    ['repos/' + owner + '/' + repo + '/contents/.opencode/attestations/index.json', contentsResponse(JSON.stringify(index))],
     ['repos/' + owner + '/' + repo + '/contents/' + relPath, contentsResponse(attText)],
   ];
 }

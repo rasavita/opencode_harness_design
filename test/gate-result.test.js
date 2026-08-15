@@ -6,7 +6,7 @@ const {
   formatBlock,
   formatSkip,
   ensureTierFooter,
-} = require('../.claude/hooks/lib/gate-result');
+} = require('../.opencode/hooks/lib/gate-result');
 
 test('formatBlock includes Fix, Waive, Tier', () => {
   const msg = formatBlock({

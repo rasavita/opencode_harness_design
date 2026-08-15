@@ -16,7 +16,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { validateDesignDecisions } = require('../.claude/scripts/validate-design-decisions.js');
+const { validateDesignDecisions } = require('../.opencode/scripts/validate-design-decisions.js');
 
 const decision = (over = {}) => ({
   id: 'D-A',
@@ -112,15 +112,15 @@ const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'validate-design-decisions.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'validate-design-decisions.js');
 
 function designRoot(sessionId, docOver = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'design-decisions-'));
   fs.mkdirSync(path.join(dir, 'specs/decisions'), { recursive: true });
   fs.writeFileSync(path.join(dir, 'specs/decisions/design-decisions.json'),
     JSON.stringify(doc(docOver), null, 2));
-  fs.mkdirSync(path.join(dir, '.claude/runs'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.claude/runs/2026-08-10.jsonl'),
+  fs.mkdirSync(path.join(dir, '.opencode/runs'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.opencode/runs/2026-08-10.jsonl'),
     `${JSON.stringify({ kind: 'tool', session_id: sessionId })}\n`);
   return dir;
 }
@@ -169,7 +169,7 @@ test('a waived headless lane gets no checkpoint', () => {
 test('design-render re-running the gate does not claim to have shaped the decisions', () => {
   const dir = designRoot('SESSION-SHAPING');
   gate(dir);
-  fs.appendFileSync(path.join(dir, '.claude/runs/2026-08-10.jsonl'),
+  fs.appendFileSync(path.join(dir, '.opencode/runs/2026-08-10.jsonl'),
     `${JSON.stringify({ kind: 'tool', session_id: 'SESSION-FRESH' })}\n`);
   gate(dir);
   assert.strictEqual(verdictOf(dir).session_id, 'SESSION-SHAPING');
@@ -178,7 +178,7 @@ test('design-render re-running the gate does not claim to have shaped the decisi
 test('changed design decisions re-stamp — a new shaping dialogue happened', () => {
   const dir = designRoot('SESSION-SHAPING');
   gate(dir);
-  fs.appendFileSync(path.join(dir, '.claude/runs/2026-08-10.jsonl'),
+  fs.appendFileSync(path.join(dir, '.opencode/runs/2026-08-10.jsonl'),
     `${JSON.stringify({ kind: 'tool', session_id: 'SESSION-SECOND' })}\n`);
   const file = path.join(dir, 'specs/decisions/design-decisions.json');
   const d = JSON.parse(fs.readFileSync(file, 'utf8'));

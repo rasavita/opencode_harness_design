@@ -13,8 +13,8 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
-const { applyScaffold } = require('../.claude/scripts/scaffold-apply');
-const strict = require('../.claude/hooks/lib/gates-strict');
+const { applyScaffold } = require('../.opencode/scripts/scaffold-apply');
+const strict = require('../.opencode/hooks/lib/gates-strict');
 
 const BASE_PROFILE = {
   name: 'secbaseline-gate-probe', description: 'gate probe',
@@ -33,7 +33,7 @@ function scaffold() {
   const target = path.join(workDir, 'project');
   const profilePath = path.join(workDir, 'profile.json');
   fs.writeFileSync(profilePath, JSON.stringify(BASE_PROFILE));
-  applyScaffold({ profile: profilePath, pluginSource: path.join(ROOT, '.claude'), target, scaffoldProfile: 'core' });
+  applyScaffold({ profile: profilePath, pluginSource: path.join(ROOT, '.opencode'), target, scaffoldProfile: 'core' });
   return { workDir, target };
 }
 
@@ -50,7 +50,7 @@ test('checkSecureBaselineWiring BLOCKs (exit 1) when security.yml is deleted', (
   const { workDir, target } = scaffold();
   try {
     fs.rmSync(path.join(target, '.github', 'workflows', 'security.yml'), { force: true });
-    const child = `require(${JSON.stringify(path.join(ROOT, '.claude/hooks/lib/gates-strict.js'))})` +
+    const child = `require(${JSON.stringify(path.join(ROOT, '.opencode/hooks/lib/gates-strict.js'))})` +
       `.checkSecureBaselineWiring({ projectDir: ${JSON.stringify(target)} });`;
     const res = spawnSync(process.execPath, ['-e', child], { encoding: 'utf8' });
     assert.strictEqual(res.status, 1, 'a missing security.yml must block');
@@ -67,7 +67,7 @@ test('checkSecureBaselineWiring BLOCKs (exit 1) when the configured environment 
   const { workDir, target } = scaffold();
   try {
     fs.rmSync(path.join(target, '.github', 'workflows', 'deploy.yml'), { force: true });
-    const child = `require(${JSON.stringify(path.join(ROOT, '.claude/hooks/lib/gates-strict.js'))})` +
+    const child = `require(${JSON.stringify(path.join(ROOT, '.opencode/hooks/lib/gates-strict.js'))})` +
       `.checkSecureBaselineWiring({ projectDir: ${JSON.stringify(target)} });`;
     const res = spawnSync(process.execPath, ['-e', child], { encoding: 'utf8' });
     assert.strictEqual(res.status, 1, 'a missing deploy.yml must block when environments are configured');

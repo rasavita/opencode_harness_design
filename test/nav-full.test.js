@@ -7,18 +7,18 @@ const path = require('path');
 const { test } = require('node:test');
 const { execFileSync } = require('child_process');
 
-const { buildNavIndex, loadNavIndex, cosineQuery } = require('../.claude/scripts/nav-index');
-const { buildCochange, cochangeNeighbors } = require('../.claude/scripts/nav-cochange');
-const { buildConceptPages } = require('../.claude/scripts/nav-concepts');
-const { buildContextPack } = require('../.claude/scripts/context-pack');
-const { callTool, handle } = require('../.claude/scripts/nav-mcp-server');
-const { appendNavEvent, readNavTelemetrySummary } = require('../.claude/scripts/nav-telemetry');
-const { cmdRefresh } = require('../.claude/scripts/nav-query');
+const { buildNavIndex, loadNavIndex, cosineQuery } = require('../.opencode/scripts/nav-index');
+const { buildCochange, cochangeNeighbors } = require('../.opencode/scripts/nav-cochange');
+const { buildConceptPages } = require('../.opencode/scripts/nav-concepts');
+const { buildContextPack } = require('../.opencode/scripts/context-pack');
+const { callTool, handle } = require('../.opencode/scripts/nav-mcp-server');
+const { appendNavEvent, readNavTelemetrySummary } = require('../.opencode/scripts/nav-telemetry');
+const { cmdRefresh } = require('../.opencode/scripts/nav-query');
 
 function tempProject() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nav-full-'));
   fs.mkdirSync(path.join(dir, 'specs', 'brownfield', 'wiki', 'pages'), { recursive: true });
-  fs.mkdirSync(path.join(dir, '.claude', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '.opencode', 'state'), { recursive: true });
   fs.mkdirSync(path.join(dir, 'src', 'auth'), { recursive: true });
   fs.mkdirSync(path.join(dir, 'src', 'billing'), { recursive: true });
   fs.mkdirSync(path.join(dir, '.harness'), { recursive: true });
@@ -223,8 +223,8 @@ test('nav-mcp callTool pack returns schema v2', () => {
     const pack = callTool('nav_pack', { question: 'validateSession', budget: 1200 });
     assert.strictEqual(pack.schema_version, 2);
     assert.ok(pack.results.length, JSON.stringify(pack));
-    assert.ok(Array.isArray(require('../.claude/scripts/nav-mcp-server').TOOLS));
-    assert.ok(require('../.claude/scripts/nav-mcp-server').TOOLS.some((t) => t.name === 'nav_pack'));
+    assert.ok(Array.isArray(require('../.opencode/scripts/nav-mcp-server').TOOLS));
+    assert.ok(require('../.opencode/scripts/nav-mcp-server').TOOLS.some((t) => t.name === 'nav_pack'));
     let out = null;
     const orig = process.stdout.write;
     process.stdout.write = (s) => { out = String(s); return true; };

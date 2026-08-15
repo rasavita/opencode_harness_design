@@ -28,7 +28,7 @@ test('record-run strips quote characters from git-derived user names', async () 
   assert.equal(result.status, 0, result.stderr);
 
   const ledger = fs.readFileSync(
-    path.join(projectDir, '.claude', 'state', 'telemetry-ledger.jsonl'), 'utf8'
+    path.join(projectDir, '.opencode', 'state', 'telemetry-ledger.jsonl'), 'utf8'
   ).trim().split('\n').map((line) => JSON.parse(line));
   assert.equal(ledger[0].user, 'dev one');
 });

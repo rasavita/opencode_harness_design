@@ -6,7 +6,7 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { collectStagedChanges, checkStaged, run } = require('../.claude/scripts/test-deletion-gate');
+const { collectStagedChanges, checkStaged, run } = require('../.opencode/scripts/test-deletion-gate');
 
 function fakeExec(map) {
   return (cmd, args) => {

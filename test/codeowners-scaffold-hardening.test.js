@@ -11,8 +11,8 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const { renderCodeowners } = require('../.claude/scripts/generate-codeowners');
-const { applyGithubDefault, materializeCodeowners } = require('../.claude/scripts/scaffold-security-baseline');
+const { renderCodeowners } = require('../.opencode/scripts/generate-codeowners');
+const { applyGithubDefault, materializeCodeowners } = require('../.opencode/scripts/scaffold-security-baseline');
 
 // --- VULN-003: owner/path values cannot smuggle extra CODEOWNERS rules ---------
 

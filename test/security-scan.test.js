@@ -4,7 +4,7 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const path = require('path');
 
-const lib = require(path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'security-scan.js'));
+const lib = require(path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'security-scan.js'));
 
 // Secret-shaped values are built at runtime (never as a literal) so this source
 // file carries no real secret — otherwise the pre-write gate blocks the write.

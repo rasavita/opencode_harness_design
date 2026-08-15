@@ -1,14 +1,14 @@
-# Claude Harness Engine v5 — Architecture Reference
+# OpenCode Harness Engine v5 — Architecture Reference
 
 > **Doc map:** this file is canonical for *architecture rationale*. For the live gate/sensor inventory see `HARNESS.md`; for install/usage see `README.md`; for the "which doc for what" index see `CODEBASE_MAP.md`.
 
-Comprehensive design document for the Claude Harness Engine: a GAN-inspired orchestration system for autonomous, long-running application development with Claude Code.
+Comprehensive design document for the OpenCode Harness Engine: a GAN-inspired orchestration system for autonomous, long-running application development with Claude Code.
 
 Copied into target projects by `/scaffold`.
 
 Current scaffold version: `2.0.0`.
 
-Canonical repository: `https://github.com/cwijayasundara/claude_harness_eng_v5.git`.
+Canonical repository: `https://github.com/cwijayasundara/opencode_harness_design.git`.
 
 Based on:
 - [Anthropic: Harness Design for Long-Running Apps](https://www.anthropic.com/engineering/harness-design-long-running-apps)
@@ -50,13 +50,13 @@ The harness is now an **agent factory**: one scaffold, optional framework skill 
 │  0. AUTHORING — Human + Claude Code (interactive)                          │
 │                                                                            │
 │  /scaffold (asks 8 questions) ─► writes:                                   │
-│    project-manifest.json · CLAUDE.md · design.md · init.sh                 │
-│    .claude/  (agents · skills · hooks · templates · state)                 │
+│    project-manifest.json · AGENTS.md · design.md · init.sh                 │
+│    .opencode/  (agents · skills · hooks · templates · state)                 │
 │    specs/   (brd · stories · design · brownfield · reviews)                │
 │                                                                            │
 │  Optional packs injected at scaffold time:                                 │
 │    • Official Claude Code plugins (superpowers, code-review, …)            │
-│    • Framework skill packs into .claude/skills/ (-a claude-code)            │
+│    • Framework skill packs into .opencode/skills/ (-a claude-code)            │
 │        – LangChain / LangGraph / DeepAgents (9 skills)                     │
 │        – Google ADK (7 skills)                                             │
 │    • Tracker config (Linear / Jira) — opt-in                               │
@@ -142,16 +142,16 @@ Neither runtime changes how `/auto` runs inside the workspace. The only differen
 
 | Component | Count | Location | Purpose |
 |---|---:|---|---|
-| Slash command (true) | 1 | `.claude/commands/scaffold.md` | Bootloader only |
-| Skills (virtual commands) | 26 | `.claude/skills/<name>/SKILL.md` | All other workflows |
-| Specialized agents | 8 | `.claude/agents/<name>.md` | Subagents with tool allowlists + model tier |
-| Lifecycle hooks | 7 | `.claude/hooks/*.js` | SessionStart, PreToolUse (Write/Edit + Bash), PostToolUse, UserPromptSubmit, Stop, SubagentStop |
-| Templates | — | `.claude/templates/*` | Sprint contract, story, init.sh, .gitignore, tracker config, state seeds, etc. (count omitted — it rots on every template add) |
-| State files | 12 tracked in this repo; 6 scaffold seeds | `.claude/state/`, `.claude/templates/state-seeds/` | Runtime snapshot + initial scaffold continuity files |
-| Utility scripts | 14 | `.claude/scripts/*.js`, `.claude/scripts/*.sh` | Model tiering, telemetry, validation, archive, certification, upstream watch |
+| Slash command (true) | 1 | `.opencode/commands/scaffold.md` | Bootloader only |
+| Skills (virtual commands) | 26 | `.opencode/skills/<name>/SKILL.md` | All other workflows |
+| Specialized agents | 8 | `.opencode/agents/<name>.md` | Subagents with tool allowlists + model tier |
+| Lifecycle hooks | 7 | `.opencode/hooks/*.js` | SessionStart, PreToolUse (Write/Edit + Bash), PostToolUse, UserPromptSubmit, Stop, SubagentStop |
+| Templates | — | `.opencode/templates/*` | Sprint contract, story, init.sh, .gitignore, tracker config, state seeds, etc. (count omitted — it rots on every template add) |
+| State files | 12 tracked in this repo; 6 scaffold seeds | `.opencode/state/`, `.opencode/templates/state-seeds/` | Runtime snapshot + initial scaffold continuity files |
+| Utility scripts | 14 | `.opencode/scripts/*.js`, `.opencode/scripts/*.sh` | Model tiering, telemetry, validation, archive, certification, upstream watch |
 | GitHub automation | 2 workflows | `.github/workflows/`, `.github/upstream/` | CI and upstream Claude Code drift watch |
 | Official plugins (default-on) | 9 | `enabledPlugins` in `settings.json` | Superpowers, code-review, frontend-design, … |
-| Framework skill packs | 2 (opt-in) | `.claude/skills/<pack-prefix>-*` (via `-a claude-code`) | LangChain (9 skills) · Google ADK (7 skills) |
+| Framework skill packs | 2 (opt-in) | `.opencode/skills/<pack-prefix>-*` (via `-a claude-code`) | LangChain (9 skills) · Google ADK (7 skills) |
 | Tracker orchestrator | 1 sibling project | `symphony_clone/` | Docker service for Linear-driven dispatch |
 | LSP servers | auto-detected | `project-manifest.json` `lsp.servers` | Symbol navigation for agents (go-to-definition, find-references) |
 
@@ -194,18 +194,18 @@ The `codebase-explorer` agent has `LSP` in its tool grants and uses it for symbo
 | code-reviewer | Opus 5 | Read · Write · Grep · Glob · Bash | Fresh-context structure (SOLID/maintainability) + correctness review of the diff |
 | codebase-explorer | Sonnet 4.6 | Read · Glob · Grep · Bash · LSP | Read-only brownfield discovery and symbol navigation |
 
-The Model column shows the **`balanced` default**. **Opus 5 is the top-capability tier** (prompts are model-agnostic by construction; see `docs/prompting-standards.md`). The cost posture is set by `execution.model_tier` (`cost`/`balanced`/`max-quality`) and stamped as exact model ids into each `.claude/agents/<name>.md` `model:` line; see `docs/model-allocation.md`.
+The Model column shows the **`balanced` default**. **Opus 5 is the top-capability tier** (prompts are model-agnostic by construction; see `docs/prompting-standards.md`). The cost posture is set by `execution.model_tier` (`cost`/`balanced`/`max-quality`) and stamped as exact model ids into each `.opencode/agents/<name>.md` `model:` line; see `docs/model-allocation.md`.
 
 ### The enforcement hooks
 
 All hooks include remediation instructions ("Fix: …") so they steer the agent, not just block it. They key off the tool name only — no per-command/agent gating — so they fire on every matching edit, including raw ad-hoc edits made outside any slash command.
 
-One consolidated hook per event — each spawns once and dispatches its checks in-process from `.claude/hooks/lib/`, so an edit costs 2 Node spawns instead of 13:
+One consolidated hook per event — each spawns once and dispatches its checks in-process from `.opencode/hooks/lib/`, so an edit costs 2 Node spawns instead of 13:
 
 | Event matcher | Hook | Purpose |
 |---|---|---|
 | `SessionStart` | `check-git-hooks.js` | Advisory: warns once when a git repo is missing the harness commit-time gates (e.g. `git init` without re-scaffolding). Never blocks; exempts the harness repo and foreign pre-commit hooks |
-| `PreToolUse Write|Edit|MultiEdit` | `pre-write-gate.js` | Blocks BEFORE disk, first failure wins: scope → machinery trust-boundary → **prompt-cache prefix** (`CLAUDE.md`, `.mcp.json`, `.claude/settings*.json`; `HARNESS_PREFIX_EDIT=1`) → `.env` protection → secret scan on inserted content only → `security-patterns.{json,yaml}` `block: true` rules (`HARNESS_PATTERN_BLOCK=off`) → 300-line file cap → 30-line function cap → TDD test-first (`HARNESS_TDD_GATE=off`) |
+| `PreToolUse Write|Edit|MultiEdit` | `pre-write-gate.js` | Blocks BEFORE disk, first failure wins: scope → machinery trust-boundary → **prompt-cache prefix** (`AGENTS.md`, `.mcp.json`, `.opencode/settings*.json`; `HARNESS_PREFIX_EDIT=1`) → `.env` protection → secret scan on inserted content only → `security-patterns.{json,yaml}` `block: true` rules (`HARNESS_PATTERN_BLOCK=off`) → 300-line file cap → 30-line function cap → TDD test-first (`HARNESS_TDD_GATE=off`) |
 | `PreToolUse Bash` | `pre-bash-gate.js` | Closes the shell write-bypass: extracts write targets from the command (redirections, `tee`, `sed -i`, `dd`, `cp`/`mv`) and re-applies project scope, the machinery trust-boundary, and `.env` protection so a shell write can't disable a gate (`HARNESS_PROTECT=off`) |
 | `PostToolUse Edit|Write|MultiEdit` | `verify-on-save.js` | Queue file in `pending-reviews.jsonl` (silent), then one-way layer imports check, ruff/mypy or eslint on the saved file — report-only, never `--fix` |
 | `UserPromptSubmit · Stop · SubagentStop` | `record-run.js` | Telemetry journal — off the per-edit hot path |
@@ -218,7 +218,7 @@ Commit-time gates are real **git hooks** (installed by `/scaffold` Step 8) — t
 | `pre-commit` | Staged-file layer scan → sprint-contract `VERDICT: PASS` check → project-wide `tsc --noEmit` (TS) → pytest coverage ratchet vs baseline / 80% floor (Python; `HARNESS_COVERAGE_GATE=off` bypass). Skips when no source files are staged. A gate that fails open (toolchain unprovisioned/timed out) prints a loud `WARNING: GATE SKIPPED` so a silent skip is never mistaken for a pass |
 | `prepare-commit-msg` | Harness-Lane/Mode/Iteration/Group commit trailers |
 
-A hook crash never blocks work, but is never silent either: failures are appended to `.claude/state/hook-errors.log`.
+A hook crash never blocks work, but is never silent either: failures are appended to `.opencode/state/hook-errors.log`.
 
 **TDD is enforced in two complementary layers.** Layer 1, the `pre-write-gate.js` test-first check (above), is deterministic and on by default: it blocks any source write with no test, but enforces test *existence* only. Layer 2 is the optional third-party [`tdd-guard`](https://github.com/nizos/tdd-guard) plugin, which adds LLM-judged red-green *ordering* (it reads live test results to catch implementation-before-failing-test and over-implementing). tdd-guard is opt-in — it needs an interactive `/plugin install` + `/tdd-guard:setup` plus per-project test reporters, so a scaffold can't auto-provision it. The two run as separate PreToolUse hooks; do not hand-add tdd-guard's command to `settings.json` (its setup registers its own hook). See the scaffold's generated `design.md` for the enable steps.
 
@@ -383,8 +383,8 @@ The 10 failure categories: `lint_format`, `type_error`, `import_error`, `key_err
 
 Recovery cost ≈ 700–1000 tokens per iteration. `/auto` reads:
 
-1. `.claude/program.md` — constraints may have changed mid-run
-2. `.claude/state/learned-rules.md` — inject verbatim into all agent prompts
+1. `.opencode/program.md` — constraints may have changed mid-run
+2. `.opencode/state/learned-rules.md` — inject verbatim into all agent prompts
 3. `claude-progress.txt` — last session block only
 4. `features.json` — what's passing, what's failing
 5. `specs/stories/dependency-graph.md` — what's the next unblocked group
@@ -466,7 +466,7 @@ Escalation contract: if the work outgrows the chosen lane (lite turns into 7 sto
 
 ## 10. Optional Framework Skill Packs
 
-`/scaffold` asks whether to install framework-specific skill packs alongside the harness. These are **opt-in** and ship through the open `skills` CLI; with `-a claude-code` they land inside `.claude/skills/<pack-prefix>-*` directly alongside the 26 harness skills. If the install is blocked (auto-mode classifier), `/scaffold` records the intent in `project-manifest.json#framework_skill_packs` and `/install-framework-packs` can re-run installs idempotently.
+`/scaffold` asks whether to install framework-specific skill packs alongside the harness. These are **opt-in** and ship through the open `skills` CLI; with `-a claude-code` they land inside `.opencode/skills/<pack-prefix>-*` directly alongside the 26 harness skills. If the install is blocked (auto-mode classifier), `/scaffold` records the intent in `project-manifest.json#framework_skill_packs` and `/install-framework-packs` can re-run installs idempotently.
 
 | Pack | Source | Skill count | Trigger phrases |
 |---|---|---:|---|
@@ -494,7 +494,7 @@ The chosen packs are recorded in `project-manifest.json` under a `framework_skil
 A solo engineer (or small pod) drives Claude Code directly:
 
 ```
-$ claude --plugin-dir ~/claude_harness_eng_v5/.claude
+$ claude --plugin-dir ~/opencode_harness_design/.opencode
 > /scaffold                # one time
 > /brd                     # or /build --lite, or /brownfield
 > /spec                    # human gate
@@ -508,13 +508,13 @@ Proof lives on disk (`specs/reviews/`, `iteration-log.md`, commits). Reviews and
 
 When the team wants a visible queue and parallel execution across machines, the harness exposes a tracker contract:
 
-1. **Publish step (one time)** — Inside Claude Code, run `/tracker-publish`. The skill reads the approved `dependency-graph.md` + `component-map.md` and creates **one tracker issue per dependency group**. Group dependencies become tracker blockers. The mapping is written to `.claude/state/tracker-map.json`.
+1. **Publish step (one time)** — Inside Claude Code, run `/tracker-publish`. The skill reads the approved `dependency-graph.md` + `component-map.md` and creates **one tracker issue per dependency group**. Group dependencies become tracker blockers. The mapping is written to `.opencode/state/tracker-map.json`.
 2. **Orchestrator step (continuous)** — `symphony_clone` runs as a Docker container. Each tick:
    - polls Linear for issues in the configured ready state + ready label whose blockers are terminal,
    - claims the top eligible issue, moves it to `In Progress`,
    - clones the repo to `/workspaces/<issue-key>`, creates `agent/<issue-key>`,
    - runs `claude --print --permission-mode bypassPermissions "<generated /auto prompt>"`,
-   - reads `.claude/state/tracker-runs/<group>/result.json`,
+   - reads `.opencode/state/tracker-runs/<group>/result.json`,
    - pushes the branch, opens a GitHub PR, comments proof back, moves the issue to `Human Review` (or `Blocked`).
 
    The orchestrator routes each eligible issue by label: `agent-plan` issues follow the PRD planning path; `agent-ready` issues follow the groomed-group execute path; a third label, `agent-feature` (configurable via `FEATURE_LABEL`), routes a raw brownfield change ticket to `/feature "<title>" --auto` — one issue → one PR — distinct from the `plan` and `execute` paths.
@@ -533,12 +533,12 @@ The orchestrator's safety boundaries:
 The `symphony_clone/` directory is **versioned alongside the harness but never copied into target projects by `/scaffold`**. The target repo only carries:
 
 ```
-.claude/                        # skills · agents · hooks · templates · state
+.opencode/                        # skills · agents · hooks · templates · state
 specs/stories/dependency-graph.md
 specs/design/component-map.md
 features.json
-.claude/tracker-config.json     # only if tracker mode was selected at scaffold time
-.claude/state/tracker-runs/     # written by /auto runs in tracker mode
+.opencode/tracker-config.json     # only if tracker mode was selected at scaffold time
+.opencode/state/tracker-runs/     # written by /auto runs in tracker mode
 ```
 
 The orchestrator is infrastructure. The scaffold is the contract.
@@ -548,7 +548,7 @@ The orchestrator is infrastructure. The scaffold is the contract.
 `/auto --group <id>` (in tracker mode) writes:
 
 ```text
-.claude/state/tracker-runs/<group>/result.json
+.opencode/state/tracker-runs/<group>/result.json
 ```
 
 Success:
@@ -589,15 +589,15 @@ Blocked:
 | `iteration-log.md` | Append-only | Full history: stories, verdicts, coverage, commits |
 | `learned-rules.md` | Monotonic (never deleted) | Defensive rules extracted from repeated failures |
 | `failures.md` | Append-only | Raw failure data for pattern extraction |
-| `.claude/state/pending-reviews.jsonl` | Recreated/cleared by hooks | Files changed this turn that require reviewer agents |
+| `.opencode/state/pending-reviews.jsonl` | Recreated/cleared by hooks | Files changed this turn that require reviewer agents |
 | `coverage-baseline.txt` | Ratcheted upward | Never drops; floor is 80% |
 | `features.json` | Updated per evaluation | Granular pass/fail with failure_layer and timestamps |
 | `claude-progress.txt` | Appended per session | Session chaining recovery context |
 | `sprint-contracts/` | One file per group | Negotiated done-criteria; immutable after negotiation |
 | `specs/reviews/eval-scores.json` | Appended per critique | User-visible design scores over time |
 | `calibration-profile.json` | Edited by human/scaffold | Scoring weights, threshold, plateau detection config |
-| `.claude/state/tracker-map.json` | Updated by `/tracker-publish` | Maps local dependency groups and stories to Linear/Jira issue keys |
-| `.claude/state/tracker-runs/<group>/result.json` | Written by `/auto --group <id>` in tracker mode | Proof contract consumed by the external orchestrator |
+| `.opencode/state/tracker-map.json` | Updated by `/tracker-publish` | Maps local dependency groups and stories to Linear/Jira issue keys |
+| `.opencode/state/tracker-runs/<group>/result.json` | Written by `/auto --group <id>` in tracker mode | Proof contract consumed by the external orchestrator |
 
 ---
 
@@ -643,7 +643,7 @@ specs/brownfield/code-graph.json   (+ per-file symbol records with line ranges)
     v
 architecture-map.md, risk-map.md, change-strategy.md
     |
-    | freshness: PostToolUse(Edit|Write) appends to .claude/state/graph-dirty.jsonl;
+    | freshness: PostToolUse(Edit|Write) appends to .opencode/state/graph-dirty.jsonl;
     | Stop/SubagentStop (graph-refresh.js) re-parses only dirty files and
     | re-renders symbol-map.md — the graph never goes stale mid-build.
     |
@@ -695,7 +695,7 @@ Agent contract: in brownfield mode, "module X depends on Y" claims must cite `co
 
 ## 16. Quality Principles
 
-Detailed rules in `.claude/skills/code-gen/SKILL.md`. Summary:
+Detailed rules in `.opencode/skills/code-gen/SKILL.md`. Summary:
 
 1. **TDD mandatory** — Write failing tests FIRST, then implement. Red-green-refactor.
 2. **100% meaningful coverage** — Every line verified by a test. 80% hard floor.

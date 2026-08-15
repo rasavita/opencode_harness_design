@@ -2,7 +2,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs'), os = require('os'), path = require('path');
-const qc = require('../.claude/scripts/quality-card.js');
+const qc = require('../.opencode/scripts/quality-card.js');
 
 function fixtureRoot() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'qc-'));

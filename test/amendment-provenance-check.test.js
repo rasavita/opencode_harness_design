@@ -6,7 +6,7 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'amendment-provenance-check.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'amendment-provenance-check.js');
 const { checkProvenance, run } = require(SCRIPT);
 
 test('a commit touching non-design files is not-applicable', () => {

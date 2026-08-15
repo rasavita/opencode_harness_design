@@ -9,7 +9,7 @@ const { test } = require('node:test');
 
 const repoRoot = path.join(__dirname, '..');
 const helper = path.join(
-  repoRoot, '.claude', 'skills', 'pe-ic-memo', 'scripts', '_test_build_sample.py'
+  repoRoot, '.opencode', 'skills', 'pe-ic-memo', 'scripts', '_test_build_sample.py'
 );
 
 test('build_deck renders a title slide plus one slide per section, with a real table shape on the table section', () => {

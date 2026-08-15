@@ -10,7 +10,7 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const { run } = require(path.join(__dirname, '..', '.claude', 'scripts', 'provision-protection.js'));
+const { run } = require(path.join(__dirname, '..', '.opencode', 'scripts', 'provision-protection.js'));
 
 function ghStub(routes, calls) {
   return (args) => {
@@ -65,7 +65,7 @@ test('--apply --fleet with an unreadable registry fails loudly (exit 2), never t
 
 test('the shipped fleet.template.json is the documented empty registry shape', () => {
   const tmpl = JSON.parse(fs.readFileSync(
-    path.join(__dirname, '..', '.claude', 'templates', 'fleet.template.json'), 'utf8'));
+    path.join(__dirname, '..', '.opencode', 'templates', 'fleet.template.json'), 'utf8'));
   assert.strictEqual(tmpl.org, '');
   assert.deepStrictEqual(tmpl.repos, []);
 });

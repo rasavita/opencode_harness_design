@@ -6,10 +6,10 @@ const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 const { test } = require('node:test');
-const { stampEnvelope } = require('../.claude/hooks/lib/task-envelope');
-const { appendEvent, lifecycleStatus, readLedger } = require('../.claude/hooks/lib/task-lifecycle');
-const { signReceipt } = require('../.claude/hooks/lib/authority-receipt');
-const { amend } = require('../.claude/scripts/task-envelope');
+const { stampEnvelope } = require('../.opencode/hooks/lib/task-envelope');
+const { appendEvent, lifecycleStatus, readLedger } = require('../.opencode/hooks/lib/task-lifecycle');
+const { signReceipt } = require('../.opencode/hooks/lib/authority-receipt');
+const { amend } = require('../.opencode/scripts/task-envelope');
 
 function envelope(expiresAt = new Date(Date.now() + 60_000).toISOString()) {
   return stampEnvelope({
@@ -41,7 +41,7 @@ test('lifecycle detects expiry and hash-chain corruption', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'task-chain-'));
   const task = envelope();
   appendEvent(root, task, 'created');
-  const file = path.join(root, '.claude', 'state', 'task-lifecycle.jsonl');
+  const file = path.join(root, '.opencode', 'state', 'task-lifecycle.jsonl');
   fs.appendFileSync(file, '{"sequence":2,"state":"active"}\n');
   assert.strictEqual(readLedger(root).state, 'invalid');
 });
@@ -49,13 +49,13 @@ test('lifecycle detects expiry and hash-chain corruption', () => {
 test('scope amendment requires and consumes signed authority while preserving the hash chain', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'task-amend-'));
   const task = envelope('2026-07-26T14:00:00Z');
-  fs.mkdirSync(path.join(root, '.claude', 'state'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.claude', 'state', 'task-envelope.json'), JSON.stringify(task));
+  fs.mkdirSync(path.join(root, '.opencode', 'state'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.opencode', 'state', 'task-envelope.json'), JSON.stringify(task));
   appendEvent(root, task, 'created', {}, new Date('2026-07-26T12:00:00Z'));
   appendEvent(root, task, 'active', {}, new Date('2026-07-26T12:01:00Z'));
   const pair = crypto.generateKeyPairSync('ed25519');
-  fs.mkdirSync(path.join(root, '.claude', 'trust'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.claude', 'trust', 'issuers.json'), JSON.stringify({
+  fs.mkdirSync(path.join(root, '.opencode', 'trust'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.opencode', 'trust', 'issuers.json'), JSON.stringify({
     schema_version: 1, issuers: [{
       issuer: 'change-board', key_id: 'one',
       public_key_pem: pair.publicKey.export({ type: 'spki', format: 'pem' }),
@@ -69,7 +69,7 @@ test('scope amendment requires and consumes signed authority while preserving th
     issued_at: '2026-07-26T12:01:00Z', expires_at: '2026-07-26T13:00:00Z',
     nonce: 'amend', actions: ['amend_task'], approval_receipt_ids: [],
   }, pair.privateKey);
-  const dir = path.join(root, '.claude', 'authority', 'capabilities');
+  const dir = path.join(root, '.opencode', 'authority', 'capabilities');
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'amend-once.json'), JSON.stringify(receipt));
   const updated = amend(root, { allow: ['test/**'] }, new Date('2026-07-26T12:10:00Z'));

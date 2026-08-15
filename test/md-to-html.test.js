@@ -5,7 +5,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { mdToHtml } = require(
-  path.join(__dirname, '..', '.claude', 'skills', 'code-map', 'scripts', 'md_to_html')
+  path.join(__dirname, '..', '.opencode', 'skills', 'code-map', 'scripts', 'md_to_html')
 );
 
 test('headings render at the right level', () => {

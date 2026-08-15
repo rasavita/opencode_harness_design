@@ -2,7 +2,7 @@ const assert = require('assert');
 const { test } = require('node:test');
 const {
   touchesSecurityBoundary,
-} = require('../.claude/hooks/lib/review-policy');
+} = require('../.opencode/hooks/lib/review-policy');
 
 test('security trigger ignores non-source docs even when names contain security words', () => {
   assert.strictEqual(touchesSecurityBoundary('docs/auth-design.md'), false);

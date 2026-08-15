@@ -16,7 +16,7 @@ const path = require('path');
 const { describe, test, before } = require('node:test');
 const { execFileSync } = require('child_process');
 
-const { runClaude } = require('./helpers/claude-runner');
+const { runClaude } = require('./helpers/opencode-runner');
 const { runProjectSuite } = require('./helpers/project-suite');
 
 const OUTPUT_DIR = path.join(__dirname, 'output');
@@ -43,12 +43,12 @@ function findSourceFiles() {
     if (!fs.existsSync(dir)) return;
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const full = path.join(dir, entry.name);
-      if (entry.isDirectory() && !['node_modules', '.claude'].includes(entry.name)) walk(full);
+      if (entry.isDirectory() && !['node_modules', '.opencode'].includes(entry.name)) walk(full);
       else if (entry.isFile() && /\.js$/.test(entry.name)) results.push(full);
     }
   };
   walk(PROJECT_DIR);
-  return results.filter((f) => !f.includes('node_modules') && !f.includes('.claude') && !f.includes('specs'));
+  return results.filter((f) => !f.includes('node_modules') && !f.includes('.opencode') && !f.includes('specs'));
 }
 
 // runProjectSuite only knows the `npm test` script. Node-builtins projects test

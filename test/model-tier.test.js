@@ -6,7 +6,7 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'model-tier.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'model-tier.js');
 const { modelsForTier, sessionFor, applyTier, PRESETS } = require(SCRIPT);
 
 const OPUS = 'claude-opus-5';
@@ -184,7 +184,7 @@ test('applyTier preserves the rest of the frontmatter and body', () => {
 // --- the repo's own agents must carry exact ids matching the default tier ------
 
 test('repo agents are stamped with exact model ids (default dogfood tier = balanced)', () => {
-  const dir = path.join(__dirname, '..', '.claude', 'agents');
+  const dir = path.join(__dirname, '..', '.opencode', 'agents');
   const expected = modelsForTier('balanced');
   const valid = new Set([OPUS, SONNET5, HAIKU]);
   // Advisor is new; modularity-reviewer may exist — require known roles only.

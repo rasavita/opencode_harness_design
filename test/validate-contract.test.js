@@ -11,8 +11,8 @@ const { test } = require('node:test');
 // codes) — contract-validate.test.js covers the schema library; this covers the
 // script that the /auto loop and the pre-commit hook actually invoke.
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'validate-contract.js');
-const SCHEMA = path.join(__dirname, '..', '.claude', 'skills', 'evaluate', 'references', 'contract-schema.json');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'validate-contract.js');
+const SCHEMA = path.join(__dirname, '..', '.opencode', 'skills', 'evaluate', 'references', 'contract-schema.json');
 
 const VALID_CONTRACT = { group: 'A', stories: ['E1-S1'], features: ['F1'], contract: {} };
 

@@ -16,10 +16,10 @@ const ENV = { HARNESS_COVERAGE_GATE: 'off' };
 const SDK_VIOLATION = 'client = Anthropic()\n';
 
 function installScript(projectDir) {
-  const dir = path.join(projectDir, '.claude', 'scripts');
+  const dir = path.join(projectDir, '.opencode', 'scripts');
   fs.mkdirSync(dir, { recursive: true });
   fs.copyFileSync(
-    path.join(__dirname, '..', '.claude', 'scripts', 'live-externals-gate.js'),
+    path.join(__dirname, '..', '.opencode', 'scripts', 'live-externals-gate.js'),
     path.join(dir, 'live-externals-gate.js')
   );
 }

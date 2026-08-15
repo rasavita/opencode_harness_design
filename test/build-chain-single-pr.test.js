@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { promptFor } = require('../.claude/scripts/build-chain.js');
+const { promptFor } = require('../.opencode/scripts/build-chain.js');
 
 test('promptFor forwards --single-pr to every link kind', () => {
   assert.ok(promptFor('PLAN', 'prd.md', { singlePr: true }).includes('--single-pr'));

@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const { test } = require('node:test');
-const P = require('../.claude/scripts/plan-confidence.js');
+const P = require('../.opencode/scripts/plan-confidence.js');
 
 // ---- computeConfidence: band boundaries ---------------------------------
 
@@ -240,7 +240,7 @@ const cpath = require('path');
 const cos = require('os');
 const { execFileSync } = require('child_process');
 
-const PC_CLI = cpath.join(__dirname, '..', '.claude', 'scripts', 'plan-confidence.js');
+const PC_CLI = cpath.join(__dirname, '..', '.opencode', 'scripts', 'plan-confidence.js');
 
 function pcRoot(files = {}) {
   const root = cfs.mkdtempSync(cpath.join(cos.tmpdir(), 'plan-confidence-'));

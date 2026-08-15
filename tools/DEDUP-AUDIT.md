@@ -49,7 +49,7 @@ a live signal. `/schedule` is the honest driver.
    `npm run control-budget` so the budget ratchets down.
 
 5. **Record the audit.** `node tools/overlap-candidates.js --record`
-   Writes `.claude/state/dedup-audit-marker.json` — the control set this full audit
+   Writes `.opencode/state/dedup-audit-marker.json` — the control set this full audit
    covered — so the next `--stale` measures drift from here. Record only after a **full**
    backstop pass (agents read source), not after a pre-pass-only run.
 

@@ -1,6 +1,6 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { validate } = require('../.claude/hooks/lib/contract-schema');
+const { validate } = require('../.opencode/hooks/lib/contract-schema');
 const pack = require('../dsl-packs/private-equity/waterfall/pack');
 
 const VALID = {

@@ -25,9 +25,9 @@ tokens but does not *cap* them. We have neither the meter nor the cap.
 
 The harness **makes no direct Anthropic API calls** — it runs *inside* Claude Code, which owns the
 API conversation (this is also why prompt caching is automatic and there are no `cache_control`
-breakpoints to manage; see CLAUDE.md → *Prompt Caching*). Consequently the orchestrator **cannot
+breakpoints to manage; see AGENTS.md → *Prompt Caching*). Consequently the orchestrator **cannot
 read an exact running token count synchronously** the way a script wrapping the SDK could. Today's
-run receipts (`.claude/hooks/record-run.js` → `.claude/runs/YYYY-MM-DD.jsonl`) record
+run receipts (`.opencode/hooks/record-run.js` → `.opencode/runs/YYYY-MM-DD.jsonl`) record
 `{kind, ts, lane, mode, iteration, group_id, story_id, session_id, host, …}` and **no token or cost
 fields at all**.
 
@@ -90,7 +90,7 @@ gatherSpend(readReceipts, startedAtMs, nowMs, tier) -> { wall_clock_ms, agents, 
 estimateCost(receipts, tier) -> number     // Σ rate[tier][agent_kind]; pure, rate table is a const
 ```
 
-- `wall_clock_ms` = `nowMs - startedAtMs` (run start stamped in a `.claude/state/budget-start` marker
+- `wall_clock_ms` = `nowMs - startedAtMs` (run start stamped in a `.opencode/state/budget-start` marker
   at Phase 4 / `/auto` entry).
 - `agents` = count of `kind === 'subagent'` receipts for this `session_id`/run.
 - `est_cost_usd` = `estimateCost(receipts, tier)` using a `RATE_USD` table keyed by tier and agent
@@ -166,7 +166,7 @@ One resolved budget, from (lowest → highest precedence):
    | balanced | 90 min | 200 | $25 |
    | max-quality | 180 min | 400 | $60 |
 
-2. **`.claude/program.md`** — a `Budget` constraint line the orchestrator re-reads every iteration
+2. **`.opencode/program.md`** — a `Budget` constraint line the orchestrator re-reads every iteration
    (so a human can tighten/loosen mid-run, like the existing `Max iterations` knob).
 3. **Env** — `HARNESS_BUDGET_WALL_MS`, `HARNESS_BUDGET_AGENTS`, `HARNESS_BUDGET_USD` (for
    `build-chain.js` headless runs, alongside `BUILD_CHAIN_LINK_TIMEOUT_MS`).
@@ -179,18 +179,18 @@ A budget of `off` disables the cap (restores today's count-only behavior).
 
 | File | Change |
 |---|---|
-| `.claude/scripts/budget-state.js` *(new)* | Pure `computeBudget` / `estimateCost` + `RATE_USD`; thin `gatherSpend` over receipts. |
+| `.opencode/scripts/budget-state.js` *(new)* | Pure `computeBudget` / `estimateCost` + `RATE_USD`; thin `gatherSpend` over receipts. |
 | `test/budget-state.test.js` *(new)* | Band boundaries, multi-dimension exhaustion (any-dimension), wall-clock vs agents vs est-cost, real-token override of the estimate, `off`. |
-| `.claude/scripts/build-chain.js` / `build-chain-state.js` | Add the budget dimension to the between-link halt; keep link-count cap as one dimension. |
-| `.claude/skills/auto/SKILL.md` | SECTION 11: budget as priority-1 clean-checkpoint stop; SECTION 2: pre-dispatch budget read + warn. |
-| `.claude/scripts/pipeline-state-readers.js` | `readBudget(projectDir)` from `budget-start` marker + receipts. |
-| `.claude/scripts/pipeline-snapshot.js` | Add `budget` to the snapshot. |
-| `.claude/scripts/pipeline-status.js` | Render the `Budget:` line when present. |
-| `.claude/hooks/record-run.js` | Stamp `budget-start` on first run receipt; add optional usage fields when the hook input exposes them. |
-| `.claude/scripts/telemetry-memory.js` | `harness_token_usage_total` + `harness_est_cost_usd` gauges. |
-| `.claude/scripts/scaffold-render.js` | Per-tier `execution.budget` defaults in `buildManifest`. |
-| `.claude/skills/build/SKILL.md` | Phase 3.5 est-spend line; `--auto` over-budget-projection stop; document `--budget`. |
-| `.claude/program.md` (+ template) | `Budget` constraint line. |
+| `.opencode/scripts/build-chain.js` / `build-chain-state.js` | Add the budget dimension to the between-link halt; keep link-count cap as one dimension. |
+| `.opencode/skills/auto/SKILL.md` | SECTION 11: budget as priority-1 clean-checkpoint stop; SECTION 2: pre-dispatch budget read + warn. |
+| `.opencode/scripts/pipeline-state-readers.js` | `readBudget(projectDir)` from `budget-start` marker + receipts. |
+| `.opencode/scripts/pipeline-snapshot.js` | Add `budget` to the snapshot. |
+| `.opencode/scripts/pipeline-status.js` | Render the `Budget:` line when present. |
+| `.opencode/hooks/record-run.js` | Stamp `budget-start` on first run receipt; add optional usage fields when the hook input exposes them. |
+| `.opencode/scripts/telemetry-memory.js` | `harness_token_usage_total` + `harness_est_cost_usd` gauges. |
+| `.opencode/scripts/scaffold-render.js` | Per-tier `execution.budget` defaults in `buildManifest`. |
+| `.opencode/skills/build/SKILL.md` | Phase 3.5 est-spend line; `--auto` over-budget-projection stop; document `--budget`. |
+| `.opencode/program.md` (+ template) | `Budget` constraint line. |
 | `project-manifest.json` template | `execution.budget` block. |
 
 ## Edge cases & non-goals

@@ -18,11 +18,11 @@ const ROOT = path.resolve(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 test('impact-scope.js and local-regression-gate.js exist and reuse tested hooks/lib machinery', () => {
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude/scripts/impact-scope.js')));
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude/hooks/lib/impact-scope.js')));
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude/scripts/local-regression-gate.js')));
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude/hooks/lib/local-regression-gate.js')));
-  const cli = read('.claude/scripts/local-regression-gate.js');
+  assert.ok(fs.existsSync(path.join(ROOT, '.opencode/scripts/impact-scope.js')));
+  assert.ok(fs.existsSync(path.join(ROOT, '.opencode/hooks/lib/impact-scope.js')));
+  assert.ok(fs.existsSync(path.join(ROOT, '.opencode/scripts/local-regression-gate.js')));
+  assert.ok(fs.existsSync(path.join(ROOT, '.opencode/hooks/lib/local-regression-gate.js')));
+  const cli = read('.opencode/scripts/local-regression-gate.js');
   assert.match(cli, /require\('\.\.\/hooks\/lib\/impact-scope'\)/, 'CLI must reuse the tested impact-scope lib');
   assert.match(cli, /require\('\.\.\/hooks\/lib\/regression-gate'\)/, 'CLI must reuse G15\'s quarantine primitive, not duplicate it');
   assert.match(cli, /require\('\.\.\/hooks\/lib\/local-regression-gate'\)/, 'CLI must reuse the tested scoped-runner lib');
@@ -30,12 +30,12 @@ test('impact-scope.js and local-regression-gate.js exist and reuse tested hooks/
 
 test('package.json exposes impact-scope and local-regression-gate scripts', () => {
   const pkg = JSON.parse(read('package.json'));
-  assert.strictEqual(pkg.scripts['impact-scope'], 'node .claude/scripts/impact-scope.js');
-  assert.strictEqual(pkg.scripts['local-regression-gate'], 'node .claude/scripts/local-regression-gate.js');
+  assert.strictEqual(pkg.scripts['impact-scope'], 'node .opencode/scripts/impact-scope.js');
+  assert.strictEqual(pkg.scripts['local-regression-gate'], 'node .opencode/scripts/local-regression-gate.js');
 });
 
 test('/change Step S5 runs local-regression-gate.js in addition to (not instead of) the unit suite', () => {
-  const skill = read('.claude/skills/change/SKILL.md');
+  const skill = read('.opencode/skills/change/SKILL.md');
   const s5Start = skill.indexOf('### Step S5');
   const s5End = skill.indexOf('### Step S6');
   const s5 = skill.slice(s5Start, s5End);
@@ -46,7 +46,7 @@ test('/change Step S5 runs local-regression-gate.js in addition to (not instead 
 });
 
 test('/vibe Step 6 runs the impact-scoped gate', () => {
-  const skill = read('.claude/skills/vibe/SKILL.md');
+  const skill = read('.opencode/skills/vibe/SKILL.md');
   assert.match(skill, /run-gate-checks\.js --only local-regression/, '/vibe must run the impact-scoped gate');
 });
 
@@ -60,7 +60,7 @@ test('/gate and /auto keep running the FULL regression-gate.js sweep unchanged (
 
   // /gate now runs the check registry rather than naming scripts, so assert there:
   // the FULL sweep must be registered and the scoped local gate must NOT be.
-  const { loadRegistry } = require('../.claude/scripts/run-gate-checks.js');
+  const { loadRegistry } = require('../.opencode/scripts/run-gate-checks.js');
   const registry = loadRegistry(process.cwd());
   const full = registry.find((c) => c.script === 'regression-gate.js');
   assert.ok(full && !full.lane_only, '/gate must still run the FULL regression sweep by default');
@@ -78,7 +78,7 @@ test('manifest registers impact-scoped-regression active, behaviour axis, diff s
   assert.strictEqual(s.status, 'active');
   assert.strictEqual(s.scope, 'runtime');
   assert.strictEqual(s.gap_ref, 'G16');
-  assert.strictEqual(s.wired_at, '.claude/scripts/local-regression-gate.js');
+  assert.strictEqual(s.wired_at, '.opencode/scripts/local-regression-gate.js');
   assert.ok(fs.existsSync(path.join(ROOT, s.wired_at)), 'wired_at must resolve');
   assert.ok(s.signal && s.description, 'signal/description must be populated per the existing style');
 });
@@ -96,7 +96,7 @@ test('sensor-arbitration.md classifies impact-scoped-regression as hard-block wi
 });
 
 test('harness-manifest.json itself remains internally valid (honesty invariant)', () => {
-  const { validate } = require('../.claude/scripts/validate-harness-manifest.js');
+  const { validate } = require('../.opencode/scripts/validate-harness-manifest.js');
   const manifest = JSON.parse(read('harness-manifest.json'));
   const { errors } = validate(manifest);
   assert.deepStrictEqual(errors, []);

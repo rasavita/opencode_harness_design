@@ -6,7 +6,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const ctx = require(path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'contexts.js'));
+const ctx = require(path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'contexts.js'));
 
 const CONFIG = {
   roots: ['src/billing', 'src/user'],

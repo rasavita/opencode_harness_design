@@ -26,19 +26,19 @@ const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
-const HOOK = path.join(__dirname, '..', '.claude', 'hooks', 'pre-bash-gate.js');
+const HOOK = path.join(__dirname, '..', '.opencode', 'hooks', 'pre-bash-gate.js');
 
 function scaffoldedProject() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'rm-guard-'));
   // NOT the harness package name: machinery protection only applies to a
   // scaffolded product, since the harness edits its own hooks by design.
   fs.writeFileSync(path.join(root, 'package.json'), '{"name":"some-product"}\n');
-  for (const dir of ['.claude/state', '.claude/git-hooks', 'src/generated', 'scratch', 'node_modules']) {
+  for (const dir of ['.opencode/state', '.opencode/git-hooks', 'src/generated', 'scratch', 'node_modules']) {
     fs.mkdirSync(path.join(root, dir), { recursive: true });
   }
-  fs.writeFileSync(path.join(root, '.claude/state/task-lifecycle.jsonl'), '');
-  fs.writeFileSync(path.join(root, '.claude/state/coverage-baseline.txt'), '80\n');
-  fs.writeFileSync(path.join(root, '.claude/git-hooks/pre-commit'), '#!/bin/sh\n');
+  fs.writeFileSync(path.join(root, '.opencode/state/task-lifecycle.jsonl'), '');
+  fs.writeFileSync(path.join(root, '.opencode/state/coverage-baseline.txt'), '80\n');
+  fs.writeFileSync(path.join(root, '.opencode/git-hooks/pre-commit'), '#!/bin/sh\n');
   fs.writeFileSync(path.join(root, 'scratch/junk'), 'x');
   fs.writeFileSync(path.join(root, 'src/generated/out.js'), 'x');
   return root;
@@ -48,7 +48,7 @@ function runGate(root, command) {
   const res = spawnSync('node', [HOOK], {
     input: JSON.stringify({ tool_name: 'Bash', tool_input: { command } }),
     encoding: 'utf8',
-    env: { ...process.env, CLAUDE_PROJECT_DIR: root },
+    env: { ...process.env, OPENCODE_PROJECT_DIR: root },
     cwd: root,
   });
   return { status: res.status, out: `${res.stdout || ''}${res.stderr || ''}` };
@@ -58,15 +58,15 @@ function runGate(root, command) {
 // state-backed gate it is strictly better for the attacker, because an absent file
 // reads as "nothing to check" rather than as tampering.
 const MUST_BLOCK = [
-  'rm .claude/state/task-lifecycle.jsonl',
-  'rm -f .claude/state/coverage-baseline.txt',
-  'rm -rf .claude/git-hooks',
-  'rm -rf .claude/state',
-  'rm -rf .claude',                                  // the container case
-  'git restore .claude/state/task-lifecycle.jsonl',  // restore takes paths positionally
-  'git checkout -- .claude/git-hooks/pre-commit',    // checkout needs the -- separator
-  'mv .claude/state/task-lifecycle.jsonl /tmp/stash', // the SOURCE is removed
-  'echo x && rm .claude/state/task-lifecycle.jsonl',  // later segment still counts
+  'rm .opencode/state/task-lifecycle.jsonl',
+  'rm -f .opencode/state/coverage-baseline.txt',
+  'rm -rf .opencode/git-hooks',
+  'rm -rf .opencode/state',
+  'rm -rf .opencode',                                  // the container case
+  'git restore .opencode/state/task-lifecycle.jsonl',  // restore takes paths positionally
+  'git checkout -- .opencode/git-hooks/pre-commit',    // checkout needs the -- separator
+  'mv .opencode/state/task-lifecycle.jsonl /tmp/stash', // the SOURCE is removed
+  'echo x && rm .opencode/state/task-lifecycle.jsonl',  // later segment still counts
 ];
 
 for (const command of MUST_BLOCK) {
@@ -89,7 +89,7 @@ const MUST_PASS = [
   'git commit -m "rm the old thing"',
   'git status',
   'npm test',
-  'echo "rm .claude/state/task-lifecycle.jsonl"',  // quoted text is not a command
+  'echo "rm .opencode/state/task-lifecycle.jsonl"',  // quoted text is not a command
 ];
 
 for (const command of MUST_PASS) {
@@ -103,16 +103,16 @@ for (const command of MUST_PASS) {
 // there. Without this the guard would make the harness undevelopable.
 test('the harness repo itself is exempt from machinery removal blocking', () => {
   const root = scaffoldedProject();
-  fs.writeFileSync(path.join(root, 'package.json'), '{"name":"claude-harness-eng-v5"}\n');
-  const { status } = runGate(root, 'rm .claude/state/task-lifecycle.jsonl');
+  fs.writeFileSync(path.join(root, 'package.json'), '{"name":"opencode-harness-design"}\n');
+  const { status } = runGate(root, 'rm .opencode/state/task-lifecycle.jsonl');
   assert.strictEqual(status, 0, 'harness self-development must not be blocked');
 });
 
 test('HARNESS_PROTECT=off is honoured for removals, as it is for writes', () => {
   const res = spawnSync('node', [HOOK], {
-    input: JSON.stringify({ tool_name: 'Bash', tool_input: { command: 'rm .claude/state/task-lifecycle.jsonl' } }),
+    input: JSON.stringify({ tool_name: 'Bash', tool_input: { command: 'rm .opencode/state/task-lifecycle.jsonl' } }),
     encoding: 'utf8',
-    env: { ...process.env, CLAUDE_PROJECT_DIR: scaffoldedProject(), HARNESS_PROTECT: 'off' },
+    env: { ...process.env, OPENCODE_PROJECT_DIR: scaffoldedProject(), HARNESS_PROTECT: 'off' },
   });
   assert.strictEqual(res.status, 0);
 });

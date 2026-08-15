@@ -7,7 +7,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'brd-taxonomy-check.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'brd-taxonomy-check.js');
 const { checkTaxonomy, SLOTS } = require(SCRIPT);
 
 // Every slot covered by at least one requirement — the shape a complete BRD has.

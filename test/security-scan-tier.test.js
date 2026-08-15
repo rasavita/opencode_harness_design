@@ -13,8 +13,8 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
-const CLI = path.join(ROOT, '.claude', 'scripts', 'security-scan.js');
-const { requiredScanners, localSastCommand } = require('../.claude/scripts/security-scan.js');
+const CLI = path.join(ROOT, '.opencode', 'scripts', 'security-scan.js');
+const { requiredScanners, localSastCommand } = require('../.opencode/scripts/security-scan.js');
 
 function runCli(args, cwd) {
   const res = spawnSync(process.execPath, [CLI, ...args], { cwd, encoding: 'utf8', env: { ...process.env, PATH: '' } });

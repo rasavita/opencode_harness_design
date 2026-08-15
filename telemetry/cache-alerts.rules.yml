@@ -6,7 +6,7 @@
 # then reload Prometheus. See telemetry/CACHE_MONITORING.md.
 #
 # Source metric: Claude Code exports `claude_code.token.usage` (OTEL counter, unit
-# `tokens`) when CLAUDE_CODE_ENABLE_TELEMETRY=1. After the OTLP -> Prometheus export
+# `tokens`) when HARNESS_ENABLE_TELEMETRY=1. After the OTLP -> Prometheus export
 # in this stack it appears as `claude_code_token_usage_tokens_total`, with label `type`
 # whose values are: input | output | cacheRead | cacheCreation (camelCase). Other
 # labels include `model` and `session_id`.
@@ -53,7 +53,7 @@ groups:
           summary: "Claude Code prompt-cache hit rate below 70% for 15m"
           description: >
             Cache hit rate is {{ $value | humanizePercentage }} (5m rate). Likely cause:
-            prefix invalidation — a mid-session tool/plugin/MCP change, a CLAUDE.md edit,
+            prefix invalidation — a mid-session tool/plugin/MCP change, a AGENTS.md edit,
             a model swap on the main loop, or a dynamic value in cached content.
             See telemetry/CACHE_MONITORING.md.
 
@@ -68,5 +68,5 @@ groups:
           description: >
             Cache hit rate is {{ $value | humanizePercentage }} (5m rate). Cost/latency
             incident — the cached prefix is being rebuilt repeatedly. Investigate recent
-            changes to the tool set, enabled plugins/MCP servers, CLAUDE.md, or the
+            changes to the tool set, enabled plugins/MCP servers, AGENTS.md, or the
             session model.

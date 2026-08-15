@@ -43,9 +43,9 @@ test('the dashboard surfaces the pipeline-progress gauges and live state metrics
 // or a renamed metric would otherwise produce a silently empty panel.
 test('every harness_* metric charted is actually emitted somewhere', () => {
   const emitters = [
-    read(path.join(ROOT, '.claude', 'scripts', 'telemetry-memory.js')),
-    read(path.join(ROOT, '.claude', 'scripts', 'telemetry-pipeline-gauges.js')),
-    read(path.join(ROOT, '.claude', 'scripts', 'telemetry-phase-eval.js')),
+    read(path.join(ROOT, '.opencode', 'scripts', 'telemetry-memory.js')),
+    read(path.join(ROOT, '.opencode', 'scripts', 'telemetry-pipeline-gauges.js')),
+    read(path.join(ROOT, '.opencode', 'scripts', 'telemetry-phase-eval.js')),
   ].join('\n');
 
   const charted = new Set(

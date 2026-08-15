@@ -12,7 +12,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { test } = require('node:test');
 
-const script = path.join(__dirname, '..', '.claude', 'scripts', 'ci-ingest.js');
+const script = path.join(__dirname, '..', '.opencode', 'scripts', 'ci-ingest.js');
 const { extractCommands, classify } = require(script);
 
 const GH_WORKFLOW = `

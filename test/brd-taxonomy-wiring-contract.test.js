@@ -13,12 +13,12 @@ const { readSkillCorpus } = require('./helpers/skill-corpus');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
-const { SLOTS } = require(path.join(ROOT, '.claude/scripts/brd-taxonomy-check.js'));
+const { SLOTS } = require(path.join(ROOT, '.opencode/scripts/brd-taxonomy-check.js'));
 
 test('package.json exposes the gate and /brd Step 4.45 runs it as a hard block', () => {
   assert.strictEqual(
     JSON.parse(read('package.json')).scripts['brd-taxonomy'],
-    'node .claude/scripts/brd-taxonomy-check.js',
+    'node .opencode/scripts/brd-taxonomy-check.js',
   );
   const brd = readSkillCorpus('brd');
   assert.match(brd, /brd-taxonomy-check\.js/, '/brd must run the taxonomy gate');
@@ -49,7 +49,7 @@ test('/spec closes the acceptance round-trip against the BRD acceptance ids', ()
 });
 
 test('rubrics defer to the deterministic verdicts instead of re-judging from prose', () => {
-  const rubrics = JSON.parse(read('.claude/templates/phase-eval-rubrics.json'));
+  const rubrics = JSON.parse(read('.opencode/templates/phase-eval-rubrics.json'));
   assert.match(rubrics.phases.brd.hard_gate, /brd-taxonomy\.json/);
   assert.match(rubrics.phases.brd.criteria.completeness, /brd-taxonomy\.json/);
   assert.match(rubrics.phases.spec.hard_gate, /story-clusters\.js/);
@@ -62,7 +62,7 @@ test('manifest and HARNESS.md register the control with a budget justification',
   assert.ok(s, 'expected a brd-taxonomy-floor sensor entry');
   assert.strictEqual(s.axis, 'traceability');
   assert.strictEqual(s.status, 'active');
-  assert.strictEqual(s.wired_at, '.claude/scripts/brd-taxonomy-check.js');
+  assert.strictEqual(s.wired_at, '.opencode/scripts/brd-taxonomy-check.js');
   assert.ok(s.net_add_justification);
   assert.match(read('HARNESS.md'), /brd-taxonomy-floor/);
 });
@@ -75,11 +75,11 @@ test('scaffold-copy propagates the gate to scaffolded projects', () => {
 // --- D9: BRD safeguards must reach the design contract ------------------------
 
 test('validate-canvas checks safeguard coverage, reusing the tested lib', () => {
-  const cli = read('.claude/scripts/validate-canvas.js');
+  const cli = read('.opencode/scripts/validate-canvas.js');
   assert.match(cli, /checkSafeguardCoverage/, 'CLI must run the coverage check');
   assert.match(cli, /brd-safeguards\.json/, 'CLI must default to the BRD safeguard spine');
   assert.match(
-    read('.claude/hooks/lib/canvas.js'),
+    read('.opencode/hooks/lib/canvas.js'),
     /function checkSafeguardCoverage/,
     'the logic must live in the tested lib, not the CLI',
   );
@@ -92,7 +92,7 @@ test('/design blocks on uncovered safeguards and states the skip/empty-spine rul
 });
 
 test('the Canvas template tells the author to cite SG-n ids in both sections', () => {
-  const tpl = read('.claude/skills/design/references/reasons-canvas-template.md');
+  const tpl = read('.opencode/skills/design/references/reasons-canvas-template.md');
   assert.match(tpl, /`SG-n`/, 'template must require SG-n citations');
   assert.match(tpl, /## Safeguards/);
   assert.match(tpl, /## Norms/);

@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
-const IGNORED = new Set(['node_modules', '.git', '.claude', '.DS_Store']);
+const IGNORED = new Set(['node_modules', '.git', '.opencode', '.DS_Store']);
 
 function listFiles(dir, prefix = '') {
   if (!fs.existsSync(dir)) return [];

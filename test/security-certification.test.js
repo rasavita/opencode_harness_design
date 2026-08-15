@@ -7,7 +7,7 @@ const path = require('path');
 const { test } = require('node:test');
 const {
   SUBJECTS, certify, verifyCertification,
-} = require('../.claude/scripts/security-certification');
+} = require('../.opencode/scripts/security-certification');
 
 const REPO = path.resolve(__dirname, '..');
 
@@ -19,16 +19,16 @@ function fixture() {
     fs.copyFileSync(path.join(REPO, rel), target);
   }
   for (const rel of [
-    '.claude/config/security-certification-profiles.json',
-    '.claude/templates/unattended-policy.template.json',
+    '.opencode/config/security-certification-profiles.json',
+    '.opencode/templates/unattended-policy.template.json',
   ]) {
     const target = path.join(root, rel);
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.copyFileSync(path.join(REPO, rel), target);
   }
   fs.copyFileSync(
-    path.join(root, '.claude', 'templates', 'unattended-policy.template.json'),
-    path.join(root, '.claude', 'unattended-policy.json'),
+    path.join(root, '.opencode', 'templates', 'unattended-policy.template.json'),
+    path.join(root, '.opencode', 'unattended-policy.json'),
   );
   return root;
 }
@@ -45,13 +45,13 @@ test('unattended-core attack corpus passes and produces a current integrity-boun
 test('certification fails after result corruption, policy drift, subject drift, or expiry', () => {
   const variants = [
     (root) => {
-      const file = path.join(root, '.claude', 'certification', 'security-boundary.json');
+      const file = path.join(root, '.opencode', 'certification', 'security-boundary.json');
       const result = JSON.parse(fs.readFileSync(file, 'utf8'));
       result.cases[0].actual = 'allowed';
       fs.writeFileSync(file, JSON.stringify(result));
     },
     (root) => {
-      const file = path.join(root, '.claude', 'unattended-policy.json');
+      const file = path.join(root, '.opencode', 'unattended-policy.json');
       const policy = JSON.parse(fs.readFileSync(file, 'utf8'));
       policy.network.allowed_domains.push('changed.example');
       fs.writeFileSync(file, JSON.stringify(policy));
@@ -75,7 +75,7 @@ test('certification fails after result corruption, policy drift, subject drift, 
 test('certification fails closed on malformed result fields', () => {
   const root = fixture();
   certify(root, 'unattended-core', new Date('2026-07-26T12:00:00Z'));
-  const file = path.join(root, '.claude', 'certification', 'security-boundary.json');
+  const file = path.join(root, '.opencode', 'certification', 'security-boundary.json');
   const result = JSON.parse(fs.readFileSync(file, 'utf8'));
   delete result.cases;
   delete result.subjects;

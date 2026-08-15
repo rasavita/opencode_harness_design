@@ -154,7 +154,7 @@ test('9: fleet-gate-retrofit is a registered, honest control; budget = 130', () 
   const entry = (manifest.sensors || []).find((s) => s.id === 'fleet-gate-retrofit');
   assert.ok(entry, 'fleet-gate-retrofit registered as a sensor');
   assert.strictEqual(entry.scope, 'portfolio');
-  assert.strictEqual(entry.wired_at, '.claude/scripts/fleet-retrofit.js');
+  assert.strictEqual(entry.wired_at, '.opencode/scripts/fleet-retrofit.js');
   assert.ok(entry.net_add_justification && entry.net_add_justification.length > 0, 'has a net_add_justification');
   const { errors } = validate(manifest);
   assert.strictEqual(errors.length, 0, JSON.stringify(errors));

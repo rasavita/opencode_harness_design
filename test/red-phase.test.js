@@ -24,8 +24,8 @@ const {
   parseVerdict,
   failingTestFiles,
   classifyRun,
-} = require('../.claude/hooks/lib/red-phase');
-const { provenanceUnverifiable } = require('../.claude/hooks/lib/red-phase-command');
+} = require('../.opencode/hooks/lib/red-phase');
+const { provenanceUnverifiable } = require('../.opencode/hooks/lib/red-phase-command');
 
 // ---------------------------------------------------------------- parseCommand
 
@@ -76,8 +76,8 @@ test('parseCommand ignores watch mode — a watch run has no terminal verdict', 
 // wrapper invocation must never be mistaken for a first-party test run.
 test('parseCommand does not classify harness wrapper scripts as test runs', () => {
   const cases = [
-    'node .claude/scripts/mutation-smoke.js --files src/a.py --test-cmd "pytest tests/"',
-    'node .claude/scripts/mutation-gate.js --staged',
+    'node .opencode/scripts/mutation-smoke.js --files src/a.py --test-cmd "pytest tests/"',
+    'node .opencode/scripts/mutation-gate.js --staged',
   ];
   for (const cmd of cases) {
     assert.strictEqual(parseCommand(cmd).isTestRun, false, `${cmd} must not be a test run`);

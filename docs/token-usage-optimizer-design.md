@@ -57,7 +57,7 @@ Implemented:
 - `tool-output-pack.js` stores raw command output, extracts failure evidence, and
   emits compact packs with token-savings estimates.
 - `context-store.js` stores raw context by stable hash under
-  `.claude/state/context-cache/`.
+  `.opencode/state/context-cache/`.
 - `context-retrieve.js` retrieves cached originals, optionally narrowed by query.
 - `run-compact.js` executes commands, stores raw output in CCR, and emits the
   compact failure-preserving pack.
@@ -86,14 +86,14 @@ Artifacts:
 - `specs/brownfield/symbol-map.md`
 - `specs/brownfield/wiki/WIKI.md`
 - `specs/brownfield/wiki/pages/*.md`
-- `.claude/state/navigation-status.json`
+- `.opencode/state/navigation-status.json`
 
 Runtime:
 
-- `.claude/scripts/navigation-refresh.js`
-- `.claude/hooks/verify-on-save.js`
-- `.claude/hooks/graph-refresh.js`
-- `.claude/scripts/pipeline-status.js`
+- `.opencode/scripts/navigation-refresh.js`
+- `.opencode/hooks/verify-on-save.js`
+- `.opencode/hooks/graph-refresh.js`
+- `.opencode/scripts/pipeline-status.js`
 
 Contract:
 
@@ -109,7 +109,7 @@ Context Access Optimizer turns navigation artifacts into bounded context packs.
 Command:
 
 ```bash
-node .claude/scripts/context-pack.js "<question>"
+node .opencode/scripts/context-pack.js "<question>"
 ```
 
 Skill wrapper:
@@ -168,7 +168,7 @@ large source bodies, unless explicitly requested with a small token budget.
 
 **Implementation status (2026-07-11 P0):** `context-pack.js` ships schema v2 with
 BM25-ish lexical + wiki scoring, depth-2 graph expansion, `--diff` dirty boost,
-`task_map` + `confidence`, and `.claude/state/context-pack-last.json` receipts.
+`task_map` + `confidence`, and `.opencode/state/context-pack-last.json` receipts.
 `token-advisor.js` honors `context_search_required`. Change-family skills document
 the Context-first Iron Law. Remaining from this design: embedding index (P1),
 MCP/`nav-query` facade, co-change edges — see
@@ -182,7 +182,7 @@ agent context.
 Script:
 
 ```bash
-node .claude/scripts/tool-output-pack.js --kind test --in <raw.log> --out <pack.json>
+node .opencode/scripts/tool-output-pack.js --kind test --in <raw.log> --out <pack.json>
 ```
 
 Supported kinds:
@@ -200,7 +200,7 @@ Rules:
   exit code, and first/last relevant output windows.
 - Collapse repeated lines.
 - Summarize passing test blocks.
-- Preserve full raw output under `specs/test_artefacts/raw/` or `.claude/state/tool-output/`.
+- Preserve full raw output under `specs/test_artefacts/raw/` or `.opencode/state/tool-output/`.
 - Never compress final PR diffs, source files, or security findings below the
   finding granularity.
 
@@ -211,7 +211,7 @@ Output:
   "kind": "test",
   "command": "npm test",
   "exit": 1,
-  "raw_path": ".claude/state/tool-output/2026-07-02T120000Z-npm-test.log",
+  "raw_path": ".opencode/state/tool-output/2026-07-02T120000Z-npm-test.log",
   "estimated_raw_tokens": 18000,
   "estimated_pack_tokens": 2200,
   "estimated_saved_tokens": 15800,
@@ -236,8 +236,8 @@ results, and broad local artifacts.
 
 Compress-Cache-Retrieve contract:
 
-1. Store raw content under `.claude/state/context-cache/<hash>.raw`.
-2. Store metadata under `.claude/state/context-cache/<hash>.json`.
+1. Store raw content under `.opencode/state/context-cache/<hash>.raw`.
+2. Store metadata under `.opencode/state/context-cache/<hash>.json`.
 3. Return compact content with `context_hash`, `raw_path`, token estimates, and a
    retrieval command.
 4. Retrieve full or query-filtered raw content on demand.
@@ -245,9 +245,9 @@ Compress-Cache-Retrieve contract:
 Scripts:
 
 ```bash
-node .claude/scripts/context-retrieve.js <hash> --query "auth token"
-node .claude/scripts/run-compact.js --kind test -- npm test
-node .claude/scripts/search-compact.js --pattern "validateSession" --glob "src/*.ts"
+node .opencode/scripts/context-retrieve.js <hash> --query "auth token"
+node .opencode/scripts/run-compact.js --kind test -- npm test
+node .opencode/scripts/search-compact.js --pattern "validateSession" --glob "src/*.ts"
 ```
 
 This keeps compression reversible while avoiding a local provider proxy. Source
@@ -285,11 +285,11 @@ Modes:
 Initial enforcement should be narrow:
 
 - Warn when a file over `max_source_read_lines` is read while a symbol-map range
-  exists. Implemented by `.claude/hooks/token-advisor.js` as
+  exists. Implemented by `.opencode/hooks/token-advisor.js` as
   `broad_source_read`.
 - Warn when likely verbose `Bash` commands such as `npm test`, `pytest`, `tsc`,
   or build commands are run directly while `compress_tool_output` is enabled.
-  Implemented by `.claude/hooks/token-advisor.js` as `verbose_command`.
+  Implemented by `.opencode/hooks/token-advisor.js` as `verbose_command`.
 - Warn when `/feature`, `/change`, or `/refactor` proceeds with stale navigation.
 - Block only in `enforced` mode, and only when a deterministic alternative is
   available.
@@ -385,8 +385,8 @@ through OTEL. Estimated values must be labelled as estimates in UI and docs.
 
 Files:
 
-- `.claude/scripts/context-pack.js`
-- `.claude/skills/context/SKILL.md`
+- `.opencode/scripts/context-pack.js`
+- `.opencode/skills/context/SKILL.md`
 - `test/context-pack.test.js`
 
 Status: implemented.
@@ -402,8 +402,8 @@ Acceptance:
 
 Files:
 
-- `.claude/scripts/tool-output-pack.js`
-- optional `.claude/hooks/lib/output-pack.js`
+- `.opencode/scripts/tool-output-pack.js`
+- optional `.opencode/hooks/lib/output-pack.js`
 - `test/tool-output-pack.test.js`
 
 Status: implemented as a standalone script. Hook integration is still pending.
@@ -419,10 +419,10 @@ Acceptance:
 
 Files:
 
-- `.claude/scripts/context-store.js`
-- `.claude/scripts/context-retrieve.js`
-- `.claude/scripts/run-compact.js`
-- `.claude/scripts/search-compact.js`
+- `.opencode/scripts/context-store.js`
+- `.opencode/scripts/context-retrieve.js`
+- `.opencode/scripts/run-compact.js`
+- `.opencode/scripts/search-compact.js`
 - `test/context-store.test.js`
 - `test/context-compact-wrappers.test.js`
 
@@ -440,10 +440,10 @@ Acceptance:
 
 Files:
 
-- `.claude/scripts/pipeline-state-readers.js`
-- `.claude/scripts/pipeline-status.js`
-- `.claude/hooks/token-advisor.js`
-- `.claude/scripts/telemetry-memory.js`
+- `.opencode/scripts/pipeline-state-readers.js`
+- `.opencode/scripts/pipeline-status.js`
+- `.opencode/hooks/token-advisor.js`
+- `.opencode/scripts/telemetry-memory.js`
 - telemetry dashboards
 
 Status: local `/status` reporting and advisory hook warnings are implemented.
@@ -462,8 +462,8 @@ Acceptance:
 
 Files:
 
-- `.claude/hooks/pre-bash-gate.js`
-- `.claude/hooks/pre-write-gate.js`
+- `.opencode/hooks/pre-bash-gate.js`
+- `.opencode/hooks/pre-write-gate.js`
 - relevant lane skills
 
 Acceptance:
@@ -488,7 +488,7 @@ Acceptance:
 - Should context packs include small source snippets by default, or citations
   only?
 - Where should raw tool output live for projects with strict artifact hygiene:
-  `.claude/state/tool-output/` or `specs/test_artefacts/raw/`?
+  `.opencode/state/tool-output/` or `specs/test_artefacts/raw/`?
 - What is the first enforcement threshold: 300 lines, 500 lines, or based on
   estimated tokens?
 

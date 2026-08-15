@@ -11,7 +11,7 @@ A headless orchestrator that:
 - Runs Claude Code non-interactively in isolated workspaces
 - Opens PRs and posts proof back to the tracker
 
-It **consumes** the Claude Harness Engine (via `claude -p` + harness skills) but has its own:
+It **consumes** the OpenCode Harness Engine (via `claude -p` + harness skills) but has its own:
 
 - Docker image / compose stack
 - Env and secrets model

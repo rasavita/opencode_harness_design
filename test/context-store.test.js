@@ -7,11 +7,11 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const { applyScaffold } = require('../.claude/scripts/scaffold-apply');
-const { storeContext, retrieveContext, estimateTextTokens } = require('../.claude/scripts/context-store');
+const { applyScaffold } = require('../.opencode/scripts/scaffold-apply');
+const { storeContext, retrieveContext, estimateTextTokens } = require('../.opencode/scripts/context-store');
 
 const ROOT = path.join(__dirname, '..');
-const PLUGIN_SOURCE = path.join(ROOT, '.claude');
+const PLUGIN_SOURCE = path.join(ROOT, '.opencode');
 
 function tempProject() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'context-store-'));
@@ -65,7 +65,7 @@ test('context retrieve CLI returns cached content by hash', () => {
   try {
     const stored = storeContext({ projectDir: dir, kind: 'generic-text', raw: 'one\ntwo auth\nthree\n' });
     const output = execFileSync(process.execPath, [
-      path.join(ROOT, '.claude', 'scripts', 'context-retrieve.js'),
+      path.join(ROOT, '.opencode', 'scripts', 'context-retrieve.js'),
       stored.hash,
       '--root', dir,
       '--query', 'auth',
@@ -94,7 +94,7 @@ test('brownfield scaffold copies the context compression scripts', () => {
     applyScaffold({ profile, pluginSource: PLUGIN_SOURCE, target: path.join(dir, 'project'), scaffoldProfile: 'brownfield' });
 
     for (const script of ['context-store.js', 'context-retrieve.js', 'run-compact.js', 'search-compact.js']) {
-      assert.ok(fs.existsSync(path.join(dir, 'project', '.claude', 'scripts', script)), script);
+      assert.ok(fs.existsSync(path.join(dir, 'project', '.opencode', 'scripts', script)), script);
     }
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });

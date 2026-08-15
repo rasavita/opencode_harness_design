@@ -3,7 +3,7 @@ const path = require('path');
 const { test } = require('node:test');
 
 const { renderCouplingReport } = require(path.join(
-  __dirname, '..', '.claude', 'skills', 'code-map', 'scripts', 'render.js'
+  __dirname, '..', '.opencode', 'skills', 'code-map', 'scripts', 'render.js'
 ));
 
 const graph = {

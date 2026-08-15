@@ -12,7 +12,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { test } = require('node:test');
 
-const script = path.join(__dirname, '..', '.claude', 'scripts', 'migration-roundtrip.sh');
+const script = path.join(__dirname, '..', '.opencode', 'scripts', 'migration-roundtrip.sh');
 
 function run(dir, args = [], env = {}) {
   return spawnSync('bash', [script, ...args], {

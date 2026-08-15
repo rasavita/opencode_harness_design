@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const { test } = require('node:test');
-const B = require('../.claude/scripts/budget-state.js');
+const B = require('../.opencode/scripts/budget-state.js');
 
 const cfg = (dims, warn) => ({ warn_at_pct: warn || 80, dimensions: dims });
 

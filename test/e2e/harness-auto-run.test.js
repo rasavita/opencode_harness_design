@@ -15,13 +15,13 @@ const path = require('path');
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { runClaude } = require('./helpers/claude-runner');
+const { runClaude } = require('./helpers/opencode-runner');
 const { runProjectSuite } = require('./helpers/project-suite');
 const { freshProject } = require('./helpers/fresh-project');
 const { alterAndVerify } = require('./helpers/alter-and-verify');
 
 const PROJECT_DIR = path.join(__dirname, 'auto-output');
-const PLUGIN_DIR = path.join(__dirname, '..', '..', '.claude');
+const PLUGIN_DIR = path.join(__dirname, '..', '..', '.opencode');
 const { randomUUID } = require('crypto');
 // Fresh id per run — hardcoded session ids fail with "already in use" on re-run.
 const SESSION = randomUUID();
@@ -38,7 +38,7 @@ test('full-auto (lite/lean): trivial CLI -> autonomous build, zero gates, suite 
   console.log('[auto] scaffold exit:', scaffold.exitCode);
   assert.ok(
     require('fs').existsSync(path.join(PROJECT_DIR, 'project-manifest.json'))
-      || require('fs').existsSync(path.join(PROJECT_DIR, 'CLAUDE.md')),
+      || require('fs').existsSync(path.join(PROJECT_DIR, 'AGENTS.md')),
     'scaffold must install harness before /build',
   );
 

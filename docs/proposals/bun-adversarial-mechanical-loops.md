@@ -1,7 +1,7 @@
 # Proposal: Bun-inspired adversarial review and mechanical loops
 
 **Date:** 2026-07-12  
-**Status:** Design proposal — **Phase A** `2.2.0` · **Phase B** `2.3.0` · **Phase C** `2.4.0` implemented (product line remains `claude_harness_eng_v5`; not a v6 reboot). Fuzz→PR and cgroup isolation remain out of core ([bun-phase-c-out-of-core.md](./bun-phase-c-out-of-core.md)). Disposable analysis artifact (not run through the SDLC / GAN pipeline).  
+**Status:** Design proposal — **Phase A** `2.2.0` · **Phase B** `2.3.0` · **Phase C** `2.4.0` implemented (product line remains `opencode_harness_design`; not a v6 reboot). Fuzz→PR and cgroup isolation remain out of core ([bun-phase-c-out-of-core.md](./bun-phase-c-out-of-core.md)). Disposable analysis artifact (not run through the SDLC / GAN pipeline).  
 **Versioning decision:** Ship as **minors** (`2.2.0`–`2.4.0`). Defaults stay backward-compatible. Bump to **3.0.0** only if defaults flip to always-adversarial or public verdict contracts break. Rename product to **v6** only for a deliberate SKU/plugin-namespace reboot — not for these controls.  
 **Trigger:** [Rewriting Bun in Rust](https://bun.com/blog/bun-in-rust) (Jarred Sumner, 2026-07-08) — a large LLM-assisted mechanical port that used prep artifacts, canaries, multi-agent adversarial review, tool-error work queues, and process edits when agents misbehaved.  
 **Related (already shipped from the same case study):**  
@@ -71,16 +71,16 @@ This harness already has the control-system skeleton (generator ≠ evaluator, f
 
 | Piece | Path | Today | Bun gap? |
 |-------|------|--------|----------|
-| Fresh-context review | `.claude/agents/code-reviewer.md` | Diff + touched files; no builder conversation; structure + correctness lenses | **One** instance by default |
-| Security adversarial | `.claude/agents/security-reviewer.md` | Find-then-refute before BLOCK | Self-refute, not second agent |
+| Fresh-context review | `.opencode/agents/code-reviewer.md` | Diff + touched files; no builder conversation; structure + correctness lenses | **One** instance by default |
+| Security adversarial | `.opencode/agents/security-reviewer.md` | Find-then-refute before BLOCK | Self-refute, not second agent |
 | Majority re-verify | `/gate` security-boundary | 3× evaluator + 3× security-reviewer, majority vote | Only when security trigger fires |
-| Implement review | `.claude/skills/implement/SKILL.md` Step 7 | Spawn **one** `code-reviewer`; max 3 fix cycles | Missing second independent reviewer |
+| Implement review | `.opencode/skills/implement/SKILL.md` Step 7 | Spawn **one** `code-reviewer`; max 3 fix cycles | Missing second independent reviewer |
 | Auto Gate 8 | `auto/references/section-5-5-…` | Single fresh-context code-reviewer | Same |
 | Generator / teams | `generator.md`, `/auto` SECTION 4 | Parallel teammates by story ownership | No hard git deny list |
-| Learned rules | `.claude/state/learned-rules.md` | Monotonic **code** rules from repeated failures | Weak **process** learning |
+| Learned rules | `.opencode/state/learned-rules.md` | Monotonic **code** rules from repeated failures | Weak **process** learning |
 | Canary | `/refactor`, `upgrading-dependencies` | G32 prompt-only, >~10 files | Not on implement/feature/migrate |
 | Test deletion | `test-deletion-gate.js` | G31 commit gate | Done |
-| Dynamic workflows | `.claude/workflows/` | Empty slot by design (skill clones removed) | Right place for error-queue *if* not a skill duplicate |
+| Dynamic workflows | `.opencode/workflows/` | Empty slot by design (skill clones removed) | Right place for error-queue *if* not a skill duplicate |
 | Worktrees | `/auto --worktree` | Optional isolation | Good substrate for Phase B shards |
 | Contracts / AT / regression | evaluator, G15/G16, G20/G23 | Behaviour oracle independent of impl language | Strength — keep as merge bar |
 
@@ -159,7 +159,7 @@ same workflow failure class ≥ 2 times
 extract process rule (not only code rule)
         │
         ▼
-.claude/state/process-rules.md   (or typed section of learned-rules)
+.opencode/state/process-rules.md   (or typed section of learned-rules)
         │
         ▼
 inject into orchestrator + implement/teammate templates
@@ -181,7 +181,7 @@ Examples of process rules (from Bun false starts):
 tool_check (tsc | ruff | mypy | eslint | …)
         │
         ▼
-.claude/state/diagnostics/errors.jsonl   # file, line, code, message, package
+.opencode/state/diagnostics/errors.jsonl   # file, line, code, message, package
         │
         ▼
 group by package/module → shards
@@ -262,7 +262,7 @@ Defaults: `adversarial: auto`, `block_merge_policy: union` (stricter; prefers ca
 1. Spawn two `code-reviewer` agents with **identical inputs**, distinct output paths:
    - `specs/reviews/code-review-a.md` + `code-review-verdict-a.json`
    - `specs/reviews/code-review-b.md` + `code-review-verdict-b.json`
-2. Run `node .claude/scripts/merge-review-verdicts.js` (new) →  
+2. Run `node .opencode/scripts/merge-review-verdicts.js` (new) →  
    `specs/reviews/code-review-verdict.json` + `code-review.md` (synthesized)  
    + `specs/reviews/adversarial-review-audit.json` (audit trail: both raw verdicts, policy, merged findings).
 3. Existing consumers keep reading `code-review-verdict.json` only — **no API break**.
@@ -290,7 +290,7 @@ Enforce with a wiring test that `/implement` and Gate 8 templates contain the fo
 
 #### Guide (feedforward)
 
-Add to `.claude/skills/code-gen/SKILL.md` and `code-reviewer.md` **correctness** lens:
+Add to `.opencode/skills/code-gen/SKILL.md` and `code-reviewer.md` **correctness** lens:
 
 1. **No stub-to-green.** Production paths must not ship `todo!()`, `unimplemented!()`, `NotImplementedError` without handler, empty `pass`/`...` bodies, or “return null and hope” solely to clear compile/lint — unless the story *explicitly* defers with a tracked stub and tests document the deferral.
 2. **Paragraph rule (Bun).** If a comment longer than ~3 lines (or a block comment paragraph) is required to justify a workaround, the code is wrong: **BLOCK**; fix the code, delete the apology comment.
@@ -318,7 +318,7 @@ You MAY: git add <paths you own>, git commit (message rules unchanged).
 
 Extend pre-bash-gate (or a dedicated `lib/git-safety.js`) to **deny** matching command lines when:
 
-- `.claude/state/parallel-implement.lock` exists, **or**
+- `.opencode/state/parallel-implement.lock` exists, **or**
 - env `HARNESS_PARALLEL_AGENTS=1` set by orchestrator at team spawn, **or**
 - always during `/auto` (stricter; preferred if false-positive rate is low)
 
@@ -338,7 +338,7 @@ Wire tests: command fixtures assert deny/allow.
 - Never run `git stash` during parallel implement (added 2026-… after …)
 ```
 
-**Option B (cleaner separation):** `.claude/state/process-rules.md` monotonic file, injected only into orchestrator + implement paths (not every reviewer, unless the rule is review-facing).
+**Option B (cleaner separation):** `.opencode/state/process-rules.md` monotonic file, injected only into orchestrator + implement paths (not every reviewer, unless the rule is review-facing).
 
 **Recommendation:** **Option B** — keeps code-style rules and workflow rules from being conflated; mirrors “fix the process that generates the code.”
 
@@ -356,7 +356,7 @@ Wire tests: command fixtures assert deny/allow.
 
 ### 6.1 `fix-from-diagnostics` skill (or workflow)
 
-**Name:** internal skill `fix-from-diagnostics` (preferred first). Promote to `.claude/workflows/fix-diagnostics.js` only if fan-out orchestration exceeds what a skill can express cleanly — avoid a weaker clone of `/implement`.
+**Name:** internal skill `fix-from-diagnostics` (preferred first). Promote to `.opencode/workflows/fix-diagnostics.js` only if fan-out orchestration exceeds what a skill can express cleanly — avoid a weaker clone of `/implement`.
 
 **Inputs:**
 
@@ -365,8 +365,8 @@ Wire tests: command fixtures assert deny/allow.
 
 **Outputs:**
 
-- `.claude/state/diagnostics/errors.jsonl`  
-- `.claude/state/diagnostics/shards.json`  
+- `.opencode/state/diagnostics/errors.jsonl`  
+- `.opencode/state/diagnostics/shards.json`  
 - Per-shard fix commits  
 - Final smoke + suite evidence  
 
@@ -492,7 +492,7 @@ Consumers continue to read:
 | Deliverable | Primary touch points | Test |
 |-------------|----------------------|------|
 | Review tier resolution | `implement/SKILL.md`, auto Gate 8, optional `change/SKILL.md` | `test/adversarial-review-wiring.test.js` |
-| `merge-review-verdicts.js` | `.claude/scripts/`, scaffold-copy `CORE_SCRIPTS` | unit tests on union/majority/timeout |
+| `merge-review-verdicts.js` | `.opencode/scripts/`, scaffold-copy `CORE_SCRIPTS` | unit tests on union/majority/timeout |
 | Anti-stub guide | `code-gen`, `code-reviewer` | wiring + optional fixture review |
 | `stub-smell-gate.js` | pre-commit, `/gate` | unit + staged fixture |
 | Git safety | pre-bash-gate, SECTION 4 templates | deny/allow fixtures |
@@ -605,8 +605,8 @@ This scaffold already owns writer/grader separation, behaviour oracles, and two 
 
 - [Rewriting Bun in Rust](https://bun.com/blog/bun-in-rust) — primary case study  
 - `HARNESS.md` — G31, G32, adversarial security pass, generator-verifier failure-mode audit  
-- `.claude/skills/gate/SKILL.md` — 3-instance re-verify  
-- `.claude/agents/code-reviewer.md` — fresh-context review contract  
-- `.claude/workflows/README.md` — dynamic workflow slot (empty by design)  
+- `.opencode/skills/gate/SKILL.md` — 3-instance re-verify  
+- `.opencode/agents/code-reviewer.md` — fresh-context review contract  
+- `.opencode/workflows/README.md` — dynamic workflow slot (empty by design)  
 - `docs/proposals/context-first-navigation.md` — proposal format / phased delivery precedent  
 - `docs/archive/superpowers/plans/2026-07-09-devin-parity-hardening.md` — majority re-verify + learned-rules propagation precedent  

@@ -1,6 +1,6 @@
 # Enterprise token cost playbook
 
-How to run the Claude Harness Engine so enterprise teams spend less **without** weakening evaluator, security, or pre-commit gates.
+How to run the OpenCode Harness Engine so enterprise teams spend less **without** weakening evaluator, security, or pre-commit gates.
 
 Principles (Lance Martin / Anthropic / Coinbase):
 
@@ -8,14 +8,14 @@ Principles (Lance Martin / Anthropic / Coinbase):
 2. **Structural escalation** — frontier at plan, mid-run advisor checkpoints, verify — not "call Opus when confused."
 3. **Visibility** — show $ and model mix; do not hide usage.
 4. **Boundary tax** — multi-agent only when ownership/volume pays for it.
-5. **Cache hygiene** — stable `CLAUDE.md`, tools, and session model.
+5. **Cache hygiene** — stable `AGENTS.md`, tools, and session model.
 
 ## Token Saver posture (recommended product install)
 
 | Knob | Value | Where |
 |------|--------|--------|
 | `execution.model_tier` | `cost` (alias `enterprise`) | `project-manifest.json` |
-| Agent pins | Sonnet gen, Haiku explorer, Opus judgment | `node .claude/scripts/model-tier.js cost --apply .claude/agents` |
+| Agent pins | Sonnet gen, Haiku explorer, Opus judgment | `node .opencode/scripts/model-tier.js cost --apply .opencode/agents` |
 | `token_governor.mode` | `enforced` (default since 2026-07; blocks broad reads + unconstrained searches, redirects verbose cmds to `run-compact.js`). Set `advisory` to only warn. | `project-manifest.json#token_governor` |
 | Budgets | Unstamped → tier defaults (cost: 30m / 80 agents / ~$8). Scaffolded manifests carry a `execution."// budget"` doc key showing the lever. | `execution.budget` or `/build --budget` |
 | Advisor cap | `execution.advisor_max_per_run: 3` | optional manifest field |
@@ -24,10 +24,10 @@ Principles (Lance Martin / Anthropic / Coinbase):
 
 ```bash
 # During / after a metered run (budget-start present):
-node .claude/scripts/pipeline-status.js
-node .claude/scripts/cost-report.js            # human table
-node .claude/scripts/cost-report.js --json     # machine
-# Artifact: .claude/state/cost-report.json
+node .opencode/scripts/pipeline-status.js
+node .opencode/scripts/cost-report.js            # human table
+node .opencode/scripts/cost-report.js --json     # machine
+# Artifact: .opencode/state/cost-report.json
 ```
 
 `/status` lines:
@@ -51,7 +51,7 @@ Enable Claude Code OTEL for authoritative cache hit rate (see `telemetry/CACHE_M
 
 ```bash
 # Policy is pure JS — unit-tested heuristic
-node -e "console.log(require('./.claude/scripts/team-policy').decideTeamMode({stories:[...]}))"
+node -e "console.log(require('./.opencode/scripts/team-policy').decideTeamMode({stories:[...]}))"
 ```
 
 ## Enforce lean context (optional)
@@ -70,12 +70,12 @@ Fail-open without symbol ranges. Escape: set `HARNESS_TOKEN_GOVERNOR=off` **in t
 Prefer:
 
 ```bash
-node .claude/scripts/run-compact.js --kind test -- npm test
+node .opencode/scripts/run-compact.js --kind test -- npm test
 ```
 
 ## Cache / session hygiene (operator checklist)
 
-- [ ] Do not edit `CLAUDE.md` mid `/auto` session
+- [ ] Do not edit `AGENTS.md` mid `/auto` session
 - [ ] Settle plugins / MCP before long runs
 - [ ] Do not `/model`-switch the orchestrator mid-run
 - [ ] Prefer wave continuity (`build-chain`) over cold restarts

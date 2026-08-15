@@ -16,7 +16,7 @@ Cluster `test/adversarial-review-wiring.test.js` groups **1** file(s).
 
 ## Repo notes (steering)
 
-- Primary harness control plane lives under .claude/ (hooks, scripts, skills). Brownfield navigation artifacts live under specs/brownfield/. Prefer /context or nav-query pack before broad source reads.
+- Primary harness control plane lives under .opencode/ (hooks, scripts, skills). Brownfield navigation artifacts live under specs/brownfield/. Prefer /context or nav-query pack before broad source reads.
 
 ## Citations
 

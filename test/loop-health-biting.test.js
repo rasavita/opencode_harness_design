@@ -2,12 +2,12 @@
 const { test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs'), os = require('os'), path = require('path');
-const { analyzeBiting } = require('../.claude/hooks/lib/loop-health');
+const { analyzeBiting } = require('../.opencode/hooks/lib/loop-health');
 
 function seed(rows) {
   const d = fs.mkdtempSync(path.join(os.tmpdir(), 'lh-'));
-  fs.mkdirSync(path.join(d, '.claude/state'), { recursive: true });
-  if (rows) fs.writeFileSync(path.join(d, '.claude/state/sensor-outcomes.jsonl'),
+  fs.mkdirSync(path.join(d, '.opencode/state'), { recursive: true });
+  if (rows) fs.writeFileSync(path.join(d, '.opencode/state/sensor-outcomes.jsonl'),
     rows.map((r) => JSON.stringify(r)).join('\n') + '\n');
   return d;
 }

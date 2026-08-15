@@ -12,7 +12,7 @@ const os = require('os');
 const path = require('path');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
-const SCRIPTS = path.join(REPO_ROOT, '.claude', 'scripts');
+const SCRIPTS = path.join(REPO_ROOT, '.opencode', 'scripts');
 const { generateAttestation, verifyAttestation } = require(path.join(SCRIPTS, 'generate-attestation'));
 const { canonicalize, sha256Hex } = require(path.join(SCRIPTS, 'canonical-json'));
 
@@ -22,13 +22,13 @@ const shaRunner = (sha) => (_cmd, args) => (args[0] === 'rev-parse' ? `${sha}\n`
 
 function makeRoot(reviews = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'attest-h-'));
-  fs.mkdirSync(path.join(root, '.claude', 'templates'), { recursive: true });
+  fs.mkdirSync(path.join(root, '.opencode', 'templates'), { recursive: true });
   fs.mkdirSync(path.join(root, 'specs', 'reviews'), { recursive: true });
   fs.copyFileSync(path.join(REPO_ROOT, 'harness-manifest.json'), path.join(root, 'harness-manifest.json'));
   fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ version: '2.5.0' }));
   fs.copyFileSync(
-    path.join(REPO_ROOT, '.claude', 'templates', 'standard-map.json'),
-    path.join(root, '.claude', 'templates', 'standard-map.json'),
+    path.join(REPO_ROOT, '.opencode', 'templates', 'standard-map.json'),
+    path.join(root, '.opencode', 'templates', 'standard-map.json'),
   );
   for (const [name, body] of Object.entries(reviews)) {
     fs.writeFileSync(path.join(root, 'specs', 'reviews', name), body);
@@ -37,7 +37,7 @@ function makeRoot(reviews = {}) {
 }
 
 function gen(root, extra = {}) {
-  return generateAttestation({ root, attestDir: path.join(root, '.claude', 'attestations'), runner: shaRunner(SHA), now: () => NOW, ...extra });
+  return generateAttestation({ root, attestDir: path.join(root, '.opencode', 'attestations'), runner: shaRunner(SHA), now: () => NOW, ...extra });
 }
 
 function reorderKeysDeep(v) {
@@ -81,7 +81,7 @@ test('fail-safe: one valid passing source + others absent => compliant:true, sou
 });
 
 test('standard_map_source records provenance (template default vs repo-root override)', () => {
-  assert.strictEqual(gen(makeRoot()).bundle.standard_map_source, '.claude/templates/standard-map.json');
+  assert.strictEqual(gen(makeRoot()).bundle.standard_map_source, '.opencode/templates/standard-map.json');
   const root = makeRoot();
   fs.writeFileSync(path.join(root, 'standard-map.json'), JSON.stringify({ id: 'root/1', by_axis: {}, by_id: {} }));
   const { bundle } = gen(root);
@@ -123,14 +123,14 @@ test('--verify rejects a non-sha256 integrity algo', () => {
 
 test('a non-hex commit_sha is rejected (no path traversal) and writes nothing', () => {
   const root = makeRoot();
-  const res = generateAttestation({ root, attestDir: path.join(root, '.claude', 'attestations'), runner: shaRunner('../evil'), now: () => NOW });
+  const res = generateAttestation({ root, attestDir: path.join(root, '.opencode', 'attestations'), runner: shaRunner('../evil'), now: () => NOW });
   assert.strictEqual(res.action, 'invalid-sha');
-  assert.ok(!fs.existsSync(path.join(root, '.claude', 'evil.json')));
+  assert.ok(!fs.existsSync(path.join(root, '.opencode', 'evil.json')));
 });
 
 test('index integrity: a tampered index fails loudly, not a silent reset', () => {
   const root = makeRoot();
-  const attestDir = path.join(root, '.claude', 'attestations');
+  const attestDir = path.join(root, '.opencode', 'attestations');
   gen(root);
   const idxPath = path.join(attestDir, 'index.json');
   const idx = JSON.parse(fs.readFileSync(idxPath, 'utf8'));
@@ -145,7 +145,7 @@ test('index integrity: a tampered index fails loudly, not a silent reset', () =>
 
 test('index preserves prior entries and updates its integrity hash on append', () => {
   const root = makeRoot();
-  const attestDir = path.join(root, '.claude', 'attestations');
+  const attestDir = path.join(root, '.opencode', 'attestations');
   gen(root);
   generateAttestation({ root, attestDir, runner: shaRunner('feed0002'), now: () => NOW });
   const idx = JSON.parse(fs.readFileSync(path.join(attestDir, 'index.json'), 'utf8'));
@@ -155,7 +155,7 @@ test('index preserves prior entries and updates its integrity hash on append', (
 
 test('already-attested re-run self-heals a missing index entry and returns stored compliance', () => {
   const root = makeRoot({ 'branch-protection-verify.json': JSON.stringify({ compliant: true, drift: [] }) });
-  const attestDir = path.join(root, '.claude', 'attestations');
+  const attestDir = path.join(root, '.opencode', 'attestations');
   gen(root);
   fs.rmSync(path.join(attestDir, 'index.json')); // simulate a lost index
   const res = gen(root); // no --force

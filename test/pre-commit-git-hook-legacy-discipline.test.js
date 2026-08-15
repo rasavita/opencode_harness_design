@@ -4,7 +4,7 @@
 // test/pre-commit-git-hook-ownership.test.js: the ownership gate and this one
 // share the same "lazy-required sensor script, no-op without its prerequisite
 // artifact" shape, so a fixture project must install the script explicitly
-// (makeGitProject() does not copy .claude/scripts).
+// (makeGitProject() does not copy .opencode/scripts).
 
 const assert = require('assert');
 const fs = require('fs');
@@ -24,11 +24,11 @@ function commitSeed(projectDir) {
 }
 
 function installLegacyDisciplineScripts(projectDir) {
-  const dir = path.join(projectDir, '.claude', 'scripts');
+  const dir = path.join(projectDir, '.opencode', 'scripts');
   fs.mkdirSync(dir, { recursive: true });
   for (const name of ['legacy-discipline-gate.js', 'ownership-check.js']) {
     fs.copyFileSync(
-      path.join(__dirname, '..', '.claude', 'scripts', name),
+      path.join(__dirname, '..', '.opencode', 'scripts', name),
       path.join(dir, name)
     );
   }

@@ -6,7 +6,7 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const SCRIPT = path.join(__dirname, '..', '.claude', 'scripts', 'ownership-check.js');
+const SCRIPT = path.join(__dirname, '..', '.opencode', 'scripts', 'ownership-check.js');
 const { parseComponentMap, checkOwnership, run } = require(SCRIPT);
 
 const MAP = `# Component Map
@@ -44,7 +44,7 @@ test('an unowned source file fails with its path listed', () => {
 
 test('allowlisted prefixes and non-source files are never checked', () => {
   const v = checkOwnership(
-    ['specs/design/x.md', 'docs/a.md', '.claude/scripts/y.js', 'test/z.test.js', 'e2e/flow.spec.ts', 'README.md', '.env.example'],
+    ['specs/design/x.md', 'docs/a.md', '.opencode/scripts/y.js', 'test/z.test.js', 'e2e/flow.spec.ts', 'README.md', '.env.example'],
     MAP
   );
   assert.strictEqual(v.checked, 0);
@@ -112,9 +112,9 @@ test('a backslash-style map token matches the POSIX-normalized file', () => {
 
 test('a ./-prefixed checked file still hits the allowlist and the owned map', () => {
   const v = checkOwnership(
-    ['./.claude/scripts/y.js', './src/api/users.py'],
+    ['./.opencode/scripts/y.js', './src/api/users.py'],
     '| S1 | `src/api/users.py` |'
   );
   assert.strictEqual(v.pass, true);
-  assert.strictEqual(v.checked, 1); // only the src file is checked; .claude is allowlisted
+  assert.strictEqual(v.checked, 1); // only the src file is checked; .opencode is allowlisted
 });

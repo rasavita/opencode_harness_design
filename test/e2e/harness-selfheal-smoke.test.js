@@ -25,12 +25,12 @@ const { execFileSync } = require('child_process');
 const { randomUUID } = require('node:crypto');
 const { test } = require('node:test');
 
-const { runClaude } = require('./helpers/claude-runner');
+const { runClaude } = require('./helpers/opencode-runner');
 const { startApp, stopApp, assertInBrowser, DEFAULT_PORT } = require('./helpers/app-runtime');
 
 const PROJECT_DIR = path.join(__dirname, 'smoke-output');
 const SHOTS_DIR = path.join(__dirname, 'screenshots');
-const HARNESS_PLUGIN_DIR = path.join(__dirname, '..', '..', '.claude');
+const HARNESS_PLUGIN_DIR = path.join(__dirname, '..', '..', '.opencode');
 // Fresh id per run. `claude --session-id` (scaffold's create path) aborts with
 // "Session ID … is already in use" if the id ever repeats, so a hardcoded
 // constant fails every run after the first. build/change still chain off this
@@ -66,7 +66,7 @@ function requestRepair(fixGoal, diagnostics) {
   return runClaude(
     `/change a browser end-to-end check failed for the existing counter web app. Goal: ${fixGoal}. ` +
       `Fix the generated code so the check passes; keep all currently working behavior intact.\n${diagnostics}`,
-    { ...claudeOpts(), timeoutMs: stepTimeout(240000) },
+    { ...opencodeOpts(), timeoutMs: stepTimeout(240000) },
   );
 }
 
@@ -122,13 +122,13 @@ function runScaffold() {
   const desc =
     'a minimal counter web app in Node.js with no external runtime dependencies; ' +
     'an HTTP server serving one HTML page; web UI surface; no team integrations';
-  const scaffold = runClaude(`/scaffold --yes ${desc}`, { ...claudeOpts(), continueSession: false, budgetUsd: '4.00', timeoutMs: stepTimeout(360000) });
+  const scaffold = runClaude(`/scaffold --yes ${desc}`, { ...opencodeOpts(), continueSession: false, budgetUsd: '4.00', timeoutMs: stepTimeout(360000) });
   logResult('scaffold', { exitCode: scaffold.exitCode });
   assert.strictEqual(
     scaffold.exitCode, 0,
     `/scaffold --yes must exit 0 (non-zero usually means a --session-id collision or a prompt with no human): ${(scaffold.stderr || '').slice(0, 300)}`,
   );
-  const required = ['project-manifest.json', 'CLAUDE.md']; // Step 2 + Step 5 outputs
+  const required = ['project-manifest.json', 'AGENTS.md']; // Step 2 + Step 5 outputs
   const present = required.filter((f) => fs.existsSync(path.join(PROJECT_DIR, f)));
   logResult('scaffold-artifacts', { present });
   assert.deepStrictEqual(present, required, `/scaffold --yes must generate ${JSON.stringify(required)}; found ${JSON.stringify(present)}`);
@@ -140,7 +140,7 @@ function runBuild() {
     'that listens on process.env.PORT and serves one HTML page; the page shows a count (element id="count" ' +
     'starting at 0) and an Increment button (id="increment") that increases the count by 1. ' +
     'package.json must have "start": "node server.js" and a passing "test" script.';
-  const build = runClaude(`/build --lite implement ${buildGoal}`, { ...claudeOpts(), budgetUsd: '5.00', timeoutMs: stepTimeout(480000) });
+  const build = runClaude(`/build --lite implement ${buildGoal}`, { ...opencodeOpts(), budgetUsd: '5.00', timeoutMs: stepTimeout(480000) });
   logResult('build-lite', { exitCode: build.exitCode });
 }
 
@@ -174,7 +174,7 @@ test('full lifecycle: scaffold -> build -> verify -> modify -> regression (self-
   const change = runClaude(
     '/change add a Decrement button (id="decrement") to the existing counter web app that lowers #count by 1; ' +
       'keep the existing Increment behavior unchanged',
-    { ...claudeOpts(), budgetUsd: '4.00', timeoutMs: stepTimeout(300000) },
+    { ...opencodeOpts(), budgetUsd: '4.00', timeoutMs: stepTimeout(300000) },
   );
   logResult('change-decrement', { exitCode: change.exitCode });
 

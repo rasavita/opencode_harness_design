@@ -3,7 +3,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const SCRIPT = require.resolve('../.claude/scripts/impact-classifier');
+const SCRIPT = require.resolve('../.opencode/scripts/impact-classifier');
 const { classifyImpact, extractFilePaths, riskHits, FILE_THRESHOLD } = require(SCRIPT);
 
 test('extractFilePaths pulls backticked file-like tokens from story text', () => {

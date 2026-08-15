@@ -8,13 +8,13 @@ const { test } = require('node:test');
 const { execFileSync } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
-const SCRIPT = path.join(ROOT, '.claude', 'scripts', 'agent-readiness.js');
+const SCRIPT = path.join(ROOT, '.opencode', 'scripts', 'agent-readiness.js');
 const rd = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 test('G21: agent-readiness is surfaced + scripted', () => {
   assert.strictEqual(
     JSON.parse(rd('package.json')).scripts['agent-readiness'],
-    'node .claude/scripts/agent-readiness.js'
+    'node .opencode/scripts/agent-readiness.js'
   );
   assert.ok(/## Agent readiness \(G21\)/.test(rd('HARNESS.md')), 'HARNESS.md must have a standalone G21 section');
   // Substance check, not an exact-phrase match: the summary sentence's exact
@@ -30,8 +30,8 @@ test('G21: agent-readiness is surfaced + scripted', () => {
   // same sentence.
   assert.ok(!/\bG21\s+is\s+new\b/.test(summarySentence),
     'G21 must be reflected as closed, not left/re-opened as a partial gap');
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude', 'skills', 'agent-readiness', 'SKILL.md')),
-    '/agent-readiness must be invokable as a skill (this harness never uses .claude/commands/ for slash capabilities)');
+  assert.ok(fs.existsSync(path.join(ROOT, '.opencode', 'skills', 'agent-readiness', 'SKILL.md')),
+    '/agent-readiness must be invokable as a skill (this harness never uses .opencode/commands/ for slash capabilities)');
 });
 
 test('G21 is NOT registered as a manifest guide or sensor — same standalone placement as G11', () => {

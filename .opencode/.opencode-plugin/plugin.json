@@ -1,0 +1,8 @@
+{
+  "name": "opencode_harness_design",
+  "version": "3.0.0",
+  "description": "OpenCode Harness Engine scaffold for autonomous long-running application development",
+  "author": {
+    "name": "OpenCode Harness Engine"
+  }
+}

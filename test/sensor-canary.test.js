@@ -6,8 +6,8 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
-const { classify, runCanaries, provenLiveSensors } = require('../.claude/scripts/sensor-canary');
-const { CANARIES } = require('../.claude/config/sensor-canaries');
+const { classify, runCanaries, provenLiveSensors } = require('../.opencode/scripts/sensor-canary');
+const { CANARIES } = require('../.opencode/config/sensor-canaries');
 
 // The classifier is the load-bearing logic: LIVE requires BOTH discrimination halves.
 test('classify: only bit-and-quiet is LIVE', () => {
@@ -38,6 +38,6 @@ test('provenLiveSensors expands to every ledger name a live probe backs', () => 
 });
 
 test('the CLI exits 0 when all canaries are live', () => {
-  const r = spawnSync('node', [path.join(ROOT, '.claude', 'scripts', 'sensor-canary.js')], { encoding: 'utf8' });
+  const r = spawnSync('node', [path.join(ROOT, '.opencode', 'scripts', 'sensor-canary.js')], { encoding: 'utf8' });
   assert.strictEqual(r.status, 0, `sensor-canary CLI must pass:\n${r.stdout}\n${r.stderr}`);
 });

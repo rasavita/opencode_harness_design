@@ -7,18 +7,18 @@ const os = require('os');
 const path = require('path');
 const { test } = require('node:test');
 
-const qualityCard = require('../.claude/scripts/quality-card');
-const walkthrough = require('../.claude/scripts/pr-walkthrough');
-const prBody = require('../.claude/scripts/pr-body');
-const humanCodebase = require('../.claude/scripts/human-codebase');
-const obsGate = require('../.claude/scripts/observability-gate');
-const perfGate = require('../.claude/scripts/perf-smell-gate');
+const qualityCard = require('../.opencode/scripts/quality-card');
+const walkthrough = require('../.opencode/scripts/pr-walkthrough');
+const prBody = require('../.opencode/scripts/pr-body');
+const humanCodebase = require('../.opencode/scripts/human-codebase');
+const obsGate = require('../.opencode/scripts/observability-gate');
+const perfGate = require('../.opencode/scripts/perf-smell-gate');
 
 function tmp() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'qc-'));
   fs.mkdirSync(path.join(root, 'specs', 'reviews'), { recursive: true });
   fs.mkdirSync(path.join(root, 'specs', 'brownfield'), { recursive: true });
-  fs.mkdirSync(path.join(root, '.claude', 'state'), { recursive: true });
+  fs.mkdirSync(path.join(root, '.opencode', 'state'), { recursive: true });
   fs.mkdirSync(path.join(root, 'src'), { recursive: true });
   return root;
 }
@@ -39,7 +39,7 @@ test('quality-card PASSes when evaluator + code-review pass', () => {
   qualityCard.writeCard(root, { card, md });
   assert.equal(card.pass, true);
   assert.ok(fs.existsSync(path.join(root, 'specs/reviews/quality-card.md')));
-  assert.ok(fs.existsSync(path.join(root, '.claude/state/gate-receipt.json')));
+  assert.ok(fs.existsSync(path.join(root, '.opencode/state/gate-receipt.json')));
   assert.match(md, /Overall: PASS/);
 });
 
@@ -128,7 +128,7 @@ test('pr-body allows draft with --no-require-gate', () => {
 
 test('pr-body completion check binds receipt to the active task envelope', () => {
   const root = tmp();
-  const { stampEnvelope } = require('../.claude/hooks/lib/task-envelope');
+  const { stampEnvelope } = require('../.opencode/hooks/lib/task-envelope');
   const envelope = stampEnvelope({
     schema_version: 1, task_id: 'T-PR', risk_tier: 'R1',
     intent_hash: 'a'.repeat(64), risk_envelope_hash: 'b'.repeat(64),
@@ -137,14 +137,14 @@ test('pr-body completion check binds receipt to the active task envelope', () =>
     budgets: { warn_at_pct: 80, dimensions: [{ unit: 'agents', limit: 1 }] },
     stopping_conditions: ['gate_pass'], created_at: new Date().toISOString(),
   });
-  write(root, '.claude/state/task-envelope.json', JSON.stringify(envelope));
+  write(root, '.opencode/state/task-envelope.json', JSON.stringify(envelope));
   assert.strictEqual(prBody.completionPasses(root), false);
-  write(root, '.claude/state/task-completion-receipt.json', JSON.stringify({
+  write(root, '.opencode/state/task-completion-receipt.json', JSON.stringify({
     pass: true, task_id: 'T-PR', task_envelope_hash: envelope.integrity.hash,
   }));
   assert.strictEqual(prBody.completionPasses(root), true);
   envelope.allowed_paths.push('other/**');
-  write(root, '.claude/state/task-envelope.json', JSON.stringify(envelope));
+  write(root, '.opencode/state/task-envelope.json', JSON.stringify(envelope));
   assert.strictEqual(prBody.completionPasses(root), false);
 });
 
@@ -204,7 +204,7 @@ test('perf-smell-gate flags query inside loop', () => {
 });
 
 test('gate skill wires quality-card and observability steps', () => {
-  const skill = fs.readFileSync(path.join(__dirname, '../.claude/skills/gate/SKILL.md'), 'utf8');
+  const skill = fs.readFileSync(path.join(__dirname, '../.opencode/skills/gate/SKILL.md'), 'utf8');
   // Step 4 receipts are still invoked directly by the skill (kernel-owned).
   assert.match(skill, /quality-card\.js/);
   assert.match(skill, /pr-walkthrough\.js/);
@@ -213,7 +213,7 @@ test('gate skill wires quality-card and observability steps', () => {
 
   // The static production-readiness ratchets moved into the pack-contributed check
   // registry, so assert membership there rather than a name in the prose.
-  const { loadRegistry } = require('../.claude/scripts/run-gate-checks.js');
+  const { loadRegistry } = require('../.opencode/scripts/run-gate-checks.js');
   const scripts = loadRegistry(path.join(__dirname, '..')).map((c) => c.script);
   assert.ok(scripts.includes('observability-gate.js'), '/gate must run the observability ratchet');
   assert.ok(scripts.includes('perf-smell-gate.js'), '/gate must run the perf-smell ratchet');
@@ -221,13 +221,13 @@ test('gate skill wires quality-card and observability steps', () => {
 
 test('build Phase 11 requires pr-body.js', () => {
   const phase = fs.readFileSync(
-    path.join(__dirname, '../.claude/skills/build/references/section-04-pipeline-phases.md'),
+    path.join(__dirname, '../.opencode/skills/build/references/section-04-pipeline-phases.md'),
     'utf8',
   );
   assert.match(phase, /pr-body\.js/);
   assert.match(phase, /--require-gate/);
   const auto = fs.readFileSync(
-    path.join(__dirname, '../.claude/skills/build/references/autonomous-lane.md'),
+    path.join(__dirname, '../.opencode/skills/build/references/autonomous-lane.md'),
     'utf8',
   );
   assert.match(auto, /pr-body\.js/);

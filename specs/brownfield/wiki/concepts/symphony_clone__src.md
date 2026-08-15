@@ -14,8 +14,8 @@ Cluster `symphony_clone/src` groups **30** file(s) (hub fan-in hint 7).
 - `symphony_clone/src/index.test.js` (hash ea519c0e62628632)
 - `symphony_clone/src/observability/logger.js` (hash ab1866979c7314b6)
 - `symphony_clone/src/observability/status-server.js` (hash 9c39e9a9a3b9aa03)
-- `symphony_clone/src/orchestrator/claude-runner.js` (hash bbac2b770e2b0007)
-- `symphony_clone/src/orchestrator/claude-runner.test.js` (hash ce4616ae2c17afdf)
+- `symphony_clone/src/orchestrator/opencode-runner.js` (hash bbac2b770e2b0007)
+- `symphony_clone/src/orchestrator/opencode-runner.test.js` (hash ce4616ae2c17afdf)
 - `symphony_clone/src/orchestrator/eligibility.js` (hash 8ca00a5fcbb48cb4)
 - `symphony_clone/src/orchestrator/eligibility.test.js` (hash d7ef2610fb922ce8)
 - `symphony_clone/src/orchestrator/outcomes.js` (hash 627f43631178ac07)
@@ -68,7 +68,7 @@ Cluster `symphony_clone/src` groups **30** file(s) (hub fan-in hint 7).
 
 ## Repo notes (steering)
 
-- Primary harness control plane lives under .claude/ (hooks, scripts, skills). Brownfield navigation artifacts live under specs/brownfield/. Prefer /context or nav-query pack before broad source reads.
+- Primary harness control plane lives under .opencode/ (hooks, scripts, skills). Brownfield navigation artifacts live under specs/brownfield/. Prefer /context or nav-query pack before broad source reads.
 
 ## Inbound edges (sample)
 
@@ -77,7 +77,7 @@ Cluster `symphony_clone/src` groups **30** file(s) (hub fan-in hint 7).
 - symphony_clone/test/config.test.js → symphony_clone/src/config.js (imports)
 - symphony_clone/test/linear-state.test.js → symphony_clone/src/tracker/linear.js (imports)
 - symphony_clone/test/prompt-builder.test.js → symphony_clone/src/orchestrator/prompt-builder.js (imports)
-- symphony_clone/test/prompt-builder.test.js → symphony_clone/src/orchestrator/claude-runner.js (imports)
+- symphony_clone/test/prompt-builder.test.js → symphony_clone/src/orchestrator/opencode-runner.js (imports)
 - symphony_clone/test/result-reader.test.js → symphony_clone/src/orchestrator/result-reader.js (imports)
 - symphony_clone/test/scheduler-resume.test.js → symphony_clone/src/orchestrator/scheduler.js (imports)
 - symphony_clone/test/scheduler-routing.test.js → symphony_clone/src/orchestrator/scheduler.js (imports)

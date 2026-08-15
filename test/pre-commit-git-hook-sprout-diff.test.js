@@ -3,7 +3,7 @@
 // Gap G30 real git-hook integration. Mirrors
 // test/pre-commit-git-hook-legacy-discipline.test.js's fixture shape: a
 // fixture project must install the sensor scripts explicitly (makeGitProject
-// does not copy .claude/scripts), but DOES copy the full .claude/hooks/lib
+// does not copy .opencode/scripts), but DOES copy the full .opencode/hooks/lib
 // tree, so sprout-classify.js / sprout-symbol-check.js / diff-hunks.js /
 // legacy-discipline-relatedness.js are already present.
 
@@ -33,10 +33,10 @@ function commitSeed(projectDir) {
 }
 
 function installScripts(projectDir) {
-  const dir = path.join(projectDir, '.claude', 'scripts');
+  const dir = path.join(projectDir, '.opencode', 'scripts');
   fs.mkdirSync(dir, { recursive: true });
   for (const name of ['legacy-discipline-gate.js', 'sprout-diff-gate.js', 'ownership-check.js']) {
-    fs.copyFileSync(path.join(__dirname, '..', '.claude', 'scripts', name), path.join(dir, name));
+    fs.copyFileSync(path.join(__dirname, '..', '.opencode', 'scripts', name), path.join(dir, name));
   }
 }
 

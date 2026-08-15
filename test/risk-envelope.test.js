@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const { test } = require('node:test');
-const { classifyRisk, maxTier } = require('../.claude/scripts/risk-envelope');
+const { classifyRisk, maxTier } = require('../.opencode/scripts/risk-envelope');
 
 const NOW = new Date('2026-07-26T12:00:00.000Z');
 

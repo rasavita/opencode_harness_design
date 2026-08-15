@@ -7,7 +7,7 @@
 // existing repo, run `/vibe`, and assert three things that distinguish a real
 // vibe run from a no-op:
 //   1. the change landed in the source,
-//   2. the vibe lane recorded its micro-contract in .claude/state/vibe-log.md
+//   2. the vibe lane recorded its micro-contract in .opencode/state/vibe-log.md
 //      (the lane-specific receipt — this is what separates /vibe from /change),
 //   3. the project's own suite stays green (the deterministic oracle).
 //
@@ -21,11 +21,11 @@ const assert = require('assert');
 const { execFileSync } = require('child_process');
 const { test } = require('node:test');
 
-const { runClaude } = require('./helpers/claude-runner');
+const { runClaude } = require('./helpers/opencode-runner');
 const { runProjectSuite } = require('./helpers/project-suite');
 
 const PROJECT_DIR = path.join(__dirname, 'vibe-output');
-const PLUGIN_DIR = path.join(__dirname, '..', '..', '.claude');
+const PLUGIN_DIR = path.join(__dirname, '..', '..', '.opencode');
 const { randomUUID } = require('crypto');
 // Fresh id per run — hardcoded session ids fail with "already in use" on re-run.
 const SESSION = randomUUID();
@@ -105,8 +105,8 @@ test('vibe: existing repo -> /vibe lands a low-risk change, logs a micro-contrac
   // 2. The vibe lane recorded its micro-contract. This is the lane-specific
   //    receipt: /change does not write here, so a populated vibe-log proves the
   //    controlled-vibe path actually ran (not some other route).
-  const vibeLog = path.join(PROJECT_DIR, '.claude', 'state', 'vibe-log.md');
-  assert.ok(fs.existsSync(vibeLog), '/vibe must append a micro-contract to .claude/state/vibe-log.md');
+  const vibeLog = path.join(PROJECT_DIR, '.opencode', 'state', 'vibe-log.md');
+  assert.ok(fs.existsSync(vibeLog), '/vibe must append a micro-contract to .opencode/state/vibe-log.md');
   const log = fs.readFileSync(vibeLog, 'utf8');
   assert.match(log, /subtract|subtraction/i, 'the vibe-log micro-contract must describe the subtract change');
 

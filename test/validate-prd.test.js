@@ -15,7 +15,7 @@
 const assert = require('assert');
 const { test } = require('node:test');
 
-const { validatePrd } = require('../.claude/scripts/validate-prd.js');
+const { validatePrd } = require('../.opencode/scripts/validate-prd.js');
 
 const GOOD = `# PRD: Workbook Triage
 

@@ -5,7 +5,7 @@ const assert = require('node:assert');
 const path = require('path');
 
 const { cycleKeys, gateDecision } = require(
-  path.resolve(__dirname, '..', '.claude', 'hooks', 'lib', 'cycle-gate.js')
+  path.resolve(__dirname, '..', '.opencode', 'hooks', 'lib', 'cycle-gate.js')
 );
 
 function graphWith(cycles) {

@@ -6,13 +6,13 @@ const { REPO_ROOT, makeHookProject, makeGitProject, runHook } = require('./helpe
 
 const HOOK = 'check-git-hooks.js';
 
-// makeGitProject copies git-hooks into .claude/git-hooks but NOT into .git/hooks
+// makeGitProject copies git-hooks into .opencode/git-hooks but NOT into .git/hooks
 // (that is /scaffold's job). It also does not copy the SessionStart hook, so add it.
 function gitProjectWithHook() {
   const projectDir = makeGitProject();
   fs.copyFileSync(
-    path.join(REPO_ROOT, '.claude', 'hooks', HOOK),
-    path.join(projectDir, '.claude', 'hooks', HOOK)
+    path.join(REPO_ROOT, '.opencode', 'hooks', HOOK),
+    path.join(projectDir, '.opencode', 'hooks', HOOK)
   );
   return projectDir;
 }
@@ -34,7 +34,7 @@ test('warns when a git repo has no pre-commit hook installed', async () => {
 test('is silent when the harness pre-commit hook is installed', async () => {
   const projectDir = gitProjectWithHook();
   // The real hook carries the marker the check looks for.
-  const real = fs.readFileSync(path.join(projectDir, '.claude', 'git-hooks', 'pre-commit'), 'utf8');
+  const real = fs.readFileSync(path.join(projectDir, '.opencode', 'git-hooks', 'pre-commit'), 'utf8');
   installPreCommit(projectDir, real);
   const result = await runHook(projectDir, HOOK, {});
   assert.strictEqual(result.status, 0);
@@ -58,7 +58,7 @@ test('is silent when this is not a git repository', async () => {
 
 test('is silent inside the harness repo itself (hooks intentionally absent)', async () => {
   const projectDir = gitProjectWithHook();
-  fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify({ name: 'claude-harness-eng-v5' }));
+  fs.writeFileSync(path.join(projectDir, 'package.json'), JSON.stringify({ name: 'opencode-harness-design' }));
   const result = await runHook(projectDir, HOOK, {});
   assert.strictEqual(result.status, 0);
   assert.strictEqual(result.stdout, '', result.stdout);

@@ -11,7 +11,7 @@ const path = require('path');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const { validate, DEFAULT_MANIFEST } = require(path.join(
-  REPO_ROOT, '.claude', 'scripts', 'validate-harness-manifest.js'
+  REPO_ROOT, '.opencode', 'scripts', 'validate-harness-manifest.js'
 ));
 
 function loadManifest() {
@@ -31,7 +31,7 @@ test('validator catches a broken wired_at reference', () => {
   const m = loadManifest();
   m.sensors.push({
     id: '__bogus__', axis: 'behaviour', type: 'computational',
-    cadence: 'commit', status: 'active', wired_at: '.claude/does-not-exist.js',
+    cadence: 'commit', status: 'active', wired_at: '.opencode/does-not-exist.js',
   });
   const { errors } = validate(m);
   assert.ok(
@@ -66,7 +66,7 @@ test('verification-matrix-gate sensor is active and wired', () => {
   assert.strictEqual(sensor.cadence, 'integration');
   assert.strictEqual(sensor.status, 'active');
   assert.strictEqual(sensor.scope, 'artifacts');
-  assert.strictEqual(sensor.wired_at, '.claude/scripts/verification-matrix-gate.js');
+  assert.strictEqual(sensor.wired_at, '.opencode/scripts/verification-matrix-gate.js');
   assert.ok(
     fs.existsSync(path.join(REPO_ROOT, sensor.wired_at)),
     'verification-matrix-gate wired_at file must exist'
@@ -81,7 +81,7 @@ test('vocabulary-check sensor is active and wired', () => {
   assert.strictEqual(sensor.cadence, 'planning');
   assert.strictEqual(sensor.status, 'active');
   assert.strictEqual(sensor.scope, 'artifacts');
-  assert.strictEqual(sensor.wired_at, '.claude/scripts/vocabulary-check.js');
+  assert.strictEqual(sensor.wired_at, '.opencode/scripts/vocabulary-check.js');
   assert.ok(
     fs.existsSync(path.join(REPO_ROOT, sensor.wired_at)),
     'vocabulary-check wired_at file must exist'
@@ -96,7 +96,7 @@ test('naming-clusters sensor is active and wired', () => {
   assert.strictEqual(sensor.cadence, 'planning');
   assert.strictEqual(sensor.status, 'active');
   assert.strictEqual(sensor.scope, 'repo');
-  assert.strictEqual(sensor.wired_at, '.claude/scripts/naming-clusters.js');
+  assert.strictEqual(sensor.wired_at, '.opencode/scripts/naming-clusters.js');
   assert.ok(
     fs.existsSync(path.join(REPO_ROOT, sensor.wired_at)),
     'naming-clusters wired_at file must exist'
